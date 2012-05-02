@@ -49,6 +49,7 @@ import org.apache.hadoop.hive.thrift.DelegationTokenIdentifier;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.security.token.delegation.AbstractDelegationTokenIdentifier;
@@ -59,6 +60,7 @@ import org.apache.hcatalog.data.schema.HCatSchema;
 import org.apache.hcatalog.data.schema.HCatSchemaUtils;
 import org.apache.hcatalog.mapreduce.FosterStorageHandler;
 import org.apache.hcatalog.mapreduce.HCatOutputFormat;
+import org.apache.hcatalog.mapreduce.HCatSplit;
 import org.apache.hcatalog.mapreduce.HCatStorageHandler;
 import org.apache.hcatalog.mapreduce.InputJobInfo;
 import org.apache.hcatalog.mapreduce.OutputJobInfo;
@@ -592,4 +594,20 @@ public class HCatUtil {
         jobConf.set(entry.getKey(), entry.getValue());
       }
     }
+
+  /**
+   * Casts an InputSplit into a HCatSplit, providing a useful error message if the cast fails.
+   * @param split the InputSplit
+   * @return the HCatSplit
+   * @throws IOException
+   */
+  public static HCatSplit castToHCatSplit(InputSplit split) throws IOException {
+    if (split instanceof HCatSplit) {
+      return (HCatSplit) split;
+    } else {
+      throw new IOException("Split must be " + HCatSplit.class.getName()
+          + " but found " + split.getClass().getName());
+    }
+  }
+
 }
