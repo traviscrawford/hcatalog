@@ -595,19 +595,4 @@ public class HCatUtil {
       }
     }
 
-  /**
-   * Casts an InputSplit into a HCatSplit, providing a useful error message if the cast fails.
-   * @param split the InputSplit
-   * @return the HCatSplit
-   * @throws IOException
-   */
-  public static HCatSplit castToHCatSplit(InputSplit split) throws IOException {
-    if (split instanceof HCatSplit) {
-      return (HCatSplit) split;
-    } else {
-      throw new IOException("Split must be " + HCatSplit.class.getName()
-          + " but found " + split.getClass().getName());
-    }
-  }
-
 }

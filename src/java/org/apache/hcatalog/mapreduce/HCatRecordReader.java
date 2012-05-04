@@ -19,7 +19,6 @@ package org.apache.hcatalog.mapreduce;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.hadoop.hive.serde2.SerDe;
 import org.apache.hadoop.hive.serde2.SerDeException;
@@ -80,7 +79,7 @@ class HCatRecordReader extends RecordReader<WritableComparable, HCatRecord> {
     public void initialize(org.apache.hadoop.mapreduce.InputSplit split,
         TaskAttemptContext taskContext) throws IOException, InterruptedException {
 
-      HCatSplit hcatSplit = HCatUtil.castToHCatSplit(split);
+      HCatSplit hcatSplit = InternalUtil.castToHCatSplit(split);
 
       baseRecordReader = createBaseRecordReader(hcatSplit, storageHandler, taskContext);
       serde = createSerDe(hcatSplit, storageHandler, taskContext);
@@ -90,19 +89,12 @@ class HCatRecordReader extends RecordReader<WritableComparable, HCatRecord> {
           taskContext.getConfiguration().get(HCatConstants.HCAT_KEY_OUTPUT_SCHEMA));
 
       if (outputSchema == null) {
-        outputSchema = ((HCatSplit) split).getTableSchema();
+        outputSchema = hcatSplit.getTableSchema();
       }
 
       // Pull the table schema out of the Split info
       // TODO This should be passed in the TaskAttemptContext instead
       dataSchema = hcatSplit.getDataSchema();
-
-      Properties properties = new Properties();
-      for (Map.Entry<String, String> param :
-          ((HCatSplit) split).getPartitionInfo()
-              .getJobProperties().entrySet()) {
-        properties.setProperty(param.getKey(), param.getValue());
-      }
     }
 
     private org.apache.hadoop.mapred.RecordReader createBaseRecordReader(HCatSplit hcatSplit,

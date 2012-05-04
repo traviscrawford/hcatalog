@@ -175,7 +175,7 @@ public abstract class HCatBaseInputFormat
   createRecordReader(InputSplit split,
       TaskAttemptContext taskContext) throws IOException, InterruptedException {
 
-    HCatSplit hcatSplit = HCatUtil.castToHCatSplit(split);
+    HCatSplit hcatSplit = InternalUtil.castToHCatSplit(split);
     PartInfo partitionInfo = hcatSplit.getPartitionInfo();
     JobContext jobContext = taskContext;
 
