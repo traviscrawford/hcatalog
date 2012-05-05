@@ -18,6 +18,7 @@
 
 package org.apache.hcatalog.mapreduce;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import junit.framework.TestCase;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.cli.CliSessionState;
@@ -49,6 +51,7 @@ import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
+import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.JobStatus;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -68,6 +71,11 @@ import org.slf4j.LoggerFactory;
 public abstract class HCatMapReduceTest extends TestCase {
 
   private static final Logger LOG = LoggerFactory.getLogger(HCatMapReduceTest.class);
+
+  protected static final String TEST_DATA_DIR = System.getProperty("user.dir")
+      + "/build/test/data/" + HCatMapReduceTest.class.getName();
+  protected static final String TEST_WAREHOUSE_DIR = TEST_DATA_DIR + "/warehouse";
+
   protected String dbName = "default";
   protected String tableName = "testHCatMapReduceTable";
 
@@ -96,11 +104,19 @@ public abstract class HCatMapReduceTest extends TestCase {
   protected void setUp() throws Exception {
     hiveConf = new HiveConf(this.getClass());
 
+    LOG.info("Using warehouse directory " + TEST_WAREHOUSE_DIR);
+    File f = new File(TEST_WAREHOUSE_DIR);
+    if (f.exists()) {
+      FileUtil.fullyDelete(f);
+    }
+    Assert.assertTrue(new File(TEST_WAREHOUSE_DIR).mkdirs());
+
     //The default org.apache.hadoop.hive.ql.hooks.PreExecutePrinter hook
     //is present only in the ql/test directory
     hiveConf.set(HiveConf.ConfVars.PREEXECHOOKS.varname, "");
     hiveConf.set(HiveConf.ConfVars.POSTEXECHOOKS.varname, "");
     hiveConf.set(HiveConf.ConfVars.HIVE_SUPPORT_CONCURRENCY.varname, "false");
+    hiveConf.set(HiveConf.ConfVars.METASTOREWAREHOUSE.varname, TEST_WAREHOUSE_DIR);
     driver = new Driver(hiveConf);
     SessionState.start(new CliSessionState(hiveConf));
 
@@ -267,6 +283,13 @@ public abstract class HCatMapReduceTest extends TestCase {
     HCatOutputFormat.setSchema(job, new HCatSchema(partitionColumns));
 
     boolean success = job.waitForCompletion(true);
+
+    // Ensure counters are set when data has actually been read.
+    if (partitionValues != null) {
+      assertTrue(job.getCounters().getGroup("FileSystemCounters")
+          .findCounter("FILE_BYTES_READ").getValue() > 0);
+    }
+
     if (success) {
       new FileOutputCommitterContainer(job,null).commitJob(job);
     } else {
