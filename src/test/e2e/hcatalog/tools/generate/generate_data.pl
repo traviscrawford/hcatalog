@@ -338,7 +338,6 @@ sub findHadoopJars()
       $coreJar = `ls $hadoopClassRoot/hadoop-core-*.jar`;
     }
 
-    my $loggingJar = `ls $hadoopClassRoot/lib/commons-logging-*.jar | grep -v api`;
     my $cfgJar = `ls $hadoopClassRoot/lib/commons-configuration-*.jar`;
     my $langJar = `ls $hadoopClassRoot/lib/commons-lang-*.jar`;
     my $cliJar = `ls $hadoopClassRoot/lib/commons-cli-*.jar`;
@@ -348,11 +347,10 @@ sub findHadoopJars()
     }
 
     chomp $coreJar;
-    chomp $loggingJar;
     chomp $cfgJar;
     chomp $langJar;
     chomp $cliJar;
-    return ($coreJar, $loggingJar, $cfgJar, $langJar, $cliJar);
+    return ($coreJar, $cfgJar, $langJar, $cliJar);
 }
 
 sub findHiveJars()
