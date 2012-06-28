@@ -125,7 +125,6 @@
           rev="${jetty.version}" conf="default"/>
         <dependency org="org.mortbay.jetty" name="jetty-util"
           rev="${jetty.version}" conf="default"/>
-	<dependency org="org.apache.commons" name="commons-compress" rev="1.4.1" conf="default"/>
 
     </dependencies>
 </ivy-module>
