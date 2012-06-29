@@ -194,7 +194,7 @@ public class PigHCatUtil {
     return rfSchema;
   }
 
-  private static ResourceSchema getBagSubSchema(HCatFieldSchema hfs) throws IOException {
+  protected static ResourceSchema getBagSubSchema(HCatFieldSchema hfs) throws IOException {
     // there are two cases - array<Type> and array<struct<...>>
     // in either case the element type of the array is represented in a
     // tuple field schema in the bag's field schema - the second case (struct)
