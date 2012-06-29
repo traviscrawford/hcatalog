@@ -200,8 +200,21 @@ public class PigHCatUtil {
     // tuple field schema in the bag's field schema - the second case (struct)
     // more naturally translates to the tuple - in the first case (array<Type>)
     // we simulate the tuple by putting the single field in a tuple
+
+    Properties props = UDFContext.getUDFContext().getClientSystemProps();
+    String innerTupleName = HCatConstants.HCAT_PIG_INNER_TUPLE_NAME_DEFAULT;
+    if (props != null && props.containsKey(HCatConstants.HCAT_PIG_INNER_TUPLE_NAME)) {
+      innerTupleName = props.getProperty(HCatConstants.HCAT_PIG_INNER_TUPLE_NAME)
+          .replaceAll("FIELDNAME", hfs.getName());
+    }
+    String innerFieldName = HCatConstants.HCAT_PIG_INNER_FIELD_NAME_DEFAULT;
+    if (props != null && props.containsKey(HCatConstants.HCAT_PIG_INNER_FIELD_NAME)) {
+      innerFieldName = props.getProperty(HCatConstants.HCAT_PIG_INNER_FIELD_NAME)
+          .replaceAll("FIELDNAME", hfs.getName());
+    }
+
     ResourceFieldSchema[] bagSubFieldSchemas = new ResourceFieldSchema[1];
-    bagSubFieldSchemas[0] = new ResourceFieldSchema().setName("innertuple")
+    bagSubFieldSchemas[0] = new ResourceFieldSchema().setName(innerTupleName)
       .setDescription("The tuple in the bag")
       .setType(DataType.TUPLE);
     HCatFieldSchema arrayElementFieldSchema = hfs.getArrayElementSchema().get(0);
@@ -214,7 +227,7 @@ public class PigHCatUtil {
       bagSubFieldSchemas[0].setSchema(s);
     } else {
       ResourceFieldSchema[] innerTupleFieldSchemas = new ResourceFieldSchema[1];
-      innerTupleFieldSchemas[0] = new ResourceFieldSchema().setName("innerfield")
+      innerTupleFieldSchemas[0] = new ResourceFieldSchema().setName(innerFieldName)
         .setDescription("The inner field in the tuple in the bag")
         .setType(getPigType(arrayElementFieldSchema))
         .setSchema(null); // the element type is not a tuple - so no subschema
