@@ -32,7 +32,7 @@ import org.apache.hadoop.hive.metastore.api.InvalidOperationException;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
-import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.mapred.HCatMapRedUtil;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.JobContext;
@@ -183,7 +183,7 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
         OutputJobInfo jobInfo = HCatOutputFormat.getJobInfo(jobContext);
         if (dynamicPartitioningUsed){
             src = new Path(getPartitionRootLocation(
-                    jobInfo.getLocation().toString(),jobInfo.getTableInfo().getTable().getPartitionKeysSize()
+                    jobInfo.getLocation().toString(),jobInfo.getTableInfo().getTable().getTTable().getPartitionKeysSize()
             ));
         }else{
             src = new Path(jobInfo.getLocation());
@@ -239,7 +239,7 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
         OutputJobInfo jobInfo = HCatOutputFormat.getJobInfo(context);
         Configuration conf = context.getConfiguration();
         Table table = jobInfo.getTableInfo().getTable();
-        Path tblPath = new Path(table.getSd().getLocation());
+        Path tblPath = new Path(table.getTTable().getSd().getLocation());
         FileSystem fs = tblPath.getFileSystem(conf);
 
         if( table.getPartitionKeys().size() == 0 ) {
@@ -275,7 +275,7 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
             HiveConf hiveConf = HCatUtil.getHiveConf(conf);
             client = HCatUtil.createHiveClient(hiveConf);
 
-            StorerInfo storer = InternalUtil.extractStorerInfo(table.getSd(),table.getParameters());
+            StorerInfo storer = InternalUtil.extractStorerInfo(table.getTTable().getSd(),table.getParameters());
 
             updateTableSchema(client, table, jobInfo.getOutputSchema());
 
@@ -421,7 +421,7 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
             Table table, FileSystem fs,
             String grpName, FsPermission perms) throws IOException {
 
-        StorageDescriptor tblSD = table.getSd();
+        StorageDescriptor tblSD = table.getTTable().getSd();
 
         Partition partition = new Partition();
         partition.setDbName(table.getDbName());
@@ -495,7 +495,7 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
     private String getFinalDynamicPartitionDestination(Table table, Map<String,String> partKVs) {
         // file:///tmp/hcat_junit_warehouse/employee/_DYN0.7770480401313761/emp_country=IN/emp_state=KA  ->
         // file:///tmp/hcat_junit_warehouse/employee/emp_country=IN/emp_state=KA
-        Path partPath = new Path(table.getSd().getLocation());
+        Path partPath = new Path(table.getTTable().getSd().getLocation());
         for(FieldSchema partKey : table.getPartitionKeys()){
             partPath = constructPartialPartPath(partPath, partKey.getName().toLowerCase(), partKVs);
         }
@@ -536,12 +536,12 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
         List<FieldSchema> newColumns = HCatUtil.validatePartitionSchema(table, partitionSchema);
 
         if( newColumns.size() != 0 ) {
-            List<FieldSchema> tableColumns = new ArrayList<FieldSchema>(table.getSd().getCols());
+            List<FieldSchema> tableColumns = new ArrayList<FieldSchema>(table.getTTable().getSd().getCols());
             tableColumns.addAll(newColumns);
 
             //Update table schema to add the newly added columns
-            table.getSd().setCols(tableColumns);
-            client.alter_table(table.getDbName(), table.getTableName(), table);
+            table.getTTable().getSd().setCols(tableColumns);
+            client.alter_table(table.getDbName(), table.getTableName(), table.getTTable());
         }
     }
 

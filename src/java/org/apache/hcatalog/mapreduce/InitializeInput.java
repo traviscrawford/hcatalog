@@ -30,7 +30,7 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
-import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hcatalog.common.ErrorType;
 import org.apache.hcatalog.common.HCatConstants;
@@ -94,8 +94,9 @@ public class InitializeInput {
         hiveConf = new HiveConf(HCatInputFormat.class);
       }
       client = HCatUtil.createHiveClient(hiveConf);
-      Table table = client.getTable(inputJobInfo.getDatabaseName(),
-                                    inputJobInfo.getTableName());
+
+      Table table =
+          HCatUtil.getTable(client, inputJobInfo.getDatabaseName(), inputJobInfo.getTableName());
 
       List<PartInfo> partInfoList = new ArrayList<PartInfo>();
 
@@ -115,18 +116,20 @@ public class InitializeInput {
 
         // populate partition info
         for (Partition ptn : parts){
-          PartInfo partInfo = extractPartInfo(ptn.getSd(),ptn.getParameters(),
-                                              job.getConfiguration(),
-                                              inputJobInfo);
+          org.apache.hadoop.hive.ql.metadata.Partition mPartition =
+              new org.apache.hadoop.hive.ql.metadata.Partition(table, ptn);
+          HCatSchema schema = HCatUtil.extractSchema(mPartition);
+          PartInfo partInfo = extractPartInfo(schema, mPartition.getTPartition().getSd(),
+              ptn.getParameters(), job.getConfiguration(), inputJobInfo);
           partInfo.setPartitionValues(createPtnKeyValueMap(table, ptn));
           partInfoList.add(partInfo);
         }
 
       }else{
         //Non partitioned table
-        PartInfo partInfo = extractPartInfo(table.getSd(),table.getParameters(),
-                                            job.getConfiguration(),
-                                            inputJobInfo);
+        HCatSchema schema = HCatUtil.extractSchema(table);
+        PartInfo partInfo = extractPartInfo(schema, table.getTTable().getSd(),
+            table.getParameters(), job.getConfiguration(), inputJobInfo);
         partInfo.setPartitionValues(new HashMap<String,String>());
         partInfoList.add(partInfo);
       }
@@ -160,10 +163,10 @@ public class InitializeInput {
     return ptnKeyValues;
   }
 
-  static PartInfo extractPartInfo(StorageDescriptor sd,
-      Map<String,String> parameters, Configuration conf,
-      InputJobInfo inputJobInfo) throws IOException{
-    HCatSchema schema = HCatUtil.extractSchemaFromStorageDescriptor(sd);
+  private static PartInfo extractPartInfo(HCatSchema schema, StorageDescriptor sd,
+      Map<String, String> parameters, Configuration conf, InputJobInfo inputJobInfo)
+      throws IOException {
+
     StorerInfo storerInfo = InternalUtil.extractStorerInfo(sd,parameters);
 
     Properties hcatProperties = new Properties();

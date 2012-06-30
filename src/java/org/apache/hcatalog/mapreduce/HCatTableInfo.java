@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import org.apache.hadoop.hive.metastore.MetaStoreUtils;
-import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hcatalog.common.HCatUtil;
 import org.apache.hcatalog.data.schema.HCatSchema;
 
@@ -118,7 +118,7 @@ public class HCatTableInfo implements Serializable {
   }
 
   public String getTableLocation() {
-      return table.getSd().getLocation();
+    return table.getTTable().getSd().getLocation();
   }
 
   /**
@@ -137,14 +137,16 @@ public class HCatTableInfo implements Serializable {
    * @throws IOException
    */
   static HCatTableInfo valueOf(Table table) throws IOException {
-    HCatSchema dataColumns = 
-        HCatUtil.extractSchemaFromStorageDescriptor(table.getSd());
-    StorerInfo storerInfo = 
-        InternalUtil.extractStorerInfo(table.getSd(), table.getParameters());
+
+    HCatSchema schema = HCatUtil.extractSchema(table);
+
+    StorerInfo storerInfo =
+        InternalUtil.extractStorerInfo(table.getTTable().getSd(), table.getParameters());
+
     HCatSchema partitionColumns = HCatUtil.getPartitionColumns(table);
     return new HCatTableInfo(table.getDbName(),
                              table.getTableName(),
-                             dataColumns,
+                             schema,
                              partitionColumns,
                              storerInfo,
                              table);
