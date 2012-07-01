@@ -42,6 +42,7 @@ import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.Partition;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
@@ -162,7 +163,11 @@ public class HCatUtil {
     }
 
     public static HCatSchema extractSchema(Partition partition) throws HCatException {
+      try {
         return new HCatSchema(HCatUtil.getHCatFieldSchemaList(partition.getCols()));
+      } catch (HiveException e) {
+        throw new HCatException("Failed extracting schema from partition " + partition, e);
+      }
     }
 
     public static List<FieldSchema> getFieldSchemaList(

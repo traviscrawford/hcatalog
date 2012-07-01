@@ -161,7 +161,7 @@ public class HCatOutputFormat extends HCatBaseOutputFormat {
        HCatStorageHandler storageHandler = HCatUtil.getStorageHandler(job.getConfiguration(), storerInfo);
 
         //Serialize the output info into the configuration
-        outputJobInfo.setTableInfo(HCatTableInfo.valueOf(table));
+        outputJobInfo.setTableInfo(HCatTableInfo.valueOf(table.getTTable()));
         outputJobInfo.setOutputSchema(tableSchema);
         harRequested = getHarRequested(hiveConf);
         outputJobInfo.setHarRequested(harRequested);

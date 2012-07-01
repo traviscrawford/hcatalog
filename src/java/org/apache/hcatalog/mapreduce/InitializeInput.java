@@ -100,7 +100,7 @@ public class InitializeInput {
 
       List<PartInfo> partInfoList = new ArrayList<PartInfo>();
 
-      inputJobInfo.setTableInfo(HCatTableInfo.valueOf(table));
+      inputJobInfo.setTableInfo(HCatTableInfo.valueOf(table.getTTable()));
       if( table.getPartitionKeys().size() != 0 ) {
         //Partitioned table
         List<Partition> parts = client.listPartitionsByFilter(inputJobInfo.getDatabaseName(),

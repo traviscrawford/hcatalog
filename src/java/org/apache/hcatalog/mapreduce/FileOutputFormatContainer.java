@@ -120,7 +120,7 @@ class FileOutputFormatContainer extends OutputFormatContainer {
             handleDuplicatePublish(context,
                     jobInfo,
                     client,
-                    jobInfo.getTableInfo().getTable());
+                    new Table(jobInfo.getTableInfo().getTable()));
         } catch (MetaException e) {
             throw new IOException(e);
         } catch (TException e) {
