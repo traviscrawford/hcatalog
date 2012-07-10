@@ -136,7 +136,7 @@
                findbugsReportHtmlFile="${findbugs.report.htmlfile}"
                sourceDir="${basedir}/src/main/java"
                jarDir="${build.dir}"
-               classPathJarDir="${build.dir}/ivy/test"/>
+               classPathRef="findbugs.class.path"/>
   </target>
 
   <import file="${basedir}/../ant/findbugs.xml"/>

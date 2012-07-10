@@ -28,7 +28,7 @@
     <attribute name="findbugsReportHtmlFile"/>
     <attribute name="sourceDir"/>
     <attribute name="jarDir"/>
-    <attribute name="classPathJarDir"/>
+    <attribute name="classPathRef"/>
     <sequential>
       <mkdir dir="@{outputDir}"/>
       <findbugs
@@ -40,9 +40,7 @@
           excludeFilter="@{excludeFilter}"
           jvmargs="-Xmx1024M">
         <auxClasspath>
-          <fileset dir="@{classPathJarDir}">
-            <include name="**/*.jar"/>
-          </fileset>
+          <path refid="@{classPathRef}"/>
         </auxClasspath>
         <sourcePath path="@{sourceDir}"/>
         <fileset dir="@{jarDir}">
@@ -55,19 +53,11 @@
     </sequential>
   </macrodef>
 
-  <target name="init-findbugs" depends="findbugs.check">
+  <target name="init-findbugs">
+    <available property="findbugs.present" file="${findbugs.home}/lib/findbugs.jar"/>
+    <fail message="'findbugs.home' is not defined. Please pass -Dfindbugs.home=&lt;base of Findbugs installation&gt; to Ant on the command-line." unless="findbugs.present"/>
     <taskdef name="findbugs"
              classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
              classpath="${findbugs.home}/lib/findbugs-ant.jar"/>
   </target>
-
-  <target name="check-for-findbugs">
-    <available property="findbugs.present" file="${findbugs.home}/lib/findbugs.jar"/>
-  </target>
-
-  <target name="findbugs.check" depends="check-for-findbugs" unless="findbugs.present">
-     <fail message="'findbugs.home' is not defined. Please pass -Dfindbugs.home=&lt;base of Findbugs installation&gt; 
-        to Ant on the command-line." />
-  </target>
-
 </project>
