@@ -86,6 +86,8 @@
     <echo message="${ant.project.name}"/>
     <ivy:retrieve sync="true"
       pattern="${build.dir}/ivy/[conf]/[organization]-[artifact]-[revision](-[classifier]).[ext]"/>
+    <ivy:makepom ivyfile="${basedir}/ivy.xml"
+      pomfile="${build.dir}/ivy/${ant.project.name}-${hcatalog.version}.pom"/>
   </target>
 
   <target name="ivy-publish">

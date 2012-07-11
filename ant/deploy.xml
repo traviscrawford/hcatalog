@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+<project xmlns:ivy="antlib:org.apache.ivy.ant"
+         xmlns:artifact="artifact:org.apache.maven.artifact.ant">
+
+  <macrodef name="_sign">
+    <attribute name="inputFile"/>
+    <sequential>
+      <echo>Signing @{inputFile}</echo>
+      <exec executable="gpg">
+        <arg value="--armor"/>
+        <arg value="--output"/>
+        <arg value="@{inputFile}.asc"/>
+        <arg value="--passphrase"/>
+        <arg value="${gpg.passphrase}"/>
+        <arg value="--detach-sig"/>
+        <arg value="@{inputFile}"/>
+      </exec>
+    </sequential>
+  </macrodef>
+
+  <target name="init-maven">
+    <taskdef resource="org/apache/maven/artifact/ant/antlib.xml"
+             uri="artifact:org.apache.maven.artifact.ant"
+             classpath="build/ivy/lib/hcatalog/maven-ant-tasks-${maven-ant-tasks.version}.jar"/>
+  </target>
+
+  <target name="mvn-install" depends="init-maven"
+          description="Install HCatalog in your local maven repository">
+
+    <input message="password:>" addproperty="gpg.passphrase">
+      <handler classname="org.apache.tools.ant.input.SecureInputHandler"/>
+    </input>
+
+    <_sign inputFile="${build.dir}/hcatalog/hcatalog-${hcatalog.version}.jar"/>
+    <_sign inputFile="${build.dir}/hcatalog/hcatalog-core-${hcatalog.version}.jar"/>
+    <_sign inputFile="${build.dir}/hcatalog/hcatalog-server-extensions-${hcatalog.version}.jar"/>
+    <_sign inputFile="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom"/>
+    <_sign inputFile="${basedir}/hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
+    <_sign inputFile="${basedir}/hcatalog-pig-adapter/build/ivy/hcatalog-pig-adapter-${hcatalog.version}.pom"/>
+
+    <artifact:install file="${build.dir}/hcatalog/hcatalog-${hcatalog.version}.jar">
+      <artifact:pom file="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom"/>
+      <attach file="${build.dir}/hcatalog/hcatalog-${hcatalog.version}.jar.asc" type="jar.asc"/>
+      <attach file="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom.asc" type="pom.asc"/>
+    </artifact:install>
+
+    <artifact:install file="${build.dir}/hcatalog/hcatalog-core-${hcatalog.version}.jar">
+      <artifact:pom file="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom"/>
+      <attach file="${build.dir}/hcatalog/hcatalog-core-${hcatalog.version}.jar.asc" type="jar.asc"/>
+      <attach file="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom.asc" type="pom.asc"/>
+    </artifact:install>
+
+    <artifact:install file="${build.dir}/hcatalog/hcatalog-server-extensions-${hcatalog.version}.jar">
+      <artifact:pom file="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom"/>
+      <attach file="${build.dir}/hcatalog/hcatalog-server-extensions-${hcatalog.version}.jar.asc" type="jar.asc"/>
+      <attach file="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom.asc" type="pom.asc"/>
+    </artifact:install>
+
+    <artifact:install file="${basedir}/hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar">
+      <artifact:pom file="hcatalog-pig-adapter/build/ivy/hcatalog-pig-adapter-${hcatalog.version}.pom"/>
+      <attach file="${basedir}/hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar.asc" type="jar.asc"/>
+      <attach file="hcatalog-pig-adapter/build/ivy/hcatalog-pig-adapter-${hcatalog.version}.pom.asc" type="pom.asc"/>
+    </artifact:install>
+  </target>
+
+</project>
