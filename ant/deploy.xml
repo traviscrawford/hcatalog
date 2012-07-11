@@ -50,9 +50,11 @@
     </input>
 
     <_sign inputFile="${build.dir}/hcatalog/hcatalog-${hcatalog.version}.jar"/>
-    <_sign inputFile="${build.dir}/hcatalog/hcatalog-core-${hcatalog.version}.jar"/>
-    <_sign inputFile="${build.dir}/hcatalog/hcatalog-server-extensions-${hcatalog.version}.jar"/>
     <_sign inputFile="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom"/>
+    <_sign inputFile="${build.dir}/hcatalog/hcatalog-core-${hcatalog.version}.jar"/>
+    <_sign inputFile="${build.ivy.dir}/hcatalog-core-${hcatalog.version}.pom"/>
+    <_sign inputFile="${build.dir}/hcatalog/hcatalog-server-extensions-${hcatalog.version}.jar"/>
+    <_sign inputFile="${build.ivy.dir}/hcatalog-server-extensions-${hcatalog.version}.pom"/>
     <_sign inputFile="${basedir}/hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
     <_sign inputFile="${basedir}/hcatalog-pig-adapter/build/ivy/hcatalog-pig-adapter-${hcatalog.version}.pom"/>
 
@@ -71,9 +73,9 @@
     <_install jarFile="${build.dir}/hcatalog/hcatalog-${hcatalog.version}.jar"
       pomFile="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom"/>
     <_install jarFile="${build.dir}/hcatalog/hcatalog-core-${hcatalog.version}.jar"
-      pomFile="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom"/>
+      pomFile="${build.ivy.dir}/hcatalog-core-${hcatalog.version}.pom"/>
     <_install jarFile="${build.dir}/hcatalog/hcatalog-server-extensions-${hcatalog.version}.jar"
-      pomFile="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom"/>
+      pomFile="${build.ivy.dir}/hcatalog-server-extensions-${hcatalog.version}.pom"/>
     <_install jarFile="${basedir}/hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"
       pomFile="hcatalog-pig-adapter/build/ivy/hcatalog-pig-adapter-${hcatalog.version}.pom"/>
   </target>
