@@ -56,29 +56,26 @@
     <_sign inputFile="${basedir}/hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
     <_sign inputFile="${basedir}/hcatalog-pig-adapter/build/ivy/hcatalog-pig-adapter-${hcatalog.version}.pom"/>
 
-    <artifact:install file="${build.dir}/hcatalog/hcatalog-${hcatalog.version}.jar">
-      <artifact:pom file="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom"/>
-      <attach file="${build.dir}/hcatalog/hcatalog-${hcatalog.version}.jar.asc" type="jar.asc"/>
-      <attach file="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom.asc" type="pom.asc"/>
-    </artifact:install>
+    <macrodef name="_install">
+      <attribute name="jarFile"/>
+      <attribute name="pomFile"/>
+      <sequential>
+        <artifact:install file="@{jarFile}">
+          <artifact:pom file="@{pomFile}"/>
+          <attach file="@{jarFile}.asc" type="jar.asc"/>
+          <attach file="@{pomFile}.asc" type="pom.asc"/>
+        </artifact:install>
+      </sequential>
+    </macrodef>
 
-    <artifact:install file="${build.dir}/hcatalog/hcatalog-core-${hcatalog.version}.jar">
-      <artifact:pom file="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom"/>
-      <attach file="${build.dir}/hcatalog/hcatalog-core-${hcatalog.version}.jar.asc" type="jar.asc"/>
-      <attach file="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom.asc" type="pom.asc"/>
-    </artifact:install>
-
-    <artifact:install file="${build.dir}/hcatalog/hcatalog-server-extensions-${hcatalog.version}.jar">
-      <artifact:pom file="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom"/>
-      <attach file="${build.dir}/hcatalog/hcatalog-server-extensions-${hcatalog.version}.jar.asc" type="jar.asc"/>
-      <attach file="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom.asc" type="pom.asc"/>
-    </artifact:install>
-
-    <artifact:install file="${basedir}/hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar">
-      <artifact:pom file="hcatalog-pig-adapter/build/ivy/hcatalog-pig-adapter-${hcatalog.version}.pom"/>
-      <attach file="${basedir}/hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar.asc" type="jar.asc"/>
-      <attach file="hcatalog-pig-adapter/build/ivy/hcatalog-pig-adapter-${hcatalog.version}.pom.asc" type="pom.asc"/>
-    </artifact:install>
+    <_install jarFile="${build.dir}/hcatalog/hcatalog-${hcatalog.version}.jar"
+      pomFile="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom"/>
+    <_install jarFile="${build.dir}/hcatalog/hcatalog-core-${hcatalog.version}.jar"
+      pomFile="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom"/>
+    <_install jarFile="${build.dir}/hcatalog/hcatalog-server-extensions-${hcatalog.version}.jar"
+      pomFile="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom"/>
+    <_install jarFile="${basedir}/hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"
+      pomFile="hcatalog-pig-adapter/build/ivy/hcatalog-pig-adapter-${hcatalog.version}.pom"/>
   </target>
 
 </project>
