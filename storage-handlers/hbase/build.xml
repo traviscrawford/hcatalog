@@ -217,15 +217,21 @@
     </target>
 
     <target name="javadoc" depends="jar" description="Create documentation">
-        <mkdir dir="${build.javadoc}" />
-        <javadoc packagenames="org.apache.hcatalog.*" destdir="${build.javadoc}" author="true" version="true" use="true"
-        windowtitle="HCatalog ${hcatalog.version} API" doctitle="HCatalog ${hcatalog.version} API" sourcepath="${src.dir}:${basedir}/src/gen-java">
-            <!--<packageset dir="${src.dir}" /> -->
-            <classpath>
-                <path refid="classpath" />
-            </classpath>
-            <group title="hcatalog" packages="org.apache.hcatalog.*" />
-        </javadoc>
+        <mkdir dir="${build.javadoc}"/>
+        <javadoc
+          packagenames="org.apache.hcatalog.*"
+          destdir="${build.javadoc}"
+          author="true"
+          version="true"
+          use="true"
+          windowtitle="HCatalog ${hcatalog.version} API"
+          doctitle="HCatalog ${hcatalog.version} API"
+          sourcepath="${src.dir}:${basedir}/src/gen-java">
+        <classpath>
+          <path refid="ivy.default.classpath"/>
+        </classpath>
+        <group title="hcatalog" packages="org.apache.hcatalog.*"/>
+      </javadoc>
     </target>
 
 

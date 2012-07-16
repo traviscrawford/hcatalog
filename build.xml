@@ -494,7 +494,7 @@
              failonerror="true">
       <packageset dir="${src.dir}" />
         <classpath>
-          <path refid="classpath" />
+          <path refid="ivy.default.classpath"/>
         </classpath>
         <group title="hcatalog" packages="org.apache.hcatalog.*" />
     </javadoc>
