@@ -57,9 +57,7 @@
   <target name="_ivy-init" depends="ivy-init-antlib" unless="_ivy-init.complete">
     <echo message="${ant.project.name}"/>
     <ivy:configure file="${ivysettings.xml}"/>
-    <ivy:makepom ivyfile="${ivy.xml}" pomfile="${pom.file}">
-      <mapping conf="compile" scope="compile"/>
-    </ivy:makepom>
+    <ivy:makepom ivyfile="${ivy.xml}" pomfile="${pom.file}"/>
     <property name="_ivy-init.complete" value="true"/>
   </target>
 
@@ -71,7 +69,7 @@
     <echo message="${ant.project.name}"/>
     <ivy:retrieve sync="true"
       pattern="${build.dir}/ivy/lib/[conf]/[organization]-[artifact]-[revision](-[classifier]).[ext]"/>
-    <ivy:cachepath pathid="ivy.compile.classpath" conf="compile"/>
+    <ivy:cachepath pathid="ivy.default.classpath" conf="default"/>
     <ivy:cachepath pathid="ivy.test.classpath" conf="test"/>
     <property name="ivy-retrieve.complete" value="true"/>
   </target>

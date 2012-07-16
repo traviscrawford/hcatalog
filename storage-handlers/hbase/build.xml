@@ -126,7 +126,7 @@
                source="${javac.version}" deprecation="${javac.deprecation}"
                includeantruntime="false">
             <compilerarg line="${javac.args}"/>
-            <classpath refid="ivy.compile.classpath"/>
+            <classpath refid="ivy.default.classpath"/>
         </javac>
     </target>
 

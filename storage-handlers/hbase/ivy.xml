@@ -23,13 +23,13 @@
         <description>Apache HCatalog</description>
     </info>
 
-    <configurations defaultconfmapping="compile">
-      <conf name="compile"/>
-      <conf name="test" extends="compile"/>
+    <configurations defaultconfmapping="default">
+      <conf name="default"/>
+      <conf name="test" extends="default"/>
     </configurations>
 
     <dependencies>
-      <dependency org="org.apache.hcatalog" name="hcatalog-core" rev="${hcatalog.version}" conf="compile->default"/>
+      <dependency org="org.apache.hcatalog" name="hcatalog-core" rev="${hcatalog.version}"/>
 
         <dependency org="org.apache.hbase" name="hbase" rev="${hbase.version}">
             <artifact name="hbase" type="jar" ext="jar"/>
@@ -44,16 +44,11 @@
         <dependency org="org.apache.hadoop" name="hadoop-test" rev="${hadoop-test.version}"/>
         <dependency org="log4j" name="log4j" rev="${log4j.version}"/>
 
-        <dependency org="org.apache.hive" name="hive-metastore" rev="${hive.version}"
-            conf="compile->default"/>
-        <dependency org="org.apache.hive" name="hive-common" rev="${hive.version}"
-            conf="compile->default"/>
-        <dependency org="org.apache.hive" name="hive-exec" rev="${hive.version}"
-            conf="compile->default"/>
-        <dependency org="org.apache.hive" name="hive-cli" rev="${hive.version}"
-            conf="compile->default"/>
-        <dependency org="org.apache.hive" name="hive-hbase-handler" rev="${hive.version}"
-            conf="compile->default">
+        <dependency org="org.apache.hive" name="hive-metastore" rev="${hive.version}"/>
+        <dependency org="org.apache.hive" name="hive-common" rev="${hive.version}"/>
+        <dependency org="org.apache.hive" name="hive-exec" rev="${hive.version}"/>
+        <dependency org="org.apache.hive" name="hive-cli" rev="${hive.version}"/>
+        <dependency org="org.apache.hive" name="hive-hbase-handler" rev="${hive.version}">
           <exclude org="org.apache.maven.plugins"/>
           <exclude org="org.jruby"/>
         </dependency>

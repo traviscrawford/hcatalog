@@ -219,7 +219,7 @@
         source="${javac.version}" deprecation="${javac.deprecation}"
         includeantruntime="false">
       <compilerarg line="${javac.args}"/>
-      <classpath refid="ivy.compile.classpath"/>
+      <classpath refid="ivy.default.classpath"/>
     </javac>
     <!-- compile shim for selected hadoop version -->
     <!--property name="debugclasspath" refid="classpath"/>
@@ -230,7 +230,7 @@
         source="${javac.version}" deprecation="${javac.deprecation}"
         includeantruntime="false">
       <compilerarg line="${javac.args}"/>
-      <classpath refid="ivy.compile.classpath"/>
+      <classpath refid="ivy.default.classpath"/>
     </javac>
   </target>
  
