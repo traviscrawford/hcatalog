@@ -62,15 +62,17 @@
     <property name="ivy-init.complete" value="true"/>
   </target>
 
-  <target name="ivy-retrieve" depends="ivy-init" description="Retrieve Ivy dependencies">
+  <target name="ivy-retrieve" depends="ivy-init" description="Retrieve Ivy dependencies"
+      unless="ivy-retrieve.complete">
     <echo message="${ant.project.name}"/>
     <ivy:retrieve sync="true"
       pattern="${build.dir}/ivy/[conf]/[organization]-[artifact]-[revision](-[classifier]).[ext]"/>
     <ivy:cachepath pathid="ivy.default.classpath" conf="default"/>
     <ivy:cachepath pathid="ivy.test.classpath" conf="test"/>
+    <property name="ivy-retrieve.complete" value="true"/>
   </target>
 
-  <target name="ivy-report" depends="ivy-retrieve" description="Generate Ivy dependency report">
+  <target name="_ivy-report" depends="ivy-retrieve" description="Generate Ivy dependency report">
     <ivy:report todir="${build.ivy.report.dir}" graph="false"/>
   </target>
 

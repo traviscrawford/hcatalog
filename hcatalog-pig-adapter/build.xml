@@ -18,7 +18,6 @@
 -->
 
 <project name="hcatalog-pig-adapter">
-  <import file="../build-common-new.xml"/>
 
   <path id="compile.class.path">
     <fileset dir="${build.dir}/ivy/default"/>
@@ -42,5 +41,8 @@
       <include name="**/hcatalog-core-*.jar"/>
     </fileset>
   </path>
+
+  <import file="../build-common-new.xml"/>
+  <import file="../ant/dependencies.xml"/>
 
 </project>
