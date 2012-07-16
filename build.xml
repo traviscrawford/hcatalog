@@ -308,7 +308,7 @@
         includeantruntime="false">
       <compilerarg line="${javac.args}"/>
       <classpath>
-        <path refid="test.classpath"/>
+        <path refid="ivy.test.classpath"/>
         <pathelement path="hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
       </classpath>
     </javac>
