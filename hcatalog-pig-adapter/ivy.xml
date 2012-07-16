@@ -32,5 +32,9 @@
   <dependencies>
     <dependency org="org.apache.hcatalog" name="hcatalog-core" rev="${hcatalog.version}"/>
     <dependency org="org.apache.pig" name="pig" rev="${pig.version}"/>
+
+    <!-- test dependencies -->
+    <dependency org="junit" name="junit" rev="${junit.version}" conf="test->default"/>
+    <dependency org="org.apache.hadoop" name="hadoop-test" rev="${hadoop-test.version}" conf="test->default"/>
   </dependencies>
 </ivy-module>

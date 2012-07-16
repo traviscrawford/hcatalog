@@ -125,49 +125,16 @@
   <property name="package.buildroot" value="${build.dir}/rpm/hcatalog_package_build_${user.name}"/>
   <property name="package.build.dir" value="${build.dir}/rpm/hcatalog_package_build_${user.name}/BUILD"/>
 
-  <condition property="os-arch" value="x86_64">
-      <and>
-	<os arch="amd64" />
-      </and>
-    </condition>
-    <condition property="os-arch" value="i386">
-      <or>
-	<os arch="i386" />
-	<os arch="i486" />
-	<os arch="i586" />
-	<os arch="i686" />
-      </or>
-    </condition>
-
   <!-- rats properties -->
   <property name="rat.reporting.classname" value="rat.Report"/>
 
-  <!--this is the naming policy for artifacts we want pulled down-->
-  <property name="ivy.artifact.retrieve.pattern" value="${ant.project.name}/[artifact]-[revision](-[classifier]).[ext]"/>
-
-  <!-- Classpaths for various builds -->
-  <condition property="os-arch" value="x86_64">
-    <and>
-      <os arch="amd64" />
-    </and>
-  </condition>
-  <condition property="os-arch" value="i386">
-    <or>
-      <os arch="i386" />
-      <os arch="i486" />
-      <os arch="i586" />
-      <os arch="i686" />
-    </or>
-  </condition>
-
   <path id="test.classpath">
-    <pathelement location="${test.build.classes}" />
-    <pathelement location="${build.classes}" />
+    <pathelement location="${test.build.classes}"/>
+    <pathelement location="${build.classes}"/>
     <pathelement location="conf"/>
-    <fileset dir="${ivy.lib.dir}">
-      <include name="**/*.jar" />
-    </fileset>
-    <pathelement location="${hcatalog.jar}"/>
+    <path refid="ivy.test.classpath"/>
+    <pathelement location="${build.dir}/${ant.project.name}/${hcatalog.core.jar}"/>
+    <pathelement location="${basedir}/hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
   </path>
 
   <!-- This is a little janky because hcatalog-core.jar is not yet a submodule. -->
@@ -301,16 +268,20 @@
   -->
   <!-- Build HCatalog test files -->
   <target name="compile-test" depends="jar">
-    <javac encoding="${build.encoding}" srcdir="${test.src.dir}" excludes="${test.excludes}"
-        includes="**/*.java" destdir="${test.build.classes}" debug="${javac.debug}"
-        optimize="${javac.optimize}" target="${javac.version}"
-        source="${javac.version}" deprecation="${javac.deprecation}"
+    <javac
+        encoding="${build.encoding}"
+        srcdir="${test.src.dir}"
+        excludes="${test.excludes}"
+        includes="**/*.java"
+        destdir="${test.build.classes}"
+        debug="${javac.debug}"
+        optimize="${javac.optimize}"
+        target="${javac.version}"
+        source="${javac.version}"
+        deprecation="${javac.deprecation}"
         includeantruntime="false">
       <compilerarg line="${javac.args}"/>
-      <classpath>
-        <path refid="ivy.test.classpath"/>
-        <pathelement path="hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
-      </classpath>
+      <classpath refid="test.classpath"/>
     </javac>
   </target>
 

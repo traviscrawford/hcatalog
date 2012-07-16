@@ -62,10 +62,10 @@
     </dependency>
 
     <!-- test dependencies -->
-    <dependency org="junit" name="junit" rev="${junit.version}" conf="test->compile"/>
-    <dependency org="org.vafer" name="jdeb" rev="${jdeb.version}" conf="test->compile"/>
-    <dependency org="com.google.code.p.arat" name="rat-lib" rev="${rats-lib.version}" conf="test->compile"/>
-    <dependency org="org.apache.hadoop" name="hadoop-test" rev="${hadoop-test.version}" conf="test->compile"/>
+    <dependency org="junit" name="junit" rev="${junit.version}" conf="test->default"/>
+    <dependency org="org.vafer" name="jdeb" rev="${jdeb.version}" conf="test->default"/>
+    <dependency org="com.google.code.p.arat" name="rat-lib" rev="${rats-lib.version}" conf="test->default"/>
+    <dependency org="org.apache.hadoop" name="hadoop-test" rev="${hadoop-test.version}" conf="test->default"/>
     <dependency org="org.apache.maven" name="maven-ant-tasks" rev="${maven-ant-tasks.version}" conf="test->*"/>
 
   </dependencies>

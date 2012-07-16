@@ -67,7 +67,7 @@
   <target name="ivy-init" depends="_ivy-init"/>
 
   <target name="_check-ivy-retrieve" unless="ivy-retrieve.complete">
-      <available property="ivy-retrieve.complete" file="${build.dir}/ivy/lib/.ivy-retrieve.complete"/>
+    <available property="ivy-retrieve.complete" file="${build.dir}/ivy/lib/.ivy-retrieve.complete"/>
   </target>
 
   <target name="ivy-retrieve" depends="ivy-init" description="Retrieve Ivy dependencies"
