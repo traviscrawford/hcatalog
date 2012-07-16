@@ -24,9 +24,9 @@
     <description>Apache HCatalog</description>
   </info>
 
-  <configurations defaultconfmapping="default">
-    <conf name="default"/>
-    <conf name="test" extends="default" visibility="private"/>
+  <configurations defaultconfmapping="compile">
+    <conf name="compile"/>
+    <conf name="test" extends="compile" visibility="private"/>
   </configurations>
 
   <dependencies>

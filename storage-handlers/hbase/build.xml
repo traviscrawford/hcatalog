@@ -99,12 +99,6 @@
     <!--this is the naming policy for artifacts we want pulled down-->
     <property name="ivy.artifact.retrieve.pattern" value="${ant.project.name}/[artifact]-[revision](-[classifier]).[ext]"/>
 
-    <!-- Classpaths for various builds -->
-    <path id="classpath">
-        <fileset dir="${hcatalog.dir}/build/hcatalog" includes=" *.jar"/>
-        <path refid="ivy.default.classpath"/>
-    </path>
-
     <path id="test.classpath">
         <pathelement location="${test.build.classes}" />
         <pathelement location="${build.classes}" />
@@ -132,7 +126,7 @@
                source="${javac.version}" deprecation="${javac.deprecation}"
                includeantruntime="false">
             <compilerarg line="${javac.args}"/>
-            <classpath refid="classpath" />
+            <classpath refid="ivy.compile.classpath"/>
         </javac>
     </target>
 

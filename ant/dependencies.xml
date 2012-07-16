@@ -24,6 +24,7 @@
      Also note how we skip loading Ivy if it is already there, just to make sure all is well.
   -->
   <target name="ivy-init-antlib" depends="ivy-download,ivy-init-dirs,ivy-probe-antlib" unless="ivy.found">
+    <echo message="${ant.project.name}"/>
     <typedef uri="antlib:org.apache.ivy.ant" onerror="fail" loaderRef="ivyLoader">
       <classpath>
         <pathelement location="${ivy.jar}"/>
@@ -55,19 +56,24 @@
     <get src="${ivy_repo_url}" dest="${ivy.jar}" usetimestamp="true" skipexisting="true"/>
   </target>
 
-  <target name="ivy-init" depends="ivy-init-antlib" unless="ivy-init.complete">
+  <target name="_ivy-init" depends="ivy-init-antlib" unless="_ivy-init.complete">
     <echo message="${ant.project.name}"/>
     <ivy:configure file="${ivysettings.xml}"/>
-    <ivy:makepom ivyfile="${ivy.xml}" pomfile="${pom.file}"/>
-    <property name="ivy-init.complete" value="true"/>
+    <ivy:makepom ivyfile="${ivy.xml}" pomfile="${pom.file}">
+      <mapping conf="default" scope="compile"/>
+    </ivy:makepom>
+    <property name="_ivy-init.complete" value="true"/>
   </target>
+
+  <!-- Two level thing so it can be overridden. -->
+  <target name="ivy-init" depends="_ivy-init"/>
 
   <target name="ivy-retrieve" depends="ivy-init" description="Retrieve Ivy dependencies"
       unless="ivy-retrieve.complete">
     <echo message="${ant.project.name}"/>
     <ivy:retrieve sync="true"
-      pattern="${build.dir}/ivy/[conf]/[organization]-[artifact]-[revision](-[classifier]).[ext]"/>
-    <ivy:cachepath pathid="ivy.default.classpath" conf="default"/>
+      pattern="${build.dir}/ivy/lib/[conf]/[organization]-[artifact]-[revision](-[classifier]).[ext]"/>
+    <ivy:cachepath pathid="ivy.compile.classpath" conf="compile"/>
     <ivy:cachepath pathid="ivy.test.classpath" conf="test"/>
     <property name="ivy-retrieve.complete" value="true"/>
   </target>

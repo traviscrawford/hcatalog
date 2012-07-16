@@ -18,7 +18,9 @@
 -->
 
 
-<project name="hcatalog" default="jar" xmlns:ivy="antlib:org.apache.ivy.ant" >
+<project name="hcatalog" default="jar"
+         xmlns:ivy="antlib:org.apache.ivy.ant"
+         xmlns:artifact="artifact:org.apache.maven.artifact.ant">
   <!--  
   ================================================================================
   Imports
@@ -175,6 +177,24 @@
     <ant target="ivy-report" dir="storage-handlers" inheritAll="false" useNativeBasedir="true"/>
   </target>
 
+  <target name="ivy-init" depends="_ivy-init">
+    <!-- HCatalog started as a single source tree that produced multiple artifacts.
+    Currently its going through a transition to subprojects. During this transition
+    we jank together pom files for artifacts produced in the existing source tree until
+    they are correctly generated from per-subproject ivy.xml files. -->
+    <copy file="${pom.file}" tofile="${build.ivy.dir}/hcatalog-core-${hcatalog.version}.pom"
+      overwrite="true"/>
+    <replace file="${build.ivy.dir}/hcatalog-core-${hcatalog.version}.pom"
+      token="artifactId>hcatalog"
+      value="artifactId>hcatalog-core"/>
+
+    <copy file="${pom.file}" overwrite="true"
+      tofile="${build.ivy.dir}/hcatalog-server-extensions-${hcatalog.version}.pom"/>
+    <replace file="${build.ivy.dir}/hcatalog-server-extensions-${hcatalog.version}.pom"
+      token="artifactId>hcatalog"
+      value="artifactId>hcatalog-server-extensions"/>
+  </target>
+
   <target name="init" depends="ivy-retrieve">
     <mkdir dir="${dist.dir}" />
     <mkdir dir="${build.classes}" />
@@ -194,7 +214,7 @@
         source="${javac.version}" deprecation="${javac.deprecation}"
         includeantruntime="false">
       <compilerarg line="${javac.args}"/>
-      <classpath refid="ivy.default.classpath"/>
+      <classpath refid="ivy.compile.classpath"/>
     </javac>
     <!-- compile shim for selected hadoop version -->
     <!--property name="debugclasspath" refid="classpath"/>
@@ -205,14 +225,17 @@
         source="${javac.version}" deprecation="${javac.deprecation}"
         includeantruntime="false">
       <compilerarg line="${javac.args}"/>
-      <classpath refid="ivy.default.classpath"/>
+      <classpath refid="ivy.compile.classpath"/>
     </javac>
   </target>
  
   <!-- Build the hcatalog client jar -->
-  <target name="clientjar" depends="compile-src">
+  <target name="clientjar" depends="compile-src,mvn-init">
     <jar jarfile="${build.dir}/${ant.project.name}/${hcatalog.core.jar}"
          basedir="${build.classes}"/>
+    <artifact:install file="${build.dir}/${ant.project.name}/${hcatalog.core.jar}">
+      <artifact:pom file="${build.ivy.dir}/hcatalog-core-${hcatalog.version}.pom"/>
+    </artifact:install>
   </target>
 
   <!--
@@ -643,6 +666,7 @@
     </target>
 
   <import file="ant/dependencies.xml"/>
+  <import file="ant/deploy.xml"/>
   <import file="ant/findbugs.xml"/>
 
 </project>

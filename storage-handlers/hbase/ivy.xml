@@ -23,13 +23,13 @@
         <description>Apache HCatalog</description>
     </info>
 
-    <configurations defaultconfmapping="default">
-        <conf name="default"/>
-        <conf name="test" extends="default"/>
+    <configurations defaultconfmapping="compile">
+      <conf name="compile"/>
+      <conf name="test" extends="compile"/>
     </configurations>
 
     <dependencies>
-      <dependency org="org.apache.hcatalog" name="hcatalog" rev="${hcatalog.version}"/>
+      <dependency org="org.apache.hcatalog" name="hcatalog-core" rev="${hcatalog.version}"/>
 
         <dependency org="org.apache.hbase" name="hbase" rev="${hbase.version}">
             <artifact name="hbase" type="jar" ext="jar"/>
@@ -49,7 +49,8 @@
         <dependency org="org.apache.hive" name="hive-exec" rev="${hive.version}"/>
 
         <!-- hbase test dependencies -->
-        <dependency org="com.github.stephenc.high-scale-lib" name="high-scale-lib" rev="${high-scale-lib.version}"/>
+        <dependency org="com.github.stephenc.high-scale-lib" name="high-scale-lib" 
+          rev="${high-scale-lib.version}"/>
 
         <!-- needed to run tests -->
         <dependency org="junit" name="junit" rev="${junit.version}" conf="test->compile"/>
