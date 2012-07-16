@@ -144,10 +144,6 @@
   <property name="ivy.artifact.retrieve.pattern" value="${ant.project.name}/[artifact]-[revision](-[classifier]).[ext]"/>
 
   <!-- Classpaths for various builds -->
-  <path id="classpath">
-    <path refid="common.classpath"/>
-  </path>
-
   <condition property="os-arch" value="x86_64">
     <and>
       <os arch="amd64" />
@@ -172,93 +168,7 @@
     <pathelement location="${hcatalog.jar}"/>
   </path>
 
-  <!--
-  ================================================================================
-  Ivy Section
-  ================================================================================
-  -->
-  <!-- Ivy goop stolen directly from Pig's build.xml -->
-  <target name="ivy-init-dirs">
-    <mkdir dir="${build.ivy.dir}" />
-    <mkdir dir="${build.ivy.lib.dir}" />
-    <mkdir dir="${build.ivy.report.dir}" />
-  </target>
-
-  <target name="ivy-probe-antlib" >
-    <condition property="ivy.found">
-      <typefound uri="antlib:org.apache.ivy.ant" name="cleancache"/>
-    </condition>
-  </target>
-
-  <target name="ivy-download" description="To download ivy" unless="offline">
-    <get src="${ivy_repo_url}" dest="${ivy.jar}" usetimestamp="true"/>
-  </target>
-
-  <!--
-     To avoid Ivy leaking things across big projects, always load Ivy in the same classloader.
-     Also note how we skip loading Ivy if it is already there, just to make sure all is well.
-  -->
-  <target name="ivy-init-antlib" depends="ivy-download,ivy-init-dirs,ivy-probe-antlib" unless="ivy.found">
-    <typedef uri="antlib:org.apache.ivy.ant" onerror="fail" loaderRef="ivyLoader">
-      <classpath>
-        <pathelement location="${ivy.jar}"/>
-      </classpath>
-    </typedef>
-    <fail>
-      <condition >
-        <not>
-          <typefound uri="antlib:org.apache.ivy.ant" name="cleancache"/>
-        </not>
-      </condition>
-         You need Apache Ivy 2.0 or later from http://ant.apache.org/
-         It could not be loaded from ${ivy_repo_url}
-    </fail>
-  </target>
-
-  <target name="ivy-init" depends="ivy-init-antlib" >
-    <!--Configure Ivy by reading in the settings file
-        If anyone has already read in a settings file into this settings ID, it gets priority
-    -->
-    <ivy:configure settingsid="${ant.project.name}.ivy.settings"
-      file="${ivysettings.xml}" override='false'/>
-    <ivy:makepom ivyfile="${ivy.xml}" pomfile="${pom.file}"/>
-  </target>
-
-  <target name="ivy-compile" depends="ivy-init" description="Resolve, Retrieve Ivy-managed artifacts for compile configuration">
-    <ivy:resolve settingsRef="${ant.project.name}.ivy.settings" conf="common"/>
-    <ivy:retrieve settingsRef="${ant.project.name}.ivy.settings"
-      pattern="${build.ivy.lib.dir}/${ivy.artifact.retrieve.pattern}" conf="common"/>
-    <ivy:cachepath pathid="compile.classpath" conf="common"/>     
-    <ivy:resolve settingsRef="${ant.project.name}.ivy.settings" conf="default"/>
-    <ivy:retrieve settingsRef="${ant.project.name}.ivy.settings"
-      pattern="${build.ivy.lib.dir}/${ivy.artifact.retrieve.pattern}" conf="default"/>
-    <ivy:cachepath pathid="compile.classpath" conf="default"/>     
-  </target>
-
-  <target name="ivy-package" depends="ivy-init"
-    description="Retrieve Ivy-managed artifacts for the package configurations">
-    <ivy:resolve settingsRef="${ant.project.name}.ivy.settings" conf="package"/>
-    <ivy:retrieve settingsRef="${ant.project.name}.ivy.settings"
-      pattern="${build.ivy.lib.dir}/${ivy.artifact.retrieve.pattern}" conf="package"/>
-    <ivy:cachepath pathid="package.classpath" conf="package"/>
-  </target>
-
-  <target name="ivy-releaseaudit" depends="ivy-init" description="Resolve, Retrieve Ivy-managed artifacts for releaseaudit configuration">
-    <ivy:resolve settingsRef="${ant.project.name}.ivy.settings" conf="releaseaudit"/>
-    <ivy:retrieve settingsRef="${ant.project.name}.ivy.settings"
-      pattern="${build.ivy.lib.dir}/${ivy.artifact.retrieve.pattern}" conf="releaseaudit"/>
-    <ivy:cachepath pathid="releaseaudit.classpath" conf="releaseaudit"/>
-  </target>
-
-  <target name="ivy-report" depends="ivy-init" description="Generate Ivy dependency report">
-    <ivy:report todir="${build.ivy.report.dir}"
-      conf="common, default"
-      organisation="org.apache.hcatalog"
-      module="hcatalog"
-      graph="false"/>
-  </target>
-
-  <target name="init" depends="ivy-compile, ivy-package" >
+  <target name="init" depends="ivy-retrieve">
     <mkdir dir="${dist.dir}" />
     <mkdir dir="${build.classes}" />
     <mkdir dir="${test.build.classes}" />
@@ -277,7 +187,7 @@
         source="${javac.version}" deprecation="${javac.deprecation}"
         includeantruntime="false">
       <compilerarg line="${javac.args}"/>
-      <classpath refid="classpath" />
+      <classpath refid="ivy.default.classpath"/>
     </javac>
     <!-- compile shim for selected hadoop version -->
     <!--property name="debugclasspath" refid="classpath"/>
@@ -288,7 +198,7 @@
         source="${javac.version}" deprecation="${javac.deprecation}"
         includeantruntime="false">
       <compilerarg line="${javac.args}"/>
-      <classpath refid="classpath" />
+      <classpath refid="ivy.default.classpath"/>
     </javac>
   </target>
  
@@ -316,8 +226,23 @@
   ================================================================================
   -->
   <target name="jar" depends="clientjar,server-extensions,jar-storage-handlers">
+    <!-- Create hcatalog.jar without the pig stuff so it can be depended on by submodules. -->
+    <jar jarfile="${build.dir}/${ant.project.name}/${hcatalog.jar}">
+      <zipfileset src="${build.dir}/${ant.project.name}/${hcatalog.core.jar}"/>
+    </jar>
+
+    <ivy:publish
+        resolver="local"
+        organisation="org.apache.hcatalog"
+        module="${ant.project.name}"
+        revision="${hcatalog.version}"
+        overwrite="true">
+      <artifacts pattern="${build.dir}/${ant.project.name}/[artifact]-[revision](-[classifier]).[ext]"/>
+    </ivy:publish>
+
     <ant target="jar" dir="hcatalog-pig-adapter" inheritAll="false"/>
 
+    <!-- Rebuild hcatalog.jar, bundling the pig adapter. -->
     <jar jarfile="${build.dir}/${ant.project.name}/${hcatalog.jar}">
       <zipfileset src="${build.dir}/${ant.project.name}/${hcatalog.core.jar}"/>
       <zipfileset src="hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
@@ -642,7 +567,7 @@
       <antcall target="package-storage-handlers"/>
     </target>
 
-    <target name="releaseaudit" depends="ivy-releaseaudit" description="Release Audit activities">
+    <target name="releaseaudit" depends="ivy-retrieve" description="Release Audit activities">
       <java classname="${rat.reporting.classname}" fork="true">
         <classpath refid="releaseaudit.classpath"/>
         <arg value="${basedir}/src"/>
@@ -710,6 +635,7 @@
         <ant dir="${test.e2e.dir}" target="deploy"/>
     </target>
 
+  <import file="ant/dependencies.xml"/>
   <import file="ant/findbugs.xml"/>
 
 </project>

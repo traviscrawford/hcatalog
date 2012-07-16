@@ -1,6 +1,10 @@
 <project name="common" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
     <dirname property="common.basedir" file="${ant.file.common}"/>
 
+    <property name="_version" value="0.5.0"/>
+    <property name="_vtype" value="-dev"/>
+    <property name="hcatalog.version" value="${_version}${_vtype}"/>
+
     <!-- shared build properties this should be the same with main build.xml -->
     <!-- this has to resolve to hcatalog project's ${build.dir} -->
     <property name="common.build.dir" value="${common.basedir}/build"/>
