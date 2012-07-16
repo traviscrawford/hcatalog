@@ -57,7 +57,9 @@
   <target name="_ivy-init" depends="ivy-init-antlib" unless="_ivy-init.complete">
     <echo message="${ant.project.name}"/>
     <ivy:configure file="${ivysettings.xml}"/>
-    <ivy:makepom ivyfile="${ivy.xml}" pomfile="${pom.file}"/>
+    <ivy:makepom ivyfile="${ivy.xml}" pomfile="${pom.file}">
+      <mapping conf="default" scope="compile"/>
+    </ivy:makepom>
     <property name="_ivy-init.complete" value="true"/>
   </target>
 
