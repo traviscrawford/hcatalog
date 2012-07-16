@@ -177,7 +177,12 @@
     <ant target="ivy-report" dir="storage-handlers" inheritAll="false" useNativeBasedir="true"/>
   </target>
 
-  <target name="ivy-init" depends="_ivy-init">
+  <target name="ivy-download" description="To download ivy" unless="offline">
+    <echo message="${ant.project.name}"/>
+    <get src="${ivy_repo_url}" dest="${ivy.jar}" usetimestamp="true" skipexisting="true"/>
+  </target>
+
+  <target name="ivy-init" depends="ivy-download,_ivy-init">
     <!-- HCatalog started as a single source tree that produced multiple artifacts.
     Currently its going through a transition to subprojects. During this transition
     we jank together pom files for artifacts produced in the existing source tree until

@@ -24,12 +24,13 @@
     <description>Apache HCatalog</description>
   </info>
 
-  <configurations defaultconfmapping="compile">
+  <configurations defaultconfmapping="compile->default">
     <conf name="compile"/>
     <conf name="test" extends="compile" visibility="private"/>
   </configurations>
 
   <dependencies>
+    <dependency org="org.apache.hcatalog" name="hcatalog-core" rev="${hcatalog.version}"/>
     <dependency org="org.apache.hadoop" name="hadoop-core" rev="${hadoop-core.version}"/>
     <dependency org="org.apache.hive" name="hive-metastore" rev="${hive.version}"/>
     <dependency org="org.apache.hive" name="hive-exec" rev="${hive.version}"/>

@@ -32,6 +32,10 @@
   <property name="test.warehouse.dir" location="${test.dir}/hcat_junit_warehouse"/>
   <property name="mvnrepo" value="http://repo2.maven.org/maven2"/>
 
+  <property name="ivysettings.xml" location="${basedir}/../ivy/ivysettings.xml" />
+  <property name="ivy.xml" location="${basedir}/ivy.xml"/>
+  <property name="pom.file" location="${build.dir}/ivy/${ant.project.name}-${hcatalog.version}.pom"/>
+
   <property name="findbugs.out.dir" location="${test.dir}/findbugs"/>
   <property name="findbugs.exclude.file" value="${basedir}/src/test/findbugsExcludeFile.xml"/>
   <property name="findbugs.report.htmlfile"
@@ -88,19 +92,6 @@
   <target name="clean">
     <echo message="${ant.project.name}"/>
     <delete dir="${build.dir}"/>
-  </target>
-
-  <target name="ivy-init">
-    <echo message="${ant.project.name}"/>
-    <ivy:configure file="../ivy/ivysettings.xml"/>
-  </target>
-
-  <target name="ivy-retrieve" depends="ivy-init">
-    <echo message="${ant.project.name}"/>
-    <ivy:retrieve sync="true"
-        pattern="${build.dir}/ivy/[conf]/[organization]-[artifact]-[revision](-[classifier]).[ext]"/>
-    <ivy:makepom ivyfile="${basedir}/ivy.xml"
-        pomfile="${build.dir}/ivy/${ant.project.name}-${hcatalog.version}.pom"/>
   </target>
 
   <target name="compile" depends="ivy-retrieve">

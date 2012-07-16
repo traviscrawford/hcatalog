@@ -21,8 +21,7 @@
   <import file="../build-common-new.xml"/>
 
   <path id="compile.class.path">
-    <fileset dir="${build.dir}/ivy/default"/>
-    <dirset dir="../build/classes"/>
+    <path refid="ivy.compile.classpath"/>
   </path>
 
   <path id="test.class.path">
@@ -33,14 +32,8 @@
     <dirset dir="${basedir}/build/test/classes"/>
   </path>
 
-  <!-- Ideally we would simply use the "default" Ivy configuration jars; however,
-  hcatalog-core.jar is not yet available at build-time so we must explicitly add it.
-  -->
   <path id="findbugs.class.path">
-    <fileset dir="${build.dir}/ivy/default"/>
-    <fileset dir="${basedir}/../build/hcatalog">
-      <include name="**/hcatalog-core-*.jar"/>
-    </fileset>
+    <path refid="ivy.compile.classpath"/>
   </path>
 
 </project>

@@ -23,7 +23,7 @@
      To avoid Ivy leaking things across big projects, always load Ivy in the same classloader.
      Also note how we skip loading Ivy if it is already there, just to make sure all is well.
   -->
-  <target name="ivy-init-antlib" depends="ivy-download,ivy-init-dirs,ivy-probe-antlib" unless="ivy.found">
+  <target name="ivy-init-antlib" depends="ivy-init-dirs,ivy-probe-antlib" unless="ivy.found">
     <echo message="${ant.project.name}"/>
     <typedef uri="antlib:org.apache.ivy.ant" onerror="fail" loaderRef="ivyLoader">
       <classpath>
@@ -42,25 +42,23 @@
   </target>
 
   <target name="ivy-init-dirs">
-    <mkdir dir="${build.ivy.dir}"/>
-    <mkdir dir="${build.ivy.report.dir}"/>
+    <echo message="${ant.project.name}"/>
+    <mkdir dir="${build.dir}/ivy"/>
+    <mkdir dir="${build.dir}/ivy/report"/>
   </target>
 
   <target name="ivy-probe-antlib" >
+    <echo message="${ant.project.name}"/>
     <condition property="ivy.found">
       <typefound uri="antlib:org.apache.ivy.ant" name="cleancache"/>
     </condition>
-  </target>
-
-  <target name="ivy-download" description="To download ivy" unless="offline">
-    <get src="${ivy_repo_url}" dest="${ivy.jar}" usetimestamp="true" skipexisting="true"/>
   </target>
 
   <target name="_ivy-init" depends="ivy-init-antlib" unless="_ivy-init.complete">
     <echo message="${ant.project.name}"/>
     <ivy:configure file="${ivysettings.xml}"/>
     <ivy:makepom ivyfile="${ivy.xml}" pomfile="${pom.file}">
-      <mapping conf="default" scope="compile"/>
+      <mapping conf="compile" scope="compile"/>
     </ivy:makepom>
     <property name="_ivy-init.complete" value="true"/>
   </target>
@@ -79,7 +77,8 @@
   </target>
 
   <target name="_ivy-report" depends="ivy-retrieve" description="Generate Ivy dependency report">
-    <ivy:report todir="${build.ivy.report.dir}" graph="false"/>
+    <echo message="${ant.project.name}"/>
+    <ivy:report todir="${build.dir}/ivy/report" graph="false"/>
   </target>
 
 </project>

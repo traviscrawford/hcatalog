@@ -37,7 +37,7 @@
 
   <dependencies>
     <dependency org="org.apache.pig" name="pig" rev="${pig.version}"/>
-    <dependency org="org.apache.hadoop" name="hadoop-tools" rev="${hadoop-tools.version}"/>
+    <dependency org="org.apache.hadoop" name="hadoop-tools" rev="${hadoop-tools.version}" conf="compile->*"/>
     <dependency org="javax.jms" name="jms" rev="${jms.version}"/>
     <dependency org="org.apache.activemq" name="activemq-core" rev="${activemq.version}">
       <exclude org="org.springframework"/>
