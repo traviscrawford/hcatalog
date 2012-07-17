@@ -228,11 +228,10 @@
   Build server side code, mainly listener.
   ================================================================================
   -->
-  <!-- Build the server side jar -->
   <target name="server-extensions" depends="compile-src">
-     <jar jarfile="${build.dir}/${ant.project.name}/${ant.project.name}-server-extensions-${hcatalog.version}.jar" basedir="${build.classes}"
- 	  includes="org/apache/hcatalog/listener/**,org/apache/hcatalog/metadata/**">
-  </jar>
+     <jar jarfile="${build.dir}/${ant.project.name}/${ant.project.name}-server-extensions-${hcatalog.version}.jar"
+          basedir="${build.classes}"
+          includes="org/apache/hcatalog/listener/**,org/apache/hcatalog/metadata/**"/>
   </target>
 
   <!--
@@ -241,23 +240,10 @@
   ================================================================================
   -->
   <target name="jar" depends="clientjar,server-extensions,jar-storage-handlers">
-    <!-- Create hcatalog.jar without the pig stuff so it can be depended on by submodules. -->
-    <jar jarfile="${build.dir}/${ant.project.name}/${hcatalog.jar}">
-      <zipfileset src="${build.dir}/${ant.project.name}/${hcatalog.core.jar}"/>
-    </jar>
-
-    <ivy:publish
-        resolver="local"
-        organisation="org.apache.hcatalog"
-        module="${ant.project.name}"
-        revision="${hcatalog.version}"
-        overwrite="true">
-      <artifacts pattern="${build.dir}/${ant.project.name}/[artifact]-[revision](-[classifier]).[ext]"/>
-    </ivy:publish>
-
     <ant target="jar" dir="hcatalog-pig-adapter" inheritAll="false"/>
 
-    <!-- Rebuild hcatalog.jar, bundling the pig adapter. -->
+    <!-- Build hcatalog.jar, bundling the pig adapter. Our intention is to stop producing this
+         fat jar after some migration period. -->
     <jar jarfile="${build.dir}/${ant.project.name}/${hcatalog.jar}">
       <zipfileset src="${build.dir}/${ant.project.name}/${hcatalog.core.jar}"/>
       <zipfileset src="hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
