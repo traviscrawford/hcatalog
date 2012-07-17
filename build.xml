@@ -417,10 +417,6 @@
     <property name="findbugs.report.xmlfile"
       value="${findbugs.out.dir}/hcat-findbugs-report.xml"/>
 
-    <path id="findbugs.class.path">
-      <fileset dir="${ivy.lib.dir}"/>
-    </path>
-
     <_findbugs outputDir="${findbugs.out.dir}"
                outputFile="${findbugs.report.xmlfile}"
                excludeFilter="${findbugs.exclude.file}"
@@ -428,7 +424,7 @@
                findbugsReportHtmlFile="${findbugs.report.htmlfile}"
                sourceDir="${src.dir}"
                jarDir="${build.dir}/${ant.project.name}"
-               classPathRef="findbugs.class.path"/>
+               classPathRef="compile.classpath"/>
 
     <ant target="findbugs" dir="hcatalog-pig-adapter" inheritAll="false"/>
   </target>
