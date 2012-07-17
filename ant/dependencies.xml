@@ -32,21 +32,20 @@
     <property name="_ivy-init.complete" value="true"/>
   </target>
 
-  <!-- Two level thing so it can be overridden. -->
   <target name="ivy-init" depends="_ivy-init"/>
 
   <target name="_check-ivy-retrieve" unless="ivy-retrieve.complete">
     <available property="ivy-retrieve.complete" file="${build.dir}/ivy/lib/.ivy-retrieve.complete"/>
   </target>
 
-  <target name="ivy-retrieve" depends="ivy-init" description="Retrieve Ivy dependencies"
+  <target name="ivy-retrieve" depends="_check-ivy-retrieve,ivy-init" description="Retrieve Ivy dependencies"
       unless="ivy-retrieve.complete">
     <echo message="${ant.project.name}"/>
     <ivy:retrieve sync="true"
       pattern="${build.dir}/ivy/lib/[conf]/[organization]-[artifact]-[revision](-[classifier]).[ext]"/>
     <ivy:cachepath pathid="ivy.default.classpath" conf="default"/>
     <ivy:cachepath pathid="ivy.test.classpath" conf="test"/>
-    <property name="ivy-retrieve.complete" value="true"/>
+    <touch file="${build.dir}/ivy/lib/.ivy-retrieve.complete"/>
   </target>
 
   <target name="_ivy-report" depends="ivy-retrieve" description="Generate Ivy dependency report">

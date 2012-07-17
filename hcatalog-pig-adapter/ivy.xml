@@ -35,6 +35,7 @@
 
     <!-- test dependencies -->
     <dependency org="junit" name="junit" rev="${junit.version}" conf="test->default"/>
-    <dependency org="org.apache.hadoop" name="hadoop-test" rev="${hadoop-test.version}" conf="test->default"/>
+    <dependency org="org.apache.hadoop" name="hadoop-test" rev="${hadoop-test.version}"
+      conf="test->default"/>
   </dependencies>
 </ivy-module>

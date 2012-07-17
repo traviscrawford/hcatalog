@@ -30,5 +30,17 @@
 
   <dependencies>
     <dependency org="org.apache.hcatalog" name="hcatalog-core" rev="${hcatalog.version}"/>
+
+    <!-- test dependencies -->
+    <dependency org="junit" name="junit" rev="${junit.version}" conf="test->default"/>
+    <dependency org="org.apache.hadoop" name="hadoop-test" rev="${hadoop-test.version}"
+        conf="test->default"/>
+    <dependency org="org.apache.hbase" name="hbase" rev="${hbase.version}" conf="test->default"/>
+      <artifact name="hbase" type="test-jar" ext="jar" m:classifier="tests"/>
+    </dependency>
+    <dependency org="org.apache.zookeeper" name="zookeeper" rev="${zookeeper.version}"
+        conf="test->default"/>
+      <artifact name="zookeeper" type="test-jar" ext="jar" m:classifier="tests"/>
+    </dependency>
   </dependencies>
 </ivy-module>
