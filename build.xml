@@ -147,6 +147,11 @@
   <target name="ivy-download" description="To download ivy" unless="offline">
     <echo message="${ant.project.name}"/>
     <get src="${ivy_repo_url}" dest="${ivy.jar}" usetimestamp="true" skipexisting="true"/>
+    <typedef uri="antlib:org.apache.ivy.ant" onerror="fail" loaderRef="ivyLoader">
+      <classpath>
+        <pathelement location="${ivy.jar}"/>
+      </classpath>
+    </typedef>
   </target>
 
   <target name="ivy-init" depends="ivy-download,_ivy-init">
@@ -167,7 +172,7 @@
       value="artifactId>hcatalog-server-extensions"/>
   </target>
 
-  <target name="init" depends="ivy-retrieve">
+  <target name="init" depends="ivy-retrieve,mvn-init">
     <mkdir dir="${dist.dir}" />
     <mkdir dir="${build.classes}" />
     <mkdir dir="${test.build.classes}" />
@@ -202,7 +207,7 @@
   </target>
  
   <!-- Build the hcatalog client jar -->
-  <target name="clientjar" depends="compile-src,mvn-init">
+  <target name="clientjar" depends="compile-src">
     <jar jarfile="${build.dir}/${ant.project.name}/${hcatalog.core.jar}"
          basedir="${build.classes}"/>
     <artifact:install file="${build.dir}/${ant.project.name}/${hcatalog.core.jar}">

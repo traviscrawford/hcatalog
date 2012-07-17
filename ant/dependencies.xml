@@ -19,43 +19,12 @@
 
 <project xmlns:ivy="antlib:org.apache.ivy.ant">
 
-  <!--
-     To avoid Ivy leaking things across big projects, always load Ivy in the same classloader.
-     Also note how we skip loading Ivy if it is already there, just to make sure all is well.
-  -->
-  <target name="ivy-init-antlib" depends="ivy-init-dirs,ivy-probe-antlib" unless="ivy.found">
+  <target name="_ivy-init" unless="_ivy-init.complete">
     <echo message="${ant.project.name}"/>
-    <typedef uri="antlib:org.apache.ivy.ant" onerror="fail" loaderRef="ivyLoader">
-      <classpath>
-        <pathelement location="${ivy.jar}"/>
-      </classpath>
-    </typedef>
-    <fail>
-      <condition >
-        <not>
-          <typefound uri="antlib:org.apache.ivy.ant" name="cleancache"/>
-        </not>
-      </condition>
-         You need Apache Ivy 2.0 or later from http://ant.apache.org/
-         It could not be loaded from ${ivy_repo_url}
-    </fail>
-  </target>
 
-  <target name="ivy-init-dirs">
-    <echo message="${ant.project.name}"/>
     <mkdir dir="${build.dir}/ivy"/>
     <mkdir dir="${build.dir}/ivy/report"/>
-  </target>
 
-  <target name="ivy-probe-antlib" >
-    <echo message="${ant.project.name}"/>
-    <condition property="ivy.found">
-      <typefound uri="antlib:org.apache.ivy.ant" name="cleancache"/>
-    </condition>
-  </target>
-
-  <target name="_ivy-init" depends="ivy-init-antlib" unless="_ivy-init.complete">
-    <echo message="${ant.project.name}"/>
     <ivy:configure file="${ivysettings.xml}"/>
     <ivy:makepom ivyfile="${ivy.xml}" pomfile="${pom.file}">
       <mapping conf="default" scope="compile"/>
