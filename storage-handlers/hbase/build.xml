@@ -99,14 +99,20 @@
     <!--this is the naming policy for artifacts we want pulled down-->
     <property name="ivy.artifact.retrieve.pattern" value="${ant.project.name}/[artifact]-[revision](-[classifier]).[ext]"/>
 
+    <path id="compile.classpath">
+      <fileset dir="${build.dir}/ivy/lib/default">
+        <include name="**/*.jar"/>
+      </fileset>
+    </path>
+
     <path id="test.classpath">
         <pathelement location="${test.build.classes}" />
         <pathelement location="${build.classes}" />
         <pathelement location="conf"/>
-        <path refid="ivy.test.classpath"/>
-        <fileset dir="${hcatalog.dir}/build/hcatalog" includes=" *.jar"/>
+        <fileset dir="${build.dir}/ivy/lib/test">
+          <include name="**/*.jar"/>
+        </fileset>
     </path>
-
 
     <target name="init" depends="ivy-retrieve">
         <mkdir dir="${dist.dir}" />
@@ -126,7 +132,7 @@
                source="${javac.version}" deprecation="${javac.deprecation}"
                includeantruntime="false">
             <compilerarg line="${javac.args}"/>
-            <classpath refid="ivy.default.classpath"/>
+            <classpath refid="compile.classpath"/>
         </javac>
     </target>
 
@@ -228,7 +234,7 @@
           doctitle="HCatalog ${hcatalog.version} API"
           sourcepath="${src.dir}:${basedir}/src/gen-java">
         <classpath>
-          <path refid="ivy.default.classpath"/>
+          <path refid="compile.classpath"/>
         </classpath>
         <group title="hcatalog" packages="org.apache.hcatalog.*"/>
       </javadoc>

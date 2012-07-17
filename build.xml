@@ -128,11 +128,19 @@
   <!-- rats properties -->
   <property name="rat.reporting.classname" value="rat.Report"/>
 
+  <path id="compile.classpath">
+    <fileset dir="${build.dir}/ivy/lib/default">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
   <path id="test.classpath">
     <pathelement location="${test.build.classes}"/>
     <pathelement location="${build.classes}"/>
     <pathelement location="conf"/>
-    <path refid="ivy.test.classpath"/>
+    <fileset dir="${build.dir}/ivy/lib/test">
+      <include name="**/*.jar"/>
+    </fileset>
     <pathelement location="${build.dir}/${ant.project.name}/${hcatalog.core.jar}"/>
     <pathelement location="${basedir}/hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
   </path>
@@ -191,7 +199,7 @@
         source="${javac.version}" deprecation="${javac.deprecation}"
         includeantruntime="false">
       <compilerarg line="${javac.args}"/>
-      <classpath refid="ivy.default.classpath"/>
+      <classpath refid="compile.classpath"/>
     </javac>
     <!-- compile shim for selected hadoop version -->
     <!--property name="debugclasspath" refid="classpath"/>
@@ -202,7 +210,7 @@
         source="${javac.version}" deprecation="${javac.deprecation}"
         includeantruntime="false">
       <compilerarg line="${javac.args}"/>
-      <classpath refid="ivy.default.classpath"/>
+      <classpath refid="compile.classpath"/>
     </javac>
   </target>
  
@@ -470,7 +478,7 @@
              failonerror="true">
       <packageset dir="${src.dir}" />
         <classpath>
-          <path refid="ivy.default.classpath"/>
+          <path refid="compile.classpath"/>
         </classpath>
         <group title="hcatalog" packages="org.apache.hcatalog.*" />
     </javadoc>

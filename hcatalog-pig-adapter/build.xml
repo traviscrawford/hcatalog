@@ -21,18 +21,24 @@
   <import file="../build-common-new.xml"/>
 
   <path id="compile.class.path">
-    <path refid="ivy.default.classpath"/>
+    <fileset dir="${build.dir}/ivy/lib/default">
+      <include name="**/*.jar"/>
+    </fileset>
   </path>
 
   <path id="test.class.path">
-    <path refid="ivy.test.classpath"/>
+    <fileset dir="${build.dir}/ivy/lib/test">
+      <include name="**/*.jar"/>
+    </fileset>
     <dirset dir="${basedir}/../build/test/classes"/>
     <dirset dir="${basedir}/build/classes"/>
     <dirset dir="${basedir}/build/test/classes"/>
   </path>
 
   <path id="findbugs.class.path">
-    <path refid="ivy.default.classpath"/>
+    <fileset dir="${build.dir}/ivy/lib/default">
+      <include name="**/*.jar"/>
+    </fileset>
   </path>
 
 </project>
