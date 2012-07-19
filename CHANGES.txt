@@ -26,6 +26,10 @@ Trunk (unreleased changes)
   HCAT-328 HCatLoader should report its input size so pig can estimate the number of reducers (traviscrawford via gates)
 
   IMPROVEMENTS
+  HCAT-440 pig field names for arrays should be configurable (traviscrawford)
+
+  HCAT-434 Package HCatalog pig support as a separate jar (traviscrawford)
+
   HCAT-341 InitializeInput improvements (traviscrawford)
 
   HCAT-439 Unit test failures in trunk build - Jenkins build 1516 (avandana)
@@ -57,6 +61,8 @@ Trunk (unreleased changes)
   OPTIMIZATIONS
 
   BUG FIXES
+  HCAT-447 findbugs target doesn't work in trunk (traviscrawford)
+
   HCAT-437 HCatSchema's equals() implementation uses hashcode obtained from toString() method. (avandana)
 
   HCAT-438 HCatFieldSchema class does not have equals() method implementation (avandana)
