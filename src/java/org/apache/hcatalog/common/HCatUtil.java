@@ -163,11 +163,7 @@ public class HCatUtil {
     }
 
     public static HCatSchema extractSchema(Partition partition) throws HCatException {
-      try {
         return new HCatSchema(HCatUtil.getHCatFieldSchemaList(partition.getCols()));
-      } catch (HiveException e) {
-        throw new HCatException("Failed extracting schema from partition " + partition, e);
-      }
     }
 
     public static List<FieldSchema> getFieldSchemaList(
