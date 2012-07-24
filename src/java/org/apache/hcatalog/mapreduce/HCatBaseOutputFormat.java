@@ -215,8 +215,10 @@ public abstract class HCatBaseOutputFormat extends OutputFormat<WritableComparab
         }
       }
     }
-    
-    HCatUtil.validatePartitionSchema(jobInfo.getTableInfo().getTable(), schemaWithoutParts);
+
+    org.apache.hadoop.hive.ql.metadata.Table mTable =
+        new org.apache.hadoop.hive.ql.metadata.Table(jobInfo.getTableInfo().getTable());
+    HCatUtil.validatePartitionSchema(mTable, schemaWithoutParts);
     jobInfo.setPosOfPartCols(posOfPartCols);
     jobInfo.setPosOfDynPartCols(posOfDynPartCols);
     jobInfo.setOutputSchema(schemaWithoutParts);
