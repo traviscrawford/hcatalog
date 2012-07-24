@@ -19,6 +19,7 @@ package org.apache.hcatalog.mapreduce;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.hadoop.hive.serde2.Deserializer;
 import org.apache.hadoop.hive.serde2.SerDeException;
@@ -114,13 +115,16 @@ class HCatRecordReader extends RecordReader<WritableComparable, HCatRecord> {
       deserializer = ReflectionUtils.newInstance(storageHandler.getSerDeClass(),
           taskContext.getConfiguration());
 
+      Properties props = new Properties();
+      for (Map.Entry e : hcatSplit.getPartitionInfo().getSerDeInfo().getParameters().entrySet()) {
+        props.put(e.getKey(), e.getValue());
+      }
       try {
-        InternalUtil.initializeDeserializer(deserializer, storageHandler.getConf(),
-            hcatSplit.getPartitionInfo().getTableInfo(),
-            hcatSplit.getPartitionInfo().getPartitionSchema());
+        deserializer.initialize(storageHandler.getConf(), props);
       } catch (SerDeException e) {
         throw new IOException("Failed initializing deserializer "
-            + storageHandler.getSerDeClass().getName(), e);
+            + storageHandler.getSerDeClass().getName() + " with parameters " +
+            hcatSplit.getPartitionInfo().getSerDeInfo().getParameters(), e);
       }
     }
 
