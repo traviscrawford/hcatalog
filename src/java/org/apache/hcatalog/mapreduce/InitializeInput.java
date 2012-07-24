@@ -184,7 +184,7 @@ public class InitializeInput {
     // FIXME
     // Bloating partinfo with inputJobInfo is not good
     return new PartInfo(schema, storageHandler,
-                        sd.getLocation(), hcatProperties,
+                        sd, hcatProperties,
                         jobProperties, inputJobInfo.getTableInfo());
   }
 

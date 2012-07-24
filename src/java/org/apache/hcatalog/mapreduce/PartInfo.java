@@ -21,13 +21,14 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.ql.plan.TableDesc;
-
+import org.apache.hadoop.hive.metastore.api.SerDeInfo;
+import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hcatalog.data.schema.HCatSchema;
-import org.apache.hcatalog.mapreduce.HCatStorageHandler;
 
-/** The Class used to serialize the partition information read from the metadata server that maps to a partition. */
+/**
+ * The Class used to serialize the partition information read from the metadata
+ * server that maps to a partition.
+ */
 public class PartInfo implements Serializable {
 
   /** The serialization version */
@@ -40,7 +41,7 @@ public class PartInfo implements Serializable {
   private final String storageHandlerClassName;
   private final String inputFormatClassName;
   private final String outputFormatClassName;
-  private final String serdeClassName;
+  private final SerDeInfo serDeInfo;
 
   /** HCat-specific properties set at the partition */
   private final Properties hcatProperties;
@@ -61,23 +62,23 @@ public class PartInfo implements Serializable {
    * Instantiates a new hcat partition info.
    * @param partitionSchema the partition schema
    * @param storageHandler the storage handler
-   * @param location the location
+   * @param storageDescriptor the storage descriptor for this partition
    * @param hcatProperties hcat-specific properties at the partition
    * @param jobProperties the job properties
    * @param tableInfo the table information
    */
   public PartInfo(HCatSchema partitionSchema, HCatStorageHandler storageHandler,
-                  String location, Properties hcatProperties, 
+                  StorageDescriptor storageDescriptor, Properties hcatProperties,
                   Map<String,String> jobProperties, HCatTableInfo tableInfo){
     this.partitionSchema = partitionSchema;
-    this.location = location;
+    this.location = storageDescriptor.getLocation();
     this.hcatProperties = hcatProperties;
     this.jobProperties = jobProperties;
     this.tableInfo = tableInfo;
+    this.serDeInfo = storageDescriptor.getSerdeInfo();
 
     this.storageHandlerClassName = storageHandler.getClass().getName();
     this.inputFormatClassName = storageHandler.getInputFormatClass().getName();
-    this.serdeClassName = storageHandler.getSerDeClass().getName();
     this.outputFormatClassName = storageHandler.getOutputFormatClass().getName();
 }
 
@@ -114,7 +115,11 @@ public class PartInfo implements Serializable {
    * @return the serdeClassName
    */
   public String getSerdeClassName() {
-    return serdeClassName;
+    return serDeInfo.getSerializationLib();
+  }
+
+  public SerDeInfo getSerDeInfo() {
+    return serDeInfo;
   }
 
   /**
