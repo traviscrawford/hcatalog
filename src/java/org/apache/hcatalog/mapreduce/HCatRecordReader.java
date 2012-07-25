@@ -119,7 +119,10 @@ class HCatRecordReader extends RecordReader<WritableComparable, HCatRecord> {
       for (Map.Entry e : hcatSplit.getPartitionInfo().getSerDeInfo().getParameters().entrySet()) {
         props.put(e.getKey(), e.getValue());
       }
+
       try {
+        InternalUtil.setLazySimpleSerDeProperties(props, hcatSplit.getPartitionInfo().tableInfo,
+            hcatSplit.getPartitionInfo().getPartitionSchema());
         deserializer.initialize(storageHandler.getConf(), props);
       } catch (SerDeException e) {
         throw new IOException("Failed initializing deserializer "

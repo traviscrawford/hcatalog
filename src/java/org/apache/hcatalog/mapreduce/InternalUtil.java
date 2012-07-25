@@ -132,31 +132,29 @@ class InternalUtil {
 
   //TODO this has to find a better home, it's also hardcoded as default in hive would be nice
   // if the default was decided by the serde
-  static void initializeOutputSerDe(SerDe serDe, Configuration conf,
-                                    OutputJobInfo jobInfo)
-  throws SerDeException {
-    initializeSerDe(serDe, conf, jobInfo.getTableInfo(),
-                    jobInfo.getOutputSchema());
+  static void initializeOutputSerDe(SerDe serDe, Configuration conf, OutputJobInfo jobInfo)
+      throws SerDeException {
+    serDe.initialize(conf, setLazySimpleSerDeProperties(
+        new Properties(), jobInfo.getTableInfo(), jobInfo.getOutputSchema()));
   }
 
-  private static void initializeSerDe(SerDe serDe, Configuration conf,
-                                            HCatTableInfo info, HCatSchema s)
-  throws SerDeException {
-     Properties props = new Properties();
+  /**
+   * Set properties required by @{link LazySimpleSerDe}.
+   */
+  static Properties setLazySimpleSerDeProperties(Properties props, HCatTableInfo info,
+      HCatSchema s) throws SerDeException {
     List<FieldSchema> fields = HCatUtil.getFieldSchemaList(s.getFields());
     props.setProperty(org.apache.hadoop.hive.serde.Constants.LIST_COLUMNS,
           MetaStoreUtils.getColumnNamesFromFieldSchema(fields));
     props.setProperty(org.apache.hadoop.hive.serde.Constants.LIST_COLUMN_TYPES,
           MetaStoreUtils.getColumnTypesFromFieldSchema(fields));
 
-    // setting these props to match LazySimpleSerde
     props.setProperty(org.apache.hadoop.hive.serde.Constants.SERIALIZATION_NULL_FORMAT, "\\N");
     props.setProperty(org.apache.hadoop.hive.serde.Constants.SERIALIZATION_FORMAT, "1");
 
     //add props from params set in table schema
     props.putAll(info.getStorerInfo().getProperties());
-
-    serDe.initialize(conf,props);
+    return props;
   }
 
 static Reporter createReporter(TaskAttemptContext context) {
