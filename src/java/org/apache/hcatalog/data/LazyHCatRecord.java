@@ -30,6 +30,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hcatalog.common.HCatException;
+import org.apache.hcatalog.data.schema.HCatFieldSchema;
 import org.apache.hcatalog.data.schema.HCatSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ public class LazyHCatRecord extends HCatRecord {
 
   public static final Logger LOG = LoggerFactory.getLogger(LazyHCatRecord.class.getName());
 
-  private Object o;
+  private Object wrappedObject;
   private StructObjectInspector soi;
   
   @Override
@@ -50,7 +51,7 @@ public class LazyHCatRecord extends HCatRecord {
     try {
       StructField fref = soi.getAllStructFieldRefs().get(fieldNum);
       return HCatRecordSerDe.serializeField(
-          soi.getStructFieldData(o, fref),
+          soi.getStructFieldData(wrappedObject, fref),
           fref.getFieldObjectInspector());
     } catch (SerDeException e) {
       throw new IllegalStateException("SerDe Exception deserializing",e);
@@ -93,10 +94,32 @@ public class LazyHCatRecord extends HCatRecord {
   }
 
   @Override
-  public Object get(String fieldName, HCatSchema recordSchema)
-      throws HCatException {
+  public Object get(String fieldName, HCatSchema recordSchema) throws HCatException {
+
     int idx = recordSchema.getPosition(fieldName);
-    return get(idx);
+    StructField structField = soi.getAllStructFieldRefs().get(idx);
+    Object structFieldData = soi.getStructFieldData(wrappedObject, structField);
+
+    Object result;
+    try {
+      result = HCatRecordSerDe.serializeField(structFieldData,
+          structField.getFieldObjectInspector());
+    } catch (SerDeException e) {
+      throw new IllegalStateException("SerDe Exception deserializing", e);
+    }
+
+    if (result == null) {
+      return result;
+    }
+
+    // By default, Enum fields are handled in the Hive style: struct<value:int>
+    // Users can optionally get the string enum value by setting a string field schema.
+    if (HCatFieldSchema.Type.STRING.equals(recordSchema.get(fieldName).getType()) &&
+        Enum.class.isAssignableFrom(structFieldData.getClass())) {
+      return result.toString();
+    }
+
+    return result;
   }
 
   @Override
@@ -115,7 +138,7 @@ public class LazyHCatRecord extends HCatRecord {
     throw new UnsupportedOperationException("not allowed to run copy() on LazyHCatRecord");
   }
   
-  public LazyHCatRecord(Object o, ObjectInspector oi)
+  public LazyHCatRecord(Object wrappedObject, ObjectInspector oi)
   throws Exception {
 
     if (oi.getCategory() != Category.STRUCT) {
@@ -126,7 +149,7 @@ public class LazyHCatRecord extends HCatRecord {
     }
 
     this.soi = (StructObjectInspector)oi;
-    this.o = o;
+    this.wrappedObject = wrappedObject;
   }
 
   @Override
