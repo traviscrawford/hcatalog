@@ -247,10 +247,7 @@ public abstract class HCatBaseStorer extends StoreFunc implements StoreMetadata 
       switch(type){
 
       case BINARY:
-        ByteArrayRef ba = new ByteArrayRef();
-        byte[] bytes = (null == pigObj) ? new byte[0] : ((DataByteArray)pigObj).get();
-        ba.setData(bytes);
-        return ba;
+        return (null == pigObj) ? new byte[0] : ((DataByteArray)pigObj).get();
 
       case STRUCT:
         if (pigObj == null) {
