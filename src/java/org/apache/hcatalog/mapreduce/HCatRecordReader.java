@@ -109,6 +109,18 @@ class HCatRecordReader extends RecordReader<WritableComparable, HCatRecord> {
           InternalUtil.createReporter(taskContext));
     }
 
+  /**
+   * Create the deserializer.
+   *
+   * Hive initializes deserializers with SerDeInfo parameters. HCatalog supplements these
+   * with some keys expected by LazySimpleSerDe, and the Table properties. Properties are
+   * added in the following order (last to define a key wins):
+   * <ol>
+   *   <li>LazySimpleSerDe properties</li>
+   *   <li>Table properties</li>
+   *   <li>SerDeInfo properties</li>
+   * </ol>
+   */
     private void createDeserializer(HCatSplit hcatSplit, HCatStorageHandler storageHandler,
         TaskAttemptContext taskContext) throws IOException {
 
@@ -116,13 +128,19 @@ class HCatRecordReader extends RecordReader<WritableComparable, HCatRecord> {
           taskContext.getConfiguration());
 
       Properties props = new Properties();
+
+      try {
+        InternalUtil.setLazySimpleSerDeProperties(props, hcatSplit.getPartitionInfo().tableInfo,
+            hcatSplit.getPartitionInfo().getPartitionSchema());
+      } catch (SerDeException e) {
+        throw new IOException("Failed setting deserializer properties.", e);
+      }
+
       for (Map.Entry e : hcatSplit.getPartitionInfo().getSerDeInfo().getParameters().entrySet()) {
         props.put(e.getKey(), e.getValue());
       }
 
       try {
-        InternalUtil.setLazySimpleSerDeProperties(props, hcatSplit.getPartitionInfo().tableInfo,
-            hcatSplit.getPartitionInfo().getPartitionSchema());
         deserializer.initialize(storageHandler.getConf(), props);
       } catch (SerDeException e) {
         throw new IOException("Failed initializing deserializer "
