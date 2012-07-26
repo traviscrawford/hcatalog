@@ -119,6 +119,14 @@ public class LazyHCatRecord extends HCatRecord {
       return soi.getStructFieldData(wrappedObject, structField).toString();
     }
 
+    // By default, Boolean fields are treated as Boolean. Users can convert to integer
+    // by setting the field schema to integer. This may be useful for pre-boolean-support
+    // pig users.
+    if (HCatFieldSchema.Type.INT.equals(recordSchema.get(fieldName).getType()) &&
+        Boolean.class.isAssignableFrom(structFieldData.getClass())) {
+      return (Boolean) soi.getStructFieldData(wrappedObject, structField) ? 1 : 0;
+    }
+
     return result;
   }
 
