@@ -96,24 +96,8 @@ public class LazyHCatRecord extends HCatRecord {
 
   @Override
   public Object get(String fieldName, HCatSchema recordSchema) throws HCatException {
-
     int idx = recordSchema.getPosition(fieldName);
-    StructField structField = soi.getAllStructFieldRefs().get(idx);
-    Object structFieldData = soi.getStructFieldData(wrappedObject, structField);
-
-    Object result;
-    try {
-      result = hCatRecordSerDe.serializeField(structFieldData,
-          structField.getFieldObjectInspector());
-    } catch (SerDeException e) {
-      throw new IllegalStateException("SerDe Exception deserializing", e);
-    }
-
-    if (result == null) {
-      return result;
-    }
-
-    return result;
+    return get(idx);
   }
 
   @Override
