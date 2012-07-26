@@ -116,7 +116,7 @@ public class LazyHCatRecord extends HCatRecord {
     // Users can optionally get the string enum value by setting a string field schema.
     if (HCatFieldSchema.Type.STRING.equals(recordSchema.get(fieldName).getType()) &&
         Enum.class.isAssignableFrom(structFieldData.getClass())) {
-      return result.toString();
+      return soi.getStructFieldData(wrappedObject, structField).toString();
     }
 
     return result;
