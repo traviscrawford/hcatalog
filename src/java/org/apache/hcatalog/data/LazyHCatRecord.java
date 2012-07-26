@@ -45,12 +45,13 @@ public class LazyHCatRecord extends HCatRecord {
 
   private Object wrappedObject;
   private StructObjectInspector soi;
+  private HCatRecordSerDe hCatRecordSerDe;
   
   @Override
   public Object get(int fieldNum) {
     try {
       StructField fref = soi.getAllStructFieldRefs().get(fieldNum);
-      return HCatRecordSerDe.serializeField(
+      return hCatRecordSerDe.serializeField(
           soi.getStructFieldData(wrappedObject, fref),
           fref.getFieldObjectInspector());
     } catch (SerDeException e) {
@@ -102,7 +103,7 @@ public class LazyHCatRecord extends HCatRecord {
 
     Object result;
     try {
-      result = HCatRecordSerDe.serializeField(structFieldData,
+      result = hCatRecordSerDe.serializeField(structFieldData,
           structField.getFieldObjectInspector());
     } catch (SerDeException e) {
       throw new IllegalStateException("SerDe Exception deserializing", e);
@@ -110,21 +111,6 @@ public class LazyHCatRecord extends HCatRecord {
 
     if (result == null) {
       return result;
-    }
-
-    // By default, Enum fields are handled in the Hive style: struct<value:int>
-    // Users can optionally get the string enum value by setting a string field schema.
-    if (HCatFieldSchema.Type.STRING.equals(recordSchema.get(fieldName).getType()) &&
-        Enum.class.isAssignableFrom(structFieldData.getClass())) {
-      return soi.getStructFieldData(wrappedObject, structField).toString();
-    }
-
-    // By default, Boolean fields are treated as Boolean. Users can convert to integer
-    // by setting the field schema to integer. This may be useful for pre-boolean-support
-    // pig users.
-    if (HCatFieldSchema.Type.INT.equals(recordSchema.get(fieldName).getType()) &&
-        Boolean.class.isAssignableFrom(structFieldData.getClass())) {
-      return (Boolean) soi.getStructFieldData(wrappedObject, structField) ? 1 : 0;
     }
 
     return result;
@@ -146,18 +132,17 @@ public class LazyHCatRecord extends HCatRecord {
     throw new UnsupportedOperationException("not allowed to run copy() on LazyHCatRecord");
   }
   
-  public LazyHCatRecord(Object wrappedObject, ObjectInspector oi)
-  throws Exception {
+  public LazyHCatRecord(Object wrappedObject, ObjectInspector oi, HCatRecordSerDe hCatRecordSerDe)
+      throws Exception {
 
     if (oi.getCategory() != Category.STRUCT) {
-      throw new SerDeException(getClass().toString()
-          + " can only make a lazy hcat record from objects of " + 
-          "struct types, but we got: "
-          + oi.getTypeName());
+      throw new SerDeException(getClass().toString() + " can only make a lazy hcat record from " +
+          "objects of struct types, but we got: " + oi.getTypeName());
     }
 
     this.soi = (StructObjectInspector)oi;
     this.wrappedObject = wrappedObject;
+    this.hCatRecordSerDe = hCatRecordSerDe;
   }
 
   @Override

@@ -33,6 +33,7 @@ import org.apache.hcatalog.common.HCatConstants;
 import org.apache.hcatalog.common.HCatUtil;
 import org.apache.hcatalog.data.DefaultHCatRecord;
 import org.apache.hcatalog.data.HCatRecord;
+import org.apache.hcatalog.data.HCatRecordSerDe;
 import org.apache.hcatalog.data.LazyHCatRecord;
 import org.apache.hcatalog.data.schema.HCatSchema;
 import org.slf4j.Logger;
@@ -56,6 +57,7 @@ class HCatRecordReader extends RecordReader<WritableComparable, HCatRecord> {
     private final HCatStorageHandler storageHandler;
 
     private Deserializer deserializer;
+    private HCatRecordSerDe hCatRecordSerDe;
 
     private Map<String,String> valuesNotInDataCols;
 
@@ -83,7 +85,25 @@ class HCatRecordReader extends RecordReader<WritableComparable, HCatRecord> {
       HCatSplit hcatSplit = InternalUtil.castToHCatSplit(split);
 
       baseRecordReader = createBaseRecordReader(hcatSplit, storageHandler, taskContext);
-      createDeserializer(hcatSplit, storageHandler, taskContext);
+
+      Properties deserializerProperties = getDeserializerProperties(hcatSplit);
+
+      deserializer = ReflectionUtils.newInstance(storageHandler.getSerDeClass(),
+          taskContext.getConfiguration());
+      try {
+        deserializer.initialize(storageHandler.getConf(), deserializerProperties);
+      } catch (SerDeException e) {
+        throw new IOException("Failed initializing deserializer " +
+            deserializer.getClass().getName() + " with properties " + deserializerProperties, e);
+      }
+
+      try {
+        hCatRecordSerDe = new HCatRecordSerDe();
+        hCatRecordSerDe.initialize(storageHandler.getConf(), deserializerProperties);
+      } catch (SerDeException e) {
+        throw new IOException("Failed initializing deserializer " +
+            hCatRecordSerDe.getClass().getName() + " with properties " + deserializerProperties, e);
+      }
 
       // Pull the output schema out of the TaskAttemptContext
       outputSchema = (HCatSchema) HCatUtil.deserialize(
@@ -121,12 +141,7 @@ class HCatRecordReader extends RecordReader<WritableComparable, HCatRecord> {
    *   <li>SerDeInfo properties</li>
    * </ol>
    */
-    private void createDeserializer(HCatSplit hcatSplit, HCatStorageHandler storageHandler,
-        TaskAttemptContext taskContext) throws IOException {
-
-      deserializer = ReflectionUtils.newInstance(storageHandler.getSerDeClass(),
-          taskContext.getConfiguration());
-
+    private Properties getDeserializerProperties(HCatSplit hcatSplit) throws IOException {
       Properties props = new Properties();
 
       try {
@@ -140,13 +155,7 @@ class HCatRecordReader extends RecordReader<WritableComparable, HCatRecord> {
         props.put(e.getKey(), e.getValue());
       }
 
-      try {
-        deserializer.initialize(storageHandler.getConf(), props);
-      } catch (SerDeException e) {
-        throw new IOException("Failed initializing deserializer "
-            + storageHandler.getSerDeClass().getName() + " with parameters " +
-            hcatSplit.getPartitionInfo().getSerDeInfo().getParameters(), e);
-      }
+      return props;
     }
 
   /* (non-Javadoc)
@@ -165,7 +174,7 @@ class HCatRecordReader extends RecordReader<WritableComparable, HCatRecord> {
     public HCatRecord getCurrentValue() throws IOException, InterruptedException {
       try {
         HCatRecord r = new LazyHCatRecord(deserializer.deserialize(currentValue),
-            deserializer.getObjectInspector());
+            deserializer.getObjectInspector(), hCatRecordSerDe);
         DefaultHCatRecord dr = new DefaultHCatRecord(outputSchema.size());
         int i = 0;
         for (String fieldName : outputSchema.getFieldNames()){

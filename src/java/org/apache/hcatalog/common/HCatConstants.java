@@ -113,4 +113,20 @@ public final class HCatConstants {
   // Hadoop Conf Var Names
   public static final String CONF_MAPREDUCE_JOB_CREDENTIALS_BINARY = "mapreduce.job.credentials.binary";
 
+  /****************************************************************************
+   * Data-related configuration properties.
+   */
+
+  // Pig < 0.10.0 does not have boolean support. For integration the option is offered to
+  // convert boolean fields to integers.
+  public static final String HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER =
+      "hcat.data.convert.boolean.to.integer";
+  public static final boolean HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT = false;
+
+  // Users may find the string representation of enum values more convenient than
+  // Hive style: struct<value:int>
+  // The option is offered to convert enums to strings.
+  public static final String HCAT_DATA_CONVERT_ENUM_TO_STRING =
+      "hcat.data.convert.enum.to.string";
+  public static final boolean HCAT_DATA_CONVERT_ENUM_TO_STRING_DEFAULT = false;
 }

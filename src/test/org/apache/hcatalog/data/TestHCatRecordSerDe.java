@@ -116,6 +116,11 @@ public class TestHCatRecordSerDe extends TestCase{
   public void testRW() throws Exception {
 
     Configuration conf = new Configuration();
+    HCatRecordSerDe hCatRecordSerDe = new HCatRecordSerDe();
+    Properties properties = new Properties();
+    properties.setProperty(Constants.LIST_COLUMNS, "");
+    properties.setProperty(Constants.LIST_COLUMN_TYPES, "");
+    hCatRecordSerDe.initialize(new Configuration(), properties);
 
     for (Entry<Properties,HCatRecord> e : getData().entrySet()){
       Properties tblProps = e.getKey();
@@ -155,10 +160,10 @@ public class TestHCatRecordSerDe extends TestCase{
       LOG.info("FOUR: {}", s4);
 
       // Test LazyHCatRecord init and read
-      LazyHCatRecord s5 = new LazyHCatRecord(o3,testSD.getObjectInspector());
+      LazyHCatRecord s5 = new LazyHCatRecord(o3,testSD.getObjectInspector(), hCatRecordSerDe);
       LOG.info("FIVE: {}",s5);
 
-      LazyHCatRecord s6 = new LazyHCatRecord(s4,hrsd.getObjectInspector());
+      LazyHCatRecord s6 = new LazyHCatRecord(s4,hrsd.getObjectInspector(), hCatRecordSerDe);
       LOG.info("SIX: {}", s6);
 
     }

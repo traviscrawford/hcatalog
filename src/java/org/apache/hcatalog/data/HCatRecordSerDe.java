@@ -41,6 +41,7 @@ import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Writable;
+import org.apache.hcatalog.common.HCatConstants;
 import org.apache.hcatalog.data.schema.HCatSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +59,9 @@ public class HCatRecordSerDe implements SerDe {
   private List<String> columnNames;
   private List<TypeInfo> columnTypes;
   private StructTypeInfo rowTypeInfo;
-
   private HCatRecordObjectInspector cachedObjectInspector;
+  private boolean convertBooleanToInteger;
+  private boolean convertEnumToString;
 
   @Override
   public void initialize(Configuration conf, Properties tbl)
@@ -93,6 +95,12 @@ public class HCatRecordSerDe implements SerDe {
 
     rowTypeInfo = (StructTypeInfo) TypeInfoFactory.getStructTypeInfo(columnNames, columnTypes);
     cachedObjectInspector = HCatRecordObjectInspectorFactory.getHCatRecordObjectInspector(rowTypeInfo);
+
+    convertBooleanToInteger = conf.getBoolean(HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER,
+        HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT);
+
+    convertEnumToString = conf.getBoolean(HCatConstants.HCAT_DATA_CONVERT_ENUM_TO_STRING,
+        HCatConstants.HCAT_DATA_CONVERT_ENUM_TO_STRING_DEFAULT);
   }
 
   public void initialize(HCatSchema hsch) throws SerDeException {
@@ -152,7 +160,7 @@ public class HCatRecordSerDe implements SerDe {
    * @param soi : StructObjectInspector
    * @return HCatRecord
    */
-  private static List<?> serializeStruct(Object obj, StructObjectInspector soi)
+  private List<?> serializeStruct(Object obj, StructObjectInspector soi)
       throws SerDeException {
 
     List<? extends StructField> fields = soi.getAllStructFieldRefs();
@@ -181,13 +189,25 @@ public class HCatRecordSerDe implements SerDe {
    * Return underlying Java Object from an object-representation
    * that is readable by a provided ObjectInspector.
    */
-  public static Object serializeField(Object field,
-      ObjectInspector fieldObjectInspector) throws SerDeException {
-    Object res = null;
+  public Object serializeField(Object field, ObjectInspector fieldObjectInspector)
+      throws SerDeException {
+    Object res;
     if (fieldObjectInspector.getCategory() == Category.PRIMITIVE){
-      res = ((PrimitiveObjectInspector)fieldObjectInspector).getPrimitiveJavaObject(field);
+      if (convertBooleanToInteger &&
+          field != null &&
+          Boolean.class.isAssignableFrom(field.getClass())) {
+        res = ((Boolean) field) ? 1 : 0;
+      } else {
+        res = ((PrimitiveObjectInspector) fieldObjectInspector).getPrimitiveJavaObject(field);
+      }
     } else if (fieldObjectInspector.getCategory() == Category.STRUCT){
-      res = serializeStruct(field,(StructObjectInspector)fieldObjectInspector);
+      if (convertEnumToString &&
+          field != null &&
+          Enum.class.isAssignableFrom(field.getClass())) {
+        res = field.toString();
+      } else {
+        res = serializeStruct(field, (StructObjectInspector) fieldObjectInspector);
+      }
     } else if (fieldObjectInspector.getCategory() == Category.LIST){
       res = serializeList(field,(ListObjectInspector)fieldObjectInspector);
     } else if (fieldObjectInspector.getCategory() == Category.MAP){
@@ -205,7 +225,7 @@ public class HCatRecordSerDe implements SerDe {
    * an object-representation that is readable by a provided
    * MapObjectInspector
    */
-  private static Map<?,?> serializeMap(Object f, MapObjectInspector moi) throws SerDeException {
+  private Map<?,?> serializeMap(Object f, MapObjectInspector moi) throws SerDeException {
     ObjectInspector koi = moi.getMapKeyObjectInspector();
     ObjectInspector voi = moi.getMapValueObjectInspector();
     Map<Object,Object> m = new TreeMap<Object, Object>();
@@ -221,7 +241,7 @@ public class HCatRecordSerDe implements SerDe {
     return m;
   }
 
-  private static List<?> serializeList(Object f, ListObjectInspector loi) throws SerDeException {
+  private List<?> serializeList(Object f, ListObjectInspector loi) throws SerDeException {
     List l = loi.getList(f);
     if (l == null){
       return null;
