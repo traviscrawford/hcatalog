@@ -32,6 +32,7 @@ import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hcatalog.common.HCatException;
+import org.apache.hcatalog.common.HCatUtil;
 import org.apache.hcatalog.data.DefaultHCatRecord;
 import org.apache.hcatalog.data.HCatRecord;
 import org.apache.hcatalog.data.schema.HCatFieldSchema;
@@ -247,7 +248,21 @@ public abstract class HCatBaseStorer extends StoreFunc implements StoreMetadata 
       switch(type){
 
       case BINARY:
-        return (null == pigObj) ? new byte[0] : ((DataByteArray)pigObj).get();
+        if (null == pigObj) {
+          return new byte[0];
+        }
+
+        if (HCatUtil.getHiveMajorVersion() != null &&
+            HCatUtil.getHiveMinorVersion() != null &&
+            HCatUtil.getHiveMajorVersion() == 0 &&
+            HCatUtil.getHiveMinorVersion() <= 9) {
+          ByteArrayRef ba = new ByteArrayRef();
+          byte[] bytes = ((DataByteArray) pigObj).get();
+          ba.setData(bytes);
+          return ba;
+        } else {
+          return ((DataByteArray)pigObj).get();
+        }
 
       case STRUCT:
         if (pigObj == null) {

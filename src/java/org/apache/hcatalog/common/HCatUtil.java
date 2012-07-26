@@ -30,6 +30,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.permission.FsAction;
@@ -64,6 +66,7 @@ import org.apache.hcatalog.mapreduce.InputJobInfo;
 import org.apache.hcatalog.mapreduce.OutputJobInfo;
 import org.apache.hcatalog.mapreduce.PartInfo;
 import org.apache.hcatalog.mapreduce.StorerInfo;
+import org.apache.pig.impl.util.JarManager;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +74,9 @@ import org.slf4j.LoggerFactory;
 public class HCatUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(HCatUtil.class);
+    private static Integer HIVE_MAJOR_VERSION = null;
+    private static Integer HIVE_MINOR_VERSION = null;
+
 
     public static boolean checkJobContextIfRunningFromBackend(JobContext j) {
         if (j.getConfiguration().get("mapred.task.id", "").equals("")) {
@@ -591,4 +597,34 @@ public class HCatUtil {
         jobConf.set(entry.getKey(), entry.getValue());
       }
     }
+
+  public static void getHiveVersion() {
+    try {
+      String hiveJarFileName = JarManager.findContainingJar(HiveConf.class);
+      JarFile jar = new JarFile(hiveJarFileName);
+      Manifest manifest = jar.getManifest();
+      String title = manifest.getMainAttributes().getValue("Implementation-Title");
+      String version = manifest.getMainAttributes().getValue("Implementation-Version");
+      if ("Hive".equals(title) && version != null) {
+        HIVE_MAJOR_VERSION = Integer.parseInt(version.split("\\.")[0]);
+        HIVE_MINOR_VERSION = Integer.parseInt(version.split("\\.")[1]);
+      }
+    } catch (IOException e) {
+      LOG.debug("Failed determining specific Hive version number.");
+    }
+  }
+
+  public static Integer getHiveMajorVersion() {
+    if (HIVE_MAJOR_VERSION == null) {
+      getHiveVersion();
+    }
+    return HIVE_MAJOR_VERSION;
+  }
+
+  public static Integer getHiveMinorVersion() {
+    if (HIVE_MINOR_VERSION == null) {
+      getHiveVersion();
+    }
+    return HIVE_MINOR_VERSION;
+  }
 }
