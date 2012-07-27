@@ -462,10 +462,10 @@ public class TestHCatStorer extends HCatBaseTest {
     driver.getResults(res);
 
     Iterator<String> itr = res.iterator();
-    assertEquals( "0\tNULL\tNULL\tNULL\tNULL\tnull\tnull" ,itr.next());
-    assertEquals( "NULL\t4.2\t2.2\t4\tlets hcat\tbinary-data\tnull" ,itr.next());
-    assertEquals( "3\t6.2999997\t3.3000000000000003\t6\tlets hcat\tbinary-data\tnull",itr.next());
-    assertFalse(itr.hasNext());
+    Assert.assertEquals( "0\tNULL\tNULL\tNULL\tNULL\tnull\tnull" ,itr.next());
+    Assert.assertEquals( "NULL\t4.2\t2.2\t4\tlets hcat\tbinary-data\tnull" ,itr.next());
+    Assert.assertEquals( "3\t6.2999997\t3.3000000000000003\t6\tlets hcat\tbinary-data\tnull",itr.next());
+    Assert.assertFalse(itr.hasNext());
 
     server.registerQuery("B = load 'junit_unparted' using "+HCatLoader.class.getName()+";");
     Iterator<Tuple> iter = server.openIterator("B");
@@ -476,13 +476,13 @@ public class TestHCatStorer extends HCatBaseTest {
         if(t.get(5) == null){
             num5nulls++;
         }else {
-            assertTrue(t.get(5) instanceof DataByteArray);
+          Assert.assertTrue(t.get(5) instanceof DataByteArray);
         }
-        assertNull(t.get(6));
+      Assert.assertNull(t.get(6));
         count++;
     }
-    assertEquals(3, count);
-    assertEquals(1, num5nulls);
+    Assert.assertEquals(3, count);
+    Assert.assertEquals(1, num5nulls);
     driver.run("drop table junit_unparted");
   }
 
