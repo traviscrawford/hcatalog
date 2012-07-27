@@ -205,6 +205,8 @@ public class HCatRecordSerDe implements SerDe {
           field != null &&
           Enum.class.isAssignableFrom(field.getClass())) {
         res = field.toString();
+      } else if (field != null && ByteBuffer.class.isAssignableFrom(field.getClass())) {
+        res = ((ByteBuffer) field).array();
       } else {
         res = serializeStruct(field, (StructObjectInspector) fieldObjectInspector);
       }
