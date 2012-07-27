@@ -32,8 +32,7 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.MetaStoreUtils;
 import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
-import org.apache.hadoop.hive.ql.metadata.Table;
-import org.apache.hadoop.hive.serde2.lazy.ByteArrayRef;
+import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hcatalog.common.HCatConstants;
 import org.apache.hcatalog.common.HCatException;
@@ -320,7 +319,7 @@ public class PigHCatUtil {
     Type itemType = hfs.getType();
     switch (itemType){
     case BINARY:
-      result = (o == null) ? null : new DataByteArray((byte[]) o);
+      result = (o == null) ? null : new DataByteArray((byte[])o);
       break;
     case STRUCT:
       result = transformToTuple((List<Object>)o,hfs);
