@@ -24,9 +24,10 @@
   <loadproperties srcfile="${path.to.basedir}/build.properties"/>
   <loadproperties srcfile="${path.to.basedir}/ivy/libraries.properties"/>
 
-  <import file="${path.to.basedir}/ant/findbugs.xml"/>
   <import file="${path.to.basedir}/ant/dependencies.xml"/>
   <import file="${path.to.basedir}/ant/deploy.xml"/>
+  <import file="${path.to.basedir}/ant/findbugs.xml"/>
+  <import file="${path.to.basedir}/ant/test.xml"/>
 
   <macrodef name="_javac">
     <attribute name="srcDir"/>
@@ -47,29 +48,6 @@
     </sequential>
   </macrodef>
 
-  <!-- By default all tests are run. To run one test define -Dtestcase=X on the command line -->
-  <macrodef name="_junit">
-    <sequential>
-      <mkdir dir="${test.logs}"/>
-      <junit printsummary="true"
-             fork="true"
-             forkmode="perBatch"
-             dir="${test.dir}"
-             failureProperty="tests.failed">
-        <sysproperty key="hive.metastore.warehouse.dir" value="${test.warehouse.dir}"/>
-        <classpath refid="test.class.path"/>
-        <formatter type="${test.junit.output.format}"/>
-        <batchtest todir="${test.logs}" unless="testcase">
-          <fileset dir="${basedir}/src/test/java" includes="**/Test*.java"/>
-        </batchtest>
-        <batchtest todir="${test.logs}" if="testcase">
-          <fileset dir="${basedir}/src/test/java" includes="**/${testcase}.java"/>
-        </batchtest>
-      </junit>
-      <fail if="tests.failed" message="Tests failed!"/>
-    </sequential>
-  </macrodef>
-
   <target name="clean">
     <echo message="${ant.project.name}"/>
     <delete dir="${build.dir}"/>
@@ -82,12 +60,15 @@
             classPathRef="compile.class.path"/>
   </target>
 
-  <target name="test" depends="jar">
-    <echo message="${ant.project.name}"/>
+  <target name="compile-test" depends="jar">
     <_javac srcDir="${basedir}/src/test/java"
             destDir="${test.classes}"
             classPathRef="test.class.path"/>
-    <_junit/>
+  </target>
+
+  <target name="test" depends="jar, compile-test">
+    <echo message="${ant.project.name}"/>
+    <_junit srcDir="${basedir}/src/test/java"/>
   </target>
 
   <target name="jar" depends="compile,mvn-init">

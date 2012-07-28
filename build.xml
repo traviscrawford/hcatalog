@@ -17,6 +17,14 @@
    limitations under the License.
 -->
 
+<!-- Run pretty much everything with:
+ant \
+  -Dclover.home=/usr/local/clover-ant-2.6.3 \
+  -Dtestcase=Foo \
+  -Drun.clover=true \
+  -Dforrest.home=/Users/travis/apache-forrest-0.9 \
+  clean package clover test generate-clover-reports forrest
+-->
 
 <project name="hcatalog" default="jar"
          xmlns:ivy="antlib:org.apache.ivy.ant"
@@ -98,7 +106,7 @@
     </fileset>
   </path>
 
-  <path id="test.classpath">
+  <path id="test.class.path">
     <pathelement location="${test.classes}"/>
     <pathelement location="${build.classes}"/>
     <pathelement location="conf"/>
@@ -251,7 +259,7 @@
         deprecation="${javac.deprecation}"
         includeantruntime="false">
       <compilerarg line="${javac.args}"/>
-      <classpath refid="test.classpath"/>
+      <classpath refid="test.class.path"/>
     </javac>
   </target>
 
@@ -261,57 +269,12 @@
   </target>
 
   <target name="test" depends="compile-test">
-    <sequential>
-      <!-- If anyone knows how to set umask inside ant please do so -->
-      <exec executable="bin/umaskcheck.sh" failonerror="true"/>
-      <delete dir="${test.logs}"/>
-      <delete dir="${test.warehouse.dir}"/>
-      <mkdir dir="${test.logs}"/>
-      <mkdir dir="${test.warehouse.dir}"/>
-      <junit showoutput="${test.output}" printsummary="yes" haltonfailure="no"
-          fork="yes" maxmemory="512m" dir="${basedir}" timeout="${test.timeout}"
-          errorProperty="tests.failed" failureProperty="tests.failed">
-        <sysproperty key="hadoop.log.dir" value="${test.logs}"/>
-        <sysproperty key="hive.metastore.warehouse.dir" value="${test.warehouse.dir}"/>
-        <classpath>
-          <pathelement location="${test.classes}" />
-          <pathelement location="." />
-          <pathelement path="${clover.jar}"/>
-          <path refid="test.classpath"/>
-          <pathelement path="hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
-        </classpath>
-        <formatter type="${test.junit.output.format}" />
-        <!-- If the user has not defined a particular test to run, run them all -->
-        <batchtest fork="yes" todir="${test.logs}" unless="testcase">
-          <fileset dir="src/test">
-            <patternset>
-              <includesfile name="${test.all.file}"/>
-              <excludesfile name="${test.exclude.file}"/>
-            </patternset>
-          </fileset>
-        </batchtest>
-        <!-- Run one test case.  To use this define -Dtestcase=X on the command line -->
-        <batchtest fork="yes" todir="${test.logs}" if="testcase">
-          <fileset dir="src/test" includes="**/${testcase}.java"/>
-        </batchtest>
-
-        <assertions>
-          <enable />
-        </assertions>
-
-      </junit>
-      <fail if="tests.failed">Tests failed!</fail>
-    </sequential>
+    <_junit srcDir="${basedir}/src/test"/>
     <ant target="test" dir="hcatalog-pig-adapter" inheritAll="false"/>
     <ant target="test" dir="webhcat/svr" inheritAll="false"/>
     <antcall target="test-storage-handlers"/>
   </target>
 
-<!-- TMP REMOVE THIS -->
-  <target name="hack-test" depends="compile-test">
-    <ant target="test" dir="webhcat/svr" inheritAll="false"/>
-  </target>
-  
   <!--
   ================================================================================
   Clover Section
@@ -403,6 +366,7 @@
   -->
   <!-- Clean up children -->
   <target name="clean" description="Cleanup all build artifacts">
+    <echo message="${ant.project.name}"/>
     <delete dir="${build.dir}" />
     <delete dir="${test.warehouse.dir}"/>
     <ant target="clean" dir="hcatalog-pig-adapter" inheritAll="false"/>
@@ -631,5 +595,6 @@
   <import file="ant/dependencies.xml"/>
   <import file="ant/deploy.xml"/>
   <import file="ant/findbugs.xml"/>
+  <import file="ant/test.xml"/>
 
 </project>
