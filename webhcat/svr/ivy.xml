@@ -24,24 +24,27 @@
   </info>
 
   <configurations defaultconfmapping="default">
-  <!--these match the Maven configurations-->
-      <conf name="default" extends="master,runtime"/>
-      <conf name="master" description="contains the artifact but no dependencies"/>
-      <conf name="runtime" description="runtime but not the artifact" />
-      <conf name="common" visibility="private" 
-          extends="runtime"
-          description="artifacts needed to compile/test the application"/>
-      <conf name="test" visibility="private" extends="runtime"/>
-      <conf name="package" visibility="private" extends="master"/>
-      <conf name="releaseaudit" visibility="private"/>
+    <conf name="default"/>
+    <conf name="test" extends="default"/>
   </configurations>
 
   <dependencies>
+    <dependency org="org.apache.hcatalog" name="hcatalog-core" rev="${hcatalog.version}"/>
+    <dependency org="org.apache.pig" name="pig" rev="${pig.version}"/>
+    <dependency org="org.apache.commons" name="commons-exec" rev="${commons-exec.version}"/>
+    <dependency org="org.eclipse.jetty.aggregate" name="jetty-all-server"
+      rev="${jetty.webhcat.version}"/>
+    <dependency org="org.slf4j" name="jul-to-slf4j" rev="${slf4j.version}"/>
+
+    <!-- test dependencies -->
+    <dependency org="junit" name="junit" rev="${junit.version}" conf="test->default"/>
+    <dependency org="org.apache.hadoop" name="hadoop-test" rev="${hadoop.jars.version}"
+      conf="test->default"/>
+
+    <!--
     <dependency org="org.apache.pig" name="pig" rev="${pig.version}"/>
     <dependency org="junit" name="junit" rev="${junit.version}"
         conf="common->default"/>
-    <dependency org="org.apache.commons" name="commons-exec"
-        rev="${commons-exec.version}" conf="common->master"/>
 
     <dependency org="org.apache.hive" name="hive-metastore"
 		rev="${hive.version}" conf="common->master"/>
@@ -119,6 +122,7 @@
         rev="${wadl-resourcedoc-doclet.version}" conf="common->master"/>
     <dependency org="xerces" name="xercesImpl"
         rev="${xerces.version}" conf="common->master"/>
+    -->
 
   </dependencies>
 </ivy-module>

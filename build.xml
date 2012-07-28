@@ -18,7 +18,9 @@
 -->
 
 
-<project name="hcatalog" default="jar" xmlns:ivy="antlib:org.apache.ivy.ant" >
+<project name="hcatalog" default="jar"
+         xmlns:ivy="antlib:org.apache.ivy.ant"
+         xmlns:artifact="artifact:org.apache.maven.artifact.ant">
   <!--  
   ================================================================================
   Imports
@@ -123,153 +125,67 @@
   <property name="package.buildroot" value="${build.dir}/rpm/hcatalog_package_build_${user.name}"/>
   <property name="package.build.dir" value="${build.dir}/rpm/hcatalog_package_build_${user.name}/BUILD"/>
 
-  <condition property="os-arch" value="x86_64">
-      <and>
-	<os arch="amd64" />
-      </and>
-    </condition>
-    <condition property="os-arch" value="i386">
-      <or>
-	<os arch="i386" />
-	<os arch="i486" />
-	<os arch="i586" />
-	<os arch="i686" />
-      </or>
-    </condition>
-
   <!-- rats properties -->
   <property name="rat.reporting.classname" value="rat.Report"/>
 
-  <!--this is the naming policy for artifacts we want pulled down-->
-  <property name="ivy.artifact.retrieve.pattern" value="${ant.project.name}/[artifact]-[revision](-[classifier]).[ext]"/>
-
-  <!-- Classpaths for various builds -->
-  <path id="classpath">
-    <path refid="common.classpath"/>
+  <path id="compile.classpath">
+    <fileset dir="${build.dir}/ivy/lib/default">
+      <include name="**/*.jar"/>
+    </fileset>
   </path>
-
-  <condition property="os-arch" value="x86_64">
-    <and>
-      <os arch="amd64" />
-    </and>
-  </condition>
-  <condition property="os-arch" value="i386">
-    <or>
-      <os arch="i386" />
-      <os arch="i486" />
-      <os arch="i586" />
-      <os arch="i686" />
-    </or>
-  </condition>
 
   <path id="test.classpath">
     <pathelement location="${test.build.classes}" />
     <pathelement location="${build.classes}" />
     <pathelement location="conf"/>
-    <fileset dir="${ivy.lib.dir}">
-      <include name="**/*.jar" />
+    <fileset dir="${build.dir}/ivy/lib/test">
+      <include name="**/*.jar"/>
     </fileset>
-    <pathelement location="${hcatalog.jar}"/>
   </path>
 
-  <!--
-  ================================================================================
-  Ivy Section
-  ================================================================================
-  -->
-  <!-- Ivy goop stolen directly from Pig's build.xml -->
-  <target name="ivy-init-dirs">
-    <mkdir dir="${build.ivy.dir}" />
-    <mkdir dir="${build.ivy.lib.dir}" />
-    <mkdir dir="${build.ivy.report.dir}" />
-  </target>
+  <!-- Classpath that includes all sub packages, used for things like Java docs -->
+  <path id="uber.classpath">
+    <fileset dir="${basedir}">
+      <include name="**/build/ivy/lib/default/*.jar"/>
+    </fileset>
+  </path>
 
-  <target name="ivy-probe-antlib" >
-    <condition property="ivy.found">
-      <typefound uri="antlib:org.apache.ivy.ant" name="cleancache"/>
-    </condition>
+  <!-- This is a little janky because hcatalog-core.jar is not yet a submodule. -->
+  <target name="ivy-report" depends="ivy-retrieve">
+    <antcall target="_ivy-report"/>
+    <ant target="_ivy-report" dir="hcatalog-pig-adapter" inheritAll="false" useNativeBasedir="true"/>
+    <ant target="ivy-report" dir="storage-handlers" inheritAll="false" useNativeBasedir="true"/>
   </target>
 
   <target name="ivy-download" description="To download ivy" unless="offline">
-    <get src="${ivy_repo_url}" dest="${ivy.jar}" usetimestamp="true"/>
-  </target>
-
-  <!--
-     To avoid Ivy leaking things across big projects, always load Ivy in the same classloader.
-     Also note how we skip loading Ivy if it is already there, just to make sure all is well.
-  -->
-  <target name="ivy-init-antlib" depends="ivy-download,ivy-init-dirs,ivy-probe-antlib" unless="ivy.found">
+    <echo message="${ant.project.name}"/>
+    <get src="${ivy_repo_url}" dest="${ivy.jar}" usetimestamp="true" skipexisting="true"/>
     <typedef uri="antlib:org.apache.ivy.ant" onerror="fail" loaderRef="ivyLoader">
       <classpath>
         <pathelement location="${ivy.jar}"/>
       </classpath>
     </typedef>
-    <fail>
-      <condition >
-        <not>
-          <typefound uri="antlib:org.apache.ivy.ant" name="cleancache"/>
-        </not>
-      </condition>
-         You need Apache Ivy 2.0 or later from http://ant.apache.org/
-         It could not be loaded from ${ivy_repo_url}
-    </fail>
   </target>
 
-  <target name="ivy-init" depends="ivy-init-antlib" >
-    <!--Configure Ivy by reading in the settings file
-        If anyone has already read in a settings file into this settings ID, it gets priority
-    -->
-    <ivy:configure settingsid="${ant.project.name}.ivy.settings"
-      file="${ivysettings.xml}" override='false'/>
-    <ivy:makepom ivyfile="${ivy.xml}" pomfile="${pom.file}"/>
+  <target name="ivy-init" depends="ivy-download,_ivy-init">
+    <!-- HCatalog started as a single source tree that produced multiple artifacts.
+    Currently its going through a transition to subprojects. During this transition
+    we jank together pom files for artifacts produced in the existing source tree until
+    they are correctly generated from per-subproject ivy.xml files. -->
+    <copy file="${pom.file}" tofile="${build.ivy.dir}/hcatalog-core-${hcatalog.version}.pom"
+          overwrite="true"/>
+    <replace file="${build.ivy.dir}/hcatalog-core-${hcatalog.version}.pom"
+             token="artifactId>hcatalog"
+             value="artifactId>hcatalog-core"/>
+
+    <copy file="${pom.file}" overwrite="true"
+          tofile="${build.ivy.dir}/hcatalog-server-extensions-${hcatalog.version}.pom"/>
+    <replace file="${build.ivy.dir}/hcatalog-server-extensions-${hcatalog.version}.pom"
+             token="artifactId>hcatalog"
+             value="artifactId>hcatalog-server-extensions"/>
   </target>
 
-  <target name="ivy-compile" depends="ivy-init" description="Resolve, Retrieve Ivy-managed artifacts for compile configuration">
-    <ivy:resolve settingsRef="${ant.project.name}.ivy.settings" conf="common"/>
-    <ivy:retrieve settingsRef="${ant.project.name}.ivy.settings"
-      pattern="${build.ivy.lib.dir}/${ivy.artifact.retrieve.pattern}" conf="common"/>
-    <ivy:cachepath pathid="compile.classpath" conf="common"/>     
-    <ivy:resolve settingsRef="${ant.project.name}.ivy.settings" conf="default"/>
-    <ivy:retrieve settingsRef="${ant.project.name}.ivy.settings"
-      pattern="${build.ivy.lib.dir}/${ivy.artifact.retrieve.pattern}" conf="default"/>
-    <ivy:cachepath pathid="compile.classpath" conf="default"/>     
-  </target>
-
-  <target name="ivy-package" depends="ivy-init"
-    description="Retrieve Ivy-managed artifacts for the package configurations">
-    <ivy:resolve settingsRef="${ant.project.name}.ivy.settings" conf="package"/>
-    <ivy:retrieve settingsRef="${ant.project.name}.ivy.settings"
-      pattern="${build.ivy.lib.dir}/${ivy.artifact.retrieve.pattern}" conf="package"/>
-    <ivy:cachepath pathid="package.classpath" conf="package"/>
-  </target>
-
-  <target name="ivy-releaseaudit" depends="ivy-init" description="Resolve, Retrieve Ivy-managed artifacts for releaseaudit configuration">
-    <ivy:resolve settingsRef="${ant.project.name}.ivy.settings" conf="releaseaudit"/>
-    <ivy:retrieve settingsRef="${ant.project.name}.ivy.settings"
-      pattern="${build.ivy.lib.dir}/${ivy.artifact.retrieve.pattern}" conf="releaseaudit"/>
-    <ivy:cachepath pathid="releaseaudit.classpath" conf="releaseaudit"/>
-  </target>
-
-  <target name="ivy-publish" depends="ivy-init">
-    <ivy:publish
-        resolver="local"
-        organisation="org.apache.hcatalog"
-        module="${ant.project.name}"
-        revision="${hcatalog.version}"
-        overwrite="true">
-      <artifacts pattern="${build.dir}/${ant.project.name}/[artifact]-[revision](-[classifier]).[ext]"/>
-    </ivy:publish>
-  </target>
-
-  <target name="ivy-report" depends="ivy-init" description="Generate Ivy dependency report">
-    <ivy:report todir="${build.ivy.report.dir}"
-      conf="common, default"
-      organisation="org.apache.hcatalog"
-      module="hcatalog"
-      graph="false"/>
-  </target>
-
-  <target name="init" depends="ivy-compile, ivy-package" >
+  <target name="init" depends="ivy-retrieve,mvn-init">
     <mkdir dir="${dist.dir}" />
     <mkdir dir="${build.classes}" />
     <mkdir dir="${test.build.classes}" />
@@ -288,7 +204,7 @@
         source="${javac.version}" deprecation="${javac.deprecation}"
         includeantruntime="false">
       <compilerarg line="${javac.args}"/>
-      <classpath refid="classpath" />
+      <classpath refid="compile.classpath"/>
     </javac>
     <!-- compile shim for selected hadoop version -->
     <!--property name="debugclasspath" refid="classpath"/>
@@ -299,7 +215,7 @@
         source="${javac.version}" deprecation="${javac.deprecation}"
         includeantruntime="false">
       <compilerarg line="${javac.args}"/>
-      <classpath refid="classpath" />
+      <classpath refid="compile.classpath"/>
     </javac>
   </target>
  
@@ -307,6 +223,9 @@
   <target name="clientjar" depends="compile-src">
     <jar jarfile="${build.dir}/${ant.project.name}/${hcatalog.core.jar}"
          basedir="${build.classes}"/>
+    <artifact:install file="${build.dir}/${ant.project.name}/${hcatalog.core.jar}">
+      <artifact:pom file="${build.ivy.dir}/hcatalog-core-${hcatalog.version}.pom"/>
+    </artifact:install>
   </target>
 
   <!--
@@ -314,11 +233,10 @@
   Build server side code, mainly listener.
   ================================================================================
   -->
-  <!-- Build the server side jar -->
   <target name="server-extensions" depends="compile-src">
-     <jar jarfile="${build.dir}/${ant.project.name}/${ant.project.name}-server-extensions-${hcatalog.version}.jar" basedir="${build.classes}"
- 	  includes="org/apache/hcatalog/listener/**,org/apache/hcatalog/metadata/**">
-  </jar>
+     <jar jarfile="${build.dir}/${ant.project.name}/${ant.project.name}-server-extensions-${hcatalog.version}.jar"
+          basedir="${build.classes}"
+          includes="org/apache/hcatalog/listener/**,org/apache/hcatalog/metadata/**"/>
   </target>
 
   <!--
@@ -330,6 +248,8 @@
     <ant target="jar" dir="hcatalog-pig-adapter" inheritAll="false"/>
     <ant target="jar" dir="webhcat/svr" inheritAll="false"/>
 
+    <!-- Build hcatalog.jar, bundling the pig adapter. Our intention is to stop producing this
+         fat jar after some migration period. -->
     <jar jarfile="${build.dir}/${ant.project.name}/${hcatalog.jar}">
       <zipfileset src="${build.dir}/${ant.project.name}/${hcatalog.core.jar}"/>
       <zipfileset src="hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
@@ -353,16 +273,20 @@
   -->
   <!-- Build HCatalog test files -->
   <target name="compile-test" depends="jar">
-    <javac encoding="${build.encoding}" srcdir="${test.src.dir}" excludes="${test.excludes}"
-        includes="**/*.java" destdir="${test.build.classes}" debug="${javac.debug}"
-        optimize="${javac.optimize}" target="${javac.version}"
-        source="${javac.version}" deprecation="${javac.deprecation}"
+    <javac
+        encoding="${build.encoding}"
+        srcdir="${test.src.dir}"
+        excludes="${test.excludes}"
+        includes="**/*.java"
+        destdir="${test.build.classes}"
+        debug="${javac.debug}"
+        optimize="${javac.optimize}"
+        target="${javac.version}"
+        source="${javac.version}"
+        deprecation="${javac.deprecation}"
         includeantruntime="false">
       <compilerarg line="${javac.args}"/>
-      <classpath>
-        <path refid="test.classpath"/>
-        <pathelement path="hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
-      </classpath>
+      <classpath refid="test.classpath"/>
     </javac>
   </target>
 
@@ -494,10 +418,6 @@
     <property name="findbugs.report.xmlfile"
       value="${findbugs.out.dir}/hcat-findbugs-report.xml"/>
 
-    <path id="findbugs.class.path">
-      <fileset dir="${ivy.lib.dir}"/>
-    </path>
-
     <_findbugs outputDir="${findbugs.out.dir}"
                outputFile="${findbugs.report.xmlfile}"
                excludeFilter="${findbugs.exclude.file}"
@@ -505,7 +425,7 @@
                findbugsReportHtmlFile="${findbugs.report.htmlfile}"
                sourceDir="${src.dir}"
                jarDir="${build.dir}/${ant.project.name}"
-               classPathRef="findbugs.class.path"/>
+               classPathRef="compile.classpath"/>
 
     <ant target="findbugs" dir="hcatalog-pig-adapter" inheritAll="false"/>
     <ant target="findbugs" dir="webhcat/svr" inheritAll="false"/>
@@ -559,15 +479,10 @@
       <packageset dir="${src.dir}" />
       <packageset dir="hcatalog-pig-adapter/src/main/java" />
       <packageset dir="webhcat/svr/src/main/java" />
-      <!--
-        <classpath>
-          <path refid="classpath" />
-        </classpath>
-        -->
-        <classpath>
-          <path refid="uber.classpath"/>
-        </classpath>
-        <group title="hcatalog" packages="org.apache.hcatalog.*" />
+      <classpath>
+        <path refid="uber.classpath"/>
+      </classpath>
+      <group title="hcatalog" packages="org.apache.hcatalog.*"/>
     </javadoc>
   </target>
 
@@ -679,7 +594,7 @@
       <antcall target="package-storage-handlers"/>
     </target>
 
-    <target name="releaseaudit" depends="ivy-releaseaudit" description="Release Audit activities">
+    <target name="releaseaudit" depends="ivy-retrieve" description="Release Audit activities">
       <java classname="${rat.reporting.classname}" fork="true">
         <classpath refid="releaseaudit.classpath"/>
         <arg value="${basedir}/src"/>
@@ -748,6 +663,8 @@
         <ant dir="${test.e2e.dir}" target="deploy"/>
     </target>
 
+  <import file="ant/dependencies.xml"/>
+  <import file="ant/deploy.xml"/>
   <import file="ant/findbugs.xml"/>
 
 </project>
