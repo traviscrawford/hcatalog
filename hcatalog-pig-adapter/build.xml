@@ -19,9 +19,7 @@
 
 <project name="hcatalog-pig-adapter">
   <property name="path.to.basedir" value="${basedir}/.."/>
-  <import file="../build-common-new.xml"/>
-
-  <property name="clover.jar" location="${clover.home}/lib/clover.jar"/>
+  <import file="../build-common.xml"/>
 
   <path id="compile.class.path">
     <fileset dir="${build.dir}/ivy/lib/default" includes="*.jar"/>

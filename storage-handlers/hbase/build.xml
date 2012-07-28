@@ -71,8 +71,6 @@
     <property name="test.output" value="no"/>
     <property name="hive.conf.dir" value="${hive.root}/conf"/>
 
-    <property name="clover.jar" location="${clover.home}/lib/clover.jar"/>
-
     <!-- ivy properteis set here -->
     <property name="ivy.repo.dir" value="${user.home}/ivyrepo" />
     <property name="ivy.dir" location="../../ivy" />

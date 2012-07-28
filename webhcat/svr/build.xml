@@ -19,7 +19,7 @@
 <project name="webhcat">
   <property name="path.to.basedir" location="${basedir}/../.."/>
 
-  <import file="../../build-common-new.xml"/>
+  <import file="../../build-common.xml"/>
 
   <path id="compile.class.path">
     <fileset dir="${build.dir}/ivy/lib/default" includes="*.jar"/>

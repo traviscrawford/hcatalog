@@ -42,7 +42,10 @@
              failureProperty="tests.failed">
         <sysproperty key="hadoop.log.dir" value="${test.logs}"/>
         <sysproperty key="hive.metastore.warehouse.dir" value="${test.warehouse.dir}"/>
-        <classpath refid="test.class.path"/>
+        <classpath>
+          <path refid="test.class.path"/>
+          <pathelement location="${clover.jar}"/>
+        </classpath>
         <formatter type="${test.junit.output.format}"/>
         <batchtest fork="yes" todir="${test.logs}" unless="testcase">
           <fileset dir="@{srcDir}" includes="**/Test*.java"/>
@@ -57,5 +60,37 @@
       <fail if="tests.failed">Tests failed!</fail>
     </sequential>
   </macrodef>
+
+  <target name="clover-init">
+    <available property="clover.present" file="${clover.jar}"/>
+    <fail message="'clover.home' is not defined. Please pass -Dclover.home=/path/to/clover to ant on the command-line." unless="clover.present"/>
+    <taskdef resource="cloverlib.xml" classpath="${clover.jar}"/>
+    <mkdir dir="${clover.db.dir}"/>
+    <clover-setup initString="${clover.db.dir}/hcat_coverage.db">
+      <fileset dir="src" includes="**/*.java" excludes="**/NoExitSecurityManager.java"/>
+      <fileset dir="webhcat/svr/src/main/java" includes="**/*.java"/>
+      <fileset dir="storage-handlers/hbase/src/java" includes="**/*.java"/>
+      <fileset dir="hcatalog-pig-adapter/src/main/java" includes="**/*.java"/>
+    </clover-setup>
+  </target>
+
+  <!-- test-with-clover should only be called from the top-level build
+  so a global coverage report is generated. -->
+  <target name="test-with-clover" depends="clover-init, test"
+          description="run unit tests and generate code coverage reports">
+    <mkdir dir="${clover.report.dir}"/>
+      <clover-report>
+      <current outfile="${clover.report.dir}" title="${final.name}">
+        <format type="html"/>
+      </current>
+      </clover-report>
+    <clover-report>
+      <current outfile="${clover.report.dir}/clover.xml" title="${final.name}">
+        <format type="xml"/>
+      </current>
+    </clover-report>
+    <mkdir dir="${clover.pdf.report.dir}"/>
+    <clover-pdf-report outfile="${clover.pdf.report.dir}/clover_coverage.pdf" />
+  </target>
 
 </project>
