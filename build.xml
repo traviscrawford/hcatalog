@@ -135,12 +135,13 @@
   </path>
 
   <path id="test.classpath">
-    <pathelement location="${test.build.classes}" />
-    <pathelement location="${build.classes}" />
+    <pathelement location="${test.build.classes}"/>
+    <pathelement location="${build.classes}"/>
     <pathelement location="conf"/>
     <fileset dir="${build.dir}/ivy/lib/test">
       <include name="**/*.jar"/>
     </fileset>
+    <pathelement location="${basedir}/hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
   </path>
 
   <!-- Classpath that includes all sub packages, used for things like Java docs -->
