@@ -19,12 +19,9 @@
 
 
 <project name="hbase-storage-handler" default="jar" xmlns:ivy="antlib:org.apache.ivy.ant" >
-    <!--
-    ================================================================================
-    Import File
-    ================================================================================
-    -->
-    <import file="../../build-common.xml"/>
+
+    <property name="path.to.basedir" location="${basedir}/../.."/>
+    <loadproperties srcfile="${path.to.basedir}/build.properties"/>
 
     <!--
     ================================================================================

@@ -20,28 +20,9 @@
 <project name="build-common-new" default="jar"
          xmlns:ivy="antlib:org.apache.ivy.ant"
          xmlns:artifact="artifact:org.apache.maven.artifact.ant">
+
+  <loadproperties srcfile="${path.to.basedir}/build.properties"/>
   <loadproperties srcfile="${path.to.basedir}/ivy/libraries.properties"/>
-
-  <property name="hcatalog.version" value="0.5.0-dev"/>
-  <property name="jar.name" value="${ant.project.name}-${hcatalog.version}.jar"/>
-  <property name="build.dir" location="${basedir}/build"/>
-  <property name="build.classes" location="${build.dir}/classes"/>
-  <property name="test.dir" location="${build.dir}/test"/>
-  <property name="test.classes" location="${test.dir}/classes"/>
-  <property name="test.logs" location="${test.dir}/logs"/>
-  <property name="test.warehouse.dir" location="${test.dir}/hcat_junit_warehouse"/>
-  <property name="mvnrepo" value="http://repo2.maven.org/maven2"/>
-
-  <property name="ivysettings.xml" location="${path.to.basedir}/ivy/ivysettings.xml"/>
-  <property name="ivy.xml" location="${basedir}/ivy.xml"/>
-  <property name="pom.file" location="${build.dir}/ivy/${ant.project.name}-${hcatalog.version}.pom"/>
-
-  <property name="findbugs.out.dir" location="${test.dir}/findbugs"/>
-  <property name="findbugs.exclude.file" value="${basedir}/src/test/findbugsExcludeFile.xml"/>
-  <property name="findbugs.report.htmlfile"
-    location="${findbugs.out.dir}/hcat-findbugs-report.html"/>
-  <property name="findbugs.report.xmlfile"
-    location="${findbugs.out.dir}/hcat-findbugs-report.xml"/>
 
   <import file="${path.to.basedir}/ant/findbugs.xml"/>
   <import file="${path.to.basedir}/ant/dependencies.xml"/>
@@ -77,7 +58,7 @@
              failureProperty="tests.failed">
         <sysproperty key="hive.metastore.warehouse.dir" value="${test.warehouse.dir}"/>
         <classpath refid="test.class.path"/>
-        <formatter type="plain"/>
+        <formatter type="${test.junit.output.format}"/>
         <batchtest todir="${test.logs}" unless="testcase">
           <fileset dir="${basedir}/src/test/java" includes="**/Test*.java"/>
         </batchtest>

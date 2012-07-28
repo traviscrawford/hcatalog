@@ -21,58 +21,22 @@
 <project name="hcatalog" default="jar"
          xmlns:ivy="antlib:org.apache.ivy.ant"
          xmlns:artifact="artifact:org.apache.maven.artifact.ant">
+
+  <property name="path.to.basedir" location="${basedir}"/>
+
+  <loadproperties srcfile="${basedir}/build.properties"/>
+
   <!--  
   ================================================================================
   Imports
   ================================================================================ -->
-  <import file="build-common.xml"/>
 
   <!--
   ================================================================================
   Properties and Classpaths Section
   ================================================================================
   -->
-  <!-- name and version -->
-  <property name="_version" value="0.5.0"/>
-  <property name="_vtype" value="-dev"/> 
-  <property name="hcatalog.version" value="${_version}${_vtype}"/>
-  <property name="hcatalog.jar" value="${ant.project.name}-${hcatalog.version}.jar"/>
-  <property name="hcatalog.core.jar" value="${ant.project.name}-core-${hcatalog.version}.jar"/>
-  <property name="final.name" value="${ant.project.name}-${hcatalog.version}" />
-  <property name="package.release" value="1"/>
 
-  <!-- build properties -->
-  <property name="lib.dir" value="${basedir}/lib/" />
-  <property name="src.dir"  location="${basedir}/src/java"/>
-  <property name="package.dir"  location="${basedir}/src/packages"/>
-  <property name="docs.src" value="${basedir}/src/docs"/>
-  <property name="build.dir" value="${basedir}/build"/>
-  <property name="build.classes" value="${build.dir}/classes" />
-  <property name="build.docs" value="${build.dir}/docs" />
-  <property name="build.javadoc" value="${build.docs}/api" />
-  <property name="dist.dir" value="${build.dir}/${final.name}" />
-
-  <!-- javac properties -->
-  <property name="build.encoding" value="UTF8" />
-  <property name="excludes" value=""/>
-  <property name="javac.debug" value="on" />
-  <property name="javac.optimize" value="on" />
-  <property name="javac.deprecation" value="off" />
-  <property name="javac.version" value="1.6" />
-  <property name="javac.args" value="" />
-
-  <!-- test properties -->
-  <property name="test.src.dir" value="${basedir}/src/test" />
-  <property name="test.build.dir" value="${build.dir}/test" />
-  <property name="test.build.classes" value="${test.build.dir}/classes" />
-  <property name="test.log.dir" value="${test.build.dir}/logs" />
-  <property name="test.timeout" value="2700000" />
-  <property name="test.junit.output.format" value="plain" />
-  <property name="test.all.file" value="${test.src.dir}/all-tests"/>
-  <property name="test.exclude.file" value="${test.src.dir}/excluded-tests"/>
-  <property name="test.output" value="no"/>
-  <property name="test.warehouse.dir" value="/tmp/hcat_junit_warehouse"/>
-  <property name="test.excludes" value="e2e/**"/>
 
   <property name="clover.db.dir" location="${build.dir}/test/clover/db"/>
   <property name="clover.report.dir" location="${build.dir}/test/clover/reports"/>
@@ -135,7 +99,7 @@
   </path>
 
   <path id="test.classpath">
-    <pathelement location="${test.build.classes}"/>
+    <pathelement location="${test.classes}"/>
     <pathelement location="${build.classes}"/>
     <pathelement location="conf"/>
     <fileset dir="${build.dir}/ivy/lib/test">
@@ -189,7 +153,7 @@
   <target name="init" depends="ivy-retrieve,mvn-init">
     <mkdir dir="${dist.dir}" />
     <mkdir dir="${build.classes}" />
-    <mkdir dir="${test.build.classes}" />
+    <mkdir dir="${test.classes}" />
   </target>
 
   <!--
@@ -279,7 +243,7 @@
         srcdir="${test.src.dir}"
         excludes="${test.excludes}"
         includes="**/*.java"
-        destdir="${test.build.classes}"
+        destdir="${test.classes}"
         debug="${javac.debug}"
         optimize="${javac.optimize}"
         target="${javac.version}"
@@ -300,17 +264,17 @@
     <sequential>
       <!-- If anyone knows how to set umask inside ant please do so -->
       <exec executable="bin/umaskcheck.sh" failonerror="true"/>
-      <delete dir="${test.log.dir}"/>
+      <delete dir="${test.logs}"/>
       <delete dir="${test.warehouse.dir}"/>
-      <mkdir dir="${test.log.dir}"/>
+      <mkdir dir="${test.logs}"/>
       <mkdir dir="${test.warehouse.dir}"/>
       <junit showoutput="${test.output}" printsummary="yes" haltonfailure="no"
           fork="yes" maxmemory="512m" dir="${basedir}" timeout="${test.timeout}"
           errorProperty="tests.failed" failureProperty="tests.failed">
-        <sysproperty key="hadoop.log.dir" value="${test.log.dir}"/>
+        <sysproperty key="hadoop.log.dir" value="${test.logs}"/>
         <sysproperty key="hive.metastore.warehouse.dir" value="${test.warehouse.dir}"/>
         <classpath>
-          <pathelement location="${test.build.classes}" />
+          <pathelement location="${test.classes}" />
           <pathelement location="." />
           <pathelement path="${clover.jar}"/>
           <path refid="test.classpath"/>
@@ -318,7 +282,7 @@
         </classpath>
         <formatter type="${test.junit.output.format}" />
         <!-- If the user has not defined a particular test to run, run them all -->
-        <batchtest fork="yes" todir="${test.log.dir}" unless="testcase">
+        <batchtest fork="yes" todir="${test.logs}" unless="testcase">
           <fileset dir="src/test">
             <patternset>
               <includesfile name="${test.all.file}"/>
@@ -327,7 +291,7 @@
           </fileset>
         </batchtest>
         <!-- Run one test case.  To use this define -Dtestcase=X on the command line -->
-        <batchtest fork="yes" todir="${test.log.dir}" if="testcase">
+        <batchtest fork="yes" todir="${test.logs}" if="testcase">
           <fileset dir="src/test" includes="**/${testcase}.java"/>
         </batchtest>
 
@@ -412,7 +376,7 @@
   -->
 
   <target name="findbugs" depends="init-findbugs,jar">
-    <property name="findbugs.out.dir" value="${test.build.dir}/findbugs"/>
+    <property name="findbugs.out.dir" value="${test.dir}/findbugs"/>
     <property name="findbugs.exclude.file" value="${test.src.dir}/findbugsExcludeFile.xml"/>
     <property name="findbugs.report.htmlfile"
       value="${findbugs.out.dir}/hcat-findbugs-report.html"/>
