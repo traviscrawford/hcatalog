@@ -30,6 +30,18 @@
 
   <dependencies>
     <dependency org="org.apache.hcatalog" name="hcatalog-core" rev="${hcatalog.version}"/>
+    <!-- Explicitly require hive jars due to
+    configuration not public in org.apache.hive#hive-builtins;0.10.0-SNAPSHOT: 'compile'.
+    -->
+    <dependency org="org.apache.hive" name="hive-builtins" rev="${hive.version}"/>
+    <dependency org="org.apache.hive" name="hive-metastore" rev="${hive.version}"/>
+    <dependency org="org.apache.hive" name="hive-common" rev="${hive.version}"/>
+    <dependency org="org.apache.hive" name="hive-exec" rev="${hive.version}"/>
+    <dependency org="org.apache.hive" name="hive-cli" rev="${hive.version}"/>
+    <dependency org="org.apache.hive" name="hive-hbase-handler" rev="${hive.version}">
+      <exclude org="org.apache.maven.plugins"/>
+      <exclude org="org.jruby"/>
+    </dependency>
 
     <!-- test dependencies -->
     <dependency org="junit" name="junit" rev="${junit.version}" conf="test->default"/>
