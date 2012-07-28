@@ -61,6 +61,7 @@
   </target>
 
   <target name="compile-test" depends="jar">
+    <echo message="${ant.project.name}"/>
     <_javac srcDir="${basedir}/src/test/java"
             destDir="${test.classes}"
             classPathRef="test.class.path"/>

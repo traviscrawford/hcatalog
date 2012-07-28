@@ -249,17 +249,23 @@ ant \
     </javac>
   </target>
 
-  <!-- Run the unit tests -->
-  <target name="test-storage-handlers">
-    <ant target="test" dir="storage-handlers" inheritAll="false" useNativeBasedir="true"/>
-  </target>
-
   <target name="test" depends="compile-test" description="run unit tests">
     <_junit srcDir="${basedir}/src/test"/>
     <ant target="test" dir="hcatalog-pig-adapter" inheritAll="false"/>
     <ant target="test" dir="webhcat/svr" inheritAll="false"/>
-    <antcall target="test-storage-handlers"/>
+    <ant target="test" dir="storage-handlers" inheritAll="false" useNativeBasedir="true"/>
   </target>
+
+  <target name="test-with-clover" depends="clover-init, compile-test"
+          description="run unit tests and generate code coverage reports">
+    <_junit srcDir="${basedir}/src/test"/>
+    <ant target="_test-with-clover" dir="hcatalog-pig-adapter" inheritAll="false"/>
+    <ant target="_test-with-clover" dir="webhcat/svr" inheritAll="false"/>
+    <!-- storage-handlers do not have coverage as they have not
+         yet been migrated to the new build files. -->
+    <ant target="test" dir="storage-handlers" inheritAll="false" useNativeBasedir="true"/>
+  </target>
+
 
   <!--
   ================================================================================

@@ -62,22 +62,19 @@
   </macrodef>
 
   <target name="clover-init">
+    <echo message="${ant.project.name}"/>
     <available property="clover.present" file="${clover.jar}"/>
     <fail message="'clover.home' is not defined. Please pass -Dclover.home=/path/to/clover to ant on the command-line." unless="clover.present"/>
     <taskdef resource="cloverlib.xml" classpath="${clover.jar}"/>
     <mkdir dir="${clover.db.dir}"/>
     <clover-setup initString="${clover.db.dir}/hcat_coverage.db">
-      <fileset dir="src" includes="**/*.java" excludes="**/NoExitSecurityManager.java"/>
-      <fileset dir="webhcat/svr/src/main/java" includes="**/*.java"/>
-      <fileset dir="storage-handlers/hbase/src/java" includes="**/*.java"/>
-      <fileset dir="hcatalog-pig-adapter/src/main/java" includes="**/*.java"/>
+      <fileset dir="src" includes="${src.dir}" excludes="**/NoExitSecurityManager.java"/>
     </clover-setup>
   </target>
 
-  <!-- test-with-clover should only be called from the top-level build
-  so a global coverage report is generated. -->
-  <target name="test-with-clover" depends="clover-init, test"
+  <target name="_test-with-clover" depends="clover-init, test"
           description="run unit tests and generate code coverage reports">
+    <echo message="${ant.project.name}"/>
     <mkdir dir="${clover.report.dir}"/>
       <clover-report>
       <current outfile="${clover.report.dir}" title="${final.name}">
