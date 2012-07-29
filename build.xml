@@ -17,15 +17,6 @@
    limitations under the License.
 -->
 
-<!-- Run pretty much everything with:
-ant \
-  -Dclover.home=/usr/local/clover-ant-2.6.3 \
-  -Dtestcase=Foo \
-  -Drun.clover=true \
-  -Dforrest.home=/Users/travis/apache-forrest-0.9 \
-  clean package clover test generate-clover-reports forrest
--->
-
 <project name="hcatalog" default="jar"
          xmlns:ivy="antlib:org.apache.ivy.ant"
          xmlns:artifact="artifact:org.apache.maven.artifact.ant">

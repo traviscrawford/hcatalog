@@ -32,21 +32,22 @@
     <property name="_ivy-init.complete" value="true"/>
   </target>
 
+  <!-- ivy-init exists as two targets so it can be overridden in build.xml.
+       This should be consolidated when core exists as a subproject. -->
   <target name="ivy-init" depends="_ivy-init"/>
 
   <target name="_check-ivy-retrieve" unless="ivy-retrieve.complete">
     <available property="ivy-retrieve.complete" file="${build.dir}/ivy/lib/.ivy-retrieve.complete"/>
   </target>
 
-  <target name="ivy-retrieve" depends="_check-ivy-retrieve,ivy-init" description="Retrieve Ivy dependencies"
-      unless="ivy-retrieve.complete">
+  <target name="ivy-retrieve" depends="_check-ivy-retrieve,ivy-init" unless="ivy-retrieve.complete">
     <echo message="${ant.project.name}"/>
     <ivy:retrieve sync="true"
       pattern="${build.dir}/ivy/lib/[conf]/[organization]-[artifact]-[revision](-[classifier]).[ext]"/>
     <touch file="${build.dir}/ivy/lib/.ivy-retrieve.complete"/>
   </target>
 
-  <target name="_ivy-report" depends="ivy-retrieve" description="Generate Ivy dependency report">
+  <target name="_ivy-report" depends="ivy-retrieve" description="Generate dependency report">
     <echo message="${ant.project.name}"/>
     <ivy:report todir="${build.dir}/ivy/report" graph="false"/>
   </target>
