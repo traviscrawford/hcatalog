@@ -44,5 +44,7 @@
       <artifact name="zookeeper" type="jar" ext="jar"/>
       <artifact name="zookeeper" type="test-jar" ext="jar" m:classifier="tests"/>
     </dependency>
+    <dependency org="commons-io" name="commons-io" rev="${commons-io.version}"
+      conf="test->default"/>
   </dependencies>
 </ivy-module>
