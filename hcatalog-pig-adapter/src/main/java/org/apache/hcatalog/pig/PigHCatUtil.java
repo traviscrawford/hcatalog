@@ -297,9 +297,7 @@ public class PigHCatUtil {
     }
 
     if (type == Type.BOOLEAN){
-      errMsg = "HCatalog column type 'BOOLEAN' is not supported in " +
-      "Pig as a column type";
-      throw new PigException(errMsg, PIG_EXCEPTION_CODE);
+      return DataType.BOOLEAN;
     }
 
     errMsg = "HCatalog column type '"+ type.toString() +"' is not supported in Pig as a column type";
@@ -408,7 +406,6 @@ public class PigHCatUtil {
       // We don't do type promotion/demotion.
       case SMALLINT:
       case TINYINT:
-      case BOOLEAN:
         throw new PigException("Incompatible type found in hcat table schema: "+hcatField, PigHCatUtil.PIG_EXCEPTION_CODE);
       case ARRAY:
         validateHCatSchemaFollowsPigRules(hcatField.getArrayElementSchema());
