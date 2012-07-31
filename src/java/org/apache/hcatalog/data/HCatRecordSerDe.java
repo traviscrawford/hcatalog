@@ -62,7 +62,6 @@ public class HCatRecordSerDe implements SerDe {
   private StructTypeInfo rowTypeInfo;
   private HCatRecordObjectInspector cachedObjectInspector;
   private boolean convertBooleanToInteger;
-  private boolean convertEnumToString;
 
   @Override
   public void initialize(Configuration conf, Properties tbl)
@@ -99,9 +98,6 @@ public class HCatRecordSerDe implements SerDe {
 
     convertBooleanToInteger = conf.getBoolean(HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER,
         HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT);
-
-    convertEnumToString = conf.getBoolean(HCatConstants.HCAT_DATA_CONVERT_ENUM_TO_STRING,
-        HCatConstants.HCAT_DATA_CONVERT_ENUM_TO_STRING_DEFAULT);
   }
 
   public void initialize(HCatSchema hsch) throws SerDeException {
@@ -202,11 +198,7 @@ public class HCatRecordSerDe implements SerDe {
         res = ((PrimitiveObjectInspector) fieldObjectInspector).getPrimitiveJavaObject(field);
       }
     } else if (fieldObjectInspector.getCategory() == Category.STRUCT){
-      if (convertEnumToString &&
-          field != null &&
-          Enum.class.isAssignableFrom(field.getClass())) {
-        res = field.toString();
-      } else if (field != null && ByteBuffer.class.isAssignableFrom(field.getClass())) {
+      if (field != null && ByteBuffer.class.isAssignableFrom(field.getClass())) {
         res = ((ByteBuffer) field).array();
       } else {
         res = serializeStruct(field, (StructObjectInspector) fieldObjectInspector);

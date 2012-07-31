@@ -122,11 +122,4 @@ public final class HCatConstants {
   public static final String HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER =
       "hcat.data.convert.boolean.to.integer";
   public static final boolean HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT = false;
-
-  // Users may find the string representation of enum values more convenient than
-  // Hive style: struct<value:int>
-  // The option is offered to convert enums to strings.
-  public static final String HCAT_DATA_CONVERT_ENUM_TO_STRING =
-      "hcat.data.convert.enum.to.string";
-  public static final boolean HCAT_DATA_CONVERT_ENUM_TO_STRING_DEFAULT = false;
 }
