@@ -46,6 +46,7 @@
       <javac
           fork="true"
           deprecation="false"
+          debug="true"
           sourcepath=""
           includes="**/*.java"
           encoding="utf-8"
