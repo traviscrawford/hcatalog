@@ -28,6 +28,8 @@ Trunk (unreleased changes)
   HCAT-328 HCatLoader should report its input size so pig can estimate the number of reducers (traviscrawford via gates)
 
   IMPROVEMENTS
+  HCAT-450 HCatalog should use transitive ivy dependencies (traviscrawford)
+
   HCAT-350 Writing BINARY data to HCatRecord depends on a Hive class (thejas via traviscrawford)
 
   HCAT-440 pig field names for arrays should be configurable (traviscrawford)
@@ -65,6 +67,8 @@ Trunk (unreleased changes)
   OPTIMIZATIONS
 
   BUG FIXES
+  HCAT-436 JSON SerDe column misnaming on CTAS (khorgath via gates)
+
   HCAT-449 HCatLoader is mistakenly identifying Configuration parameters to store (cdrome via traviscrawford)
 
   HCAT-456 storage-handlers tests failing due to missing commons-io (traviscrawford)
