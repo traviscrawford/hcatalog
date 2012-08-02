@@ -183,6 +183,12 @@ public class PigHCatUtil {
           .setDescription(hfs.getComment())
           .setType(getPigType( hfs))
           .setSchema(getBagSubSchema(hfs));
+    } else if(hfs.getType() == Type.MAP) {
+        rfSchema = new ResourceFieldSchema()
+          .setName(hfs.getName())
+          .setDescription(hfs.getComment())
+          .setType(getPigType( hfs))
+          .setSchema(getMapValueSchema(hfs));
     } else {
       rfSchema = new ResourceFieldSchema()
           .setName(hfs.getName())
@@ -204,12 +210,12 @@ public class PigHCatUtil {
     String innerTupleName = HCatConstants.HCAT_PIG_INNER_TUPLE_NAME_DEFAULT;
     if (props != null && props.containsKey(HCatConstants.HCAT_PIG_INNER_TUPLE_NAME)) {
       innerTupleName = props.getProperty(HCatConstants.HCAT_PIG_INNER_TUPLE_NAME)
-          .replaceAll("FIELDNAME", hfs.getName());
+          .replaceAll("FIELDNAME", (hfs.getName() == null ? "null" : hfs.getName()));
     }
     String innerFieldName = HCatConstants.HCAT_PIG_INNER_FIELD_NAME_DEFAULT;
     if (props != null && props.containsKey(HCatConstants.HCAT_PIG_INNER_FIELD_NAME)) {
       innerFieldName = props.getProperty(HCatConstants.HCAT_PIG_INNER_FIELD_NAME)
-          .replaceAll("FIELDNAME", hfs.getName());
+          .replaceAll("FIELDNAME", (hfs.getName() == null ? "null" : hfs.getName()));
     }
 
     ResourceFieldSchema[] bagSubFieldSchemas = new ResourceFieldSchema[1];
@@ -246,6 +252,11 @@ public class PigHCatUtil {
     }
     s.setFields(lrfs.toArray(new ResourceFieldSchema[0]));
     return s;
+  }
+
+  private static ResourceSchema getMapValueSchema(HCatFieldSchema hfs) throws IOException {
+    HCatSchema mapValueHCatSchema = hfs.getMapValueSchema();
+    return getResourceSchema(mapValueHCatSchema);
   }
 
 /**
