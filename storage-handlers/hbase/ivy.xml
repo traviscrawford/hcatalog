@@ -38,10 +38,12 @@
     <dependency org="org.apache.hadoop" name="hadoop-test" rev="${hadoop.jars.version}"
       conf="test->default"/>
     <dependency org="org.apache.hbase" name="hbase" rev="${hbase.version}" conf="test->default">
+      <artifact name="hbase" type="jar" ext="jar"/>
       <artifact name="hbase" type="test-jar" ext="jar" m:classifier="tests"/>
     </dependency>
     <dependency org="org.apache.zookeeper" name="zookeeper" rev="${zookeeper.version}"
         conf="test->default">
+      <artifact name="zookeeper" type="jar" ext="jar"/>
       <artifact name="zookeeper" type="test-jar" ext="jar" m:classifier="tests"/>
     </dependency>
     <dependency org="commons-io" name="commons-io" rev="${commons-io.version}"
