@@ -91,4 +91,11 @@
                jarDir="${build.dir}"
                classPathRef="findbugs.class.path"/>
   </target>
+
+  <target name="mvn-deploy">
+    <_mvn-deploy
+      jarFile="${build.dir}/${ant.project.name}-${hcatalog.version}.jar"
+      pomFile="${build.dir}/ivy/${ant.project.name}-${hcatalog.version}.pom"/>
+  </target>
+
 </project>

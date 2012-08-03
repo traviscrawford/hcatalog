@@ -346,6 +346,37 @@
 
   <!--
   ===============================================================================
+  Deploy Section
+  ===============================================================================
+  -->
+
+  <target name="mvn-deploy" depends="mvn-init">
+    <input message="Enter your gpg password (or just press return if using an agent): "
+           addproperty="gpg.passphrase">
+      <handler classname="org.apache.tools.ant.input.SecureInputHandler"/>
+    </input>
+    <_mvn-deploy
+      jarFile="${build.dir}/hcatalog/hcatalog-${hcatalog.version}.jar"
+      pomFile="${build.dir}/ivy/hcatalog-${hcatalog.version}.pom"/>
+    <_mvn-deploy
+      jarFile="${build.dir}/hcatalog/hcatalog-core-${hcatalog.version}.jar"
+      pomFile="${build.dir}/ivy/hcatalog-core-${hcatalog.version}.pom"/>
+    <_mvn-deploy
+      jarFile="${build.dir}/hcatalog/hcatalog-server-extensions-${hcatalog.version}.jar"
+      pomFile="${build.dir}/ivy/hcatalog-server-extensions-${hcatalog.version}.pom"/>
+    <ant target="mvn-deploy" dir="hcatalog-pig-adapter" inheritAll="false" useNativeBasedir="true">
+      <property name="gpg.passphrase" value="${gpg.passphrase}"/>
+    </ant>
+    <ant target="mvn-deploy" dir="webhcat/svr" inheritAll="false" useNativeBasedir="true">
+      <property name="gpg.passphrase" value="${gpg.passphrase}"/>
+    </ant>
+    <!-- TODO(travis): Publish storage-handlers after moving them to build-common.
+    <ant target="_ivy-report" dir="storage-handlers" inheritAll="false" useNativeBasedir="true"/>
+    -->
+  </target>
+
+  <!--
+  ===============================================================================
   Distribution Section
   ===============================================================================
   -->

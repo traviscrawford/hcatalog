@@ -24,7 +24,42 @@
     <taskdef resource="org/apache/maven/artifact/ant/antlib.xml"
              uri="artifact:org.apache.maven.artifact.ant"
              classpath="build/ivy/lib/test/org.apache.maven-maven-ant-tasks-${maven-ant-tasks.version}.jar"/>
+    <artifact:install-provider artifactId="wagon-http" version="1.0-beta-2"/>
     <property name="mvn-init.complete" value="true"/>
   </target>
+
+  <macrodef name="_sign">
+    <attribute name="inputFile"/>
+    <sequential>
+      <echo>Signing @{inputFile}</echo>
+      <delete file="@{inputFile}.asc"/>
+      <exec executable="gpg">
+        <arg value="--armor"/>
+        <arg value="--output"/>
+        <arg value="@{inputFile}.asc"/>
+        <arg value="--passphrase"/>
+        <arg value="${gpg.passphrase}"/>
+        <arg value="--detach-sig"/>
+        <arg value="@{inputFile}"/>
+      </exec>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="_mvn-deploy">
+    <attribute name="jarFile"/>
+    <attribute name="pomFile"/>
+    <sequential>
+      <_sign inputFile="@{jarFile}"/>
+      <_sign inputFile="@{pomFile}"/>
+      <artifact:pom file="@{pomFile}"
+        id="mvn-deploy.pom"/>
+      <artifact:deploy file="@{jarFile}">
+        <pom refid="mvn-deploy.pom"/>
+        <attach file="@{jarFile}.asc" type="jar.asc"/>
+        <attach file="@{pomFile}.asc" type="pom.asc"/>
+        <remoteRepository id="${mvn.repo.id}" url="${mvn.repo.url}"/>
+      </artifact:deploy>
+    </sequential>
+  </macrodef>
 
 </project>
