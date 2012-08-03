@@ -32,6 +32,7 @@ import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.security.Credentials;
 import org.apache.hcatalog.common.HCatConstants;
+import org.apache.hcatalog.common.HCatContext;
 import org.apache.hcatalog.common.HCatUtil;
 import org.apache.hcatalog.data.Pair;
 import org.apache.hcatalog.data.schema.HCatSchema;
@@ -82,6 +83,7 @@ public class HCatLoader extends HCatBaseLoader {
 
 @Override
   public void setLocation(String location, Job job) throws IOException {
+    HCatContext.get(job.getConfiguration());
 
     UDFContext udfContext = UDFContext.getUDFContext();
     Properties udfProps = udfContext.getUDFProperties(this.getClass(),
@@ -185,6 +187,8 @@ public class HCatLoader extends HCatBaseLoader {
 
   @Override
   public ResourceSchema getSchema(String location, Job job) throws IOException {
+    HCatContext.get(job.getConfiguration());
+
     Table table = phutil.getTable(location,
         hcatServerUri!=null?hcatServerUri:PigHCatUtil.getHCatServerUri(job),
             PigHCatUtil.getHCatServerPrincipal(job));
