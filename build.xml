@@ -104,6 +104,7 @@
   <target name="ivy-report" depends="ivy-retrieve">
     <antcall target="_ivy-report"/>
     <ant target="_ivy-report" dir="hcatalog-pig-adapter" inheritAll="false" useNativeBasedir="true"/>
+    <ant target="_ivy-report" dir="server-extensions" inheritAll="false" useNativeBasedir="true"/>
     <ant target="ivy-report" dir="storage-handlers" inheritAll="false" useNativeBasedir="true"/>
   </target>
 
@@ -127,12 +128,6 @@
     <replace file="${build.ivy.dir}/hcatalog-core-${hcatalog.version}.pom"
              token="artifactId>hcatalog"
              value="artifactId>hcatalog-core"/>
-
-    <copy file="${pom.file}" overwrite="true"
-          tofile="${build.ivy.dir}/hcatalog-server-extensions-${hcatalog.version}.pom"/>
-    <replace file="${build.ivy.dir}/hcatalog-server-extensions-${hcatalog.version}.pom"
-             token="artifactId>hcatalog"
-             value="artifactId>hcatalog-server-extensions"/>
   </target>
 
   <target name="init" depends="ivy-retrieve,mvn-init">
@@ -169,25 +164,12 @@
 
   <!--
   ================================================================================
-  Build server side code, mainly listener.
+  Build all jars
   ================================================================================
   -->
-  <target name="server-extensions" depends="compile-src">
-    <jar jarfile="${build.dir}/${ant.project.name}/${ant.project.name}-server-extensions-${hcatalog.version}.jar"
-         basedir="${build.classes}"
-         includes="org/apache/hcatalog/listener/**,org/apache/hcatalog/metadata/**"/>
-    <artifact:install file="${build.dir}/${ant.project.name}/${ant.project.name}-server-extensions-${hcatalog.version}.jar">
-      <artifact:pom file="${build.ivy.dir}/hcatalog-server-extensions-${hcatalog.version}.pom"/>
-    </artifact:install>
-  </target>
-
-  <!--
-  ================================================================================
-  Build both clientjar and server-extensions
-  ================================================================================
-  -->
-  <target name="jar" depends="checkstyle,shims,clientjar,server-extensions,jar-storage-handlers">
+  <target name="jar" depends="checkstyle,shims,clientjar,jar-storage-handlers">
     <ant target="jar" dir="hcatalog-pig-adapter" inheritAll="false"/>
+    <ant target="jar" dir="server-extensions" inheritAll="false"/>
     <ant target="jar" dir="webhcat/svr" inheritAll="false"/>
     <ant target="jar" dir="webhcat/java-client" inheritAll="false"/>
 
@@ -196,6 +178,7 @@
     <jar jarfile="${build.dir}/${ant.project.name}/${hcatalog.jar}">
       <zipfileset src="${build.dir}/${ant.project.name}/${hcatalog.core.jar}"/>
       <zipfileset src="hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
+      <zipfileset src="server-extensions/build/hcatalog-server-extensions-${hcatalog.version}.jar"/>
     </jar>
   </target>
 
@@ -246,6 +229,7 @@
   <target name="test" depends="compile-test" description="run unit tests">
     <_junit srcDir="${basedir}/src/test"/>
     <ant target="test" dir="hcatalog-pig-adapter" inheritAll="false"/>
+    <ant target="test" dir="server-extensions" inheritAll="false"/>
     <ant target="test" dir="webhcat/svr" inheritAll="false"/>
     <ant target="test" dir="webhcat/java-client" inheritAll="false"/>
     <ant target="test" dir="storage-handlers" inheritAll="false" useNativeBasedir="true"/>
@@ -255,6 +239,7 @@
           description="run unit tests and generate code coverage reports">
     <_junit srcDir="${basedir}/src/test"/>
     <ant target="_test-with-clover" dir="hcatalog-pig-adapter" inheritAll="false"/>
+    <ant target="_test-with-clover" dir="server-extensions" inheritAll="false"/>
     <ant target="_test-with-clover" dir="webhcat/svr" inheritAll="false"/>
     <ant target="_test-with-clover" dir="webhcat/java-client" inheritAll="false"/>
     <!-- storage-handlers do not have coverage as they have not
@@ -287,6 +272,7 @@
                classPathRef="compile.classpath"/>
 
     <ant target="findbugs" dir="hcatalog-pig-adapter" inheritAll="false"/>
+    <ant target="findbugs" dir="server-extensions" inheritAll="false"/>
     <ant target="findbugs" dir="webhcat/svr" inheritAll="false"/>
     <ant target="findbugs" dir="webhcat/java-client" inheritAll="false"/>
   </target>
@@ -302,6 +288,7 @@
     <delete dir="${build.dir}" />
     <delete dir="${test.warehouse.dir}"/>
     <ant target="clean" dir="hcatalog-pig-adapter" inheritAll="false"/>
+    <ant target="clean" dir="server-extensions" inheritAll="false"/>
     <ant target="clean" dir="webhcat/svr" inheritAll="false"/>
     <ant target="clean" dir="webhcat/java-client" inheritAll="false"/>
     <ant target="clean" dir="storage-handlers" inheritAll="false" useNativeBasedir="true"/>
@@ -341,6 +328,7 @@
              failonerror="true">
       <packageset dir="${src.dir}" />
       <packageset dir="hcatalog-pig-adapter/src/main/java" />
+      <packageset dir="server-extensions/src/main/java" />
       <packageset dir="webhcat/svr/src/main/java" />
       <packageset dir="webhcat/java-client/src/main/java" />
       <classpath>
@@ -386,6 +374,9 @@
         <include name="hcatalog-*.jar"/>
       </fileset>
       <fileset dir="hcatalog-pig-adapter/build">
+        <include name="hcatalog-*.jar"/>
+      </fileset>
+      <fileset dir="server-extensions/build">
         <include name="hcatalog-*.jar"/>
       </fileset>
       <fileset dir="webhcat/svr/build">
@@ -477,6 +468,7 @@
             <tarfileset dir="${basedir}" mode="644" prefix="${ant.project.name}-src-${hcatalog.version}">
                 <include name="conf/**"/>
                 <include name="hcatalog-pig-adapter/**"/>
+                <include name="server-extensions/**"/>
                 <include name="webhcat/**"/>
                 <include name="ivy/**"/>
                 <exclude name="ivy/*.jar"/>
