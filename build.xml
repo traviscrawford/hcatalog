@@ -175,8 +175,14 @@
          basedir="${build.classes}">
       <metainf dir="${path.to.basedir}" includes="**/LICENSE.txt,**/NOTICE.txt"/>
     </jar>
+    <jar jarfile="${build.dir}/${ant.project.name}/hcatalog-core-${hcatalog.version}-sources.jar"
+         basedir="${src.dir}">
+      <metainf dir="${path.to.basedir}" includes="**/LICENSE.txt,**/NOTICE.txt"/>
+    </jar>
     <artifact:install file="${build.dir}/${ant.project.name}/${hcatalog.core.jar}">
       <artifact:pom file="${build.ivy.dir}/hcatalog-core-${hcatalog.version}.pom"/>
+      <attach file="${build.dir}/${ant.project.name}/hcatalog-core-${hcatalog.version}-sources.jar"
+              type="jar" classifier="sources"/>
     </artifact:install>
   </target>
 
@@ -212,6 +218,15 @@
       <zipfileset src="hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
       <metainf dir="${path.to.basedir}" includes="**/LICENSE.txt,**/NOTICE.txt"/>
     </jar>
+    <jar jarfile="${build.dir}/${ant.project.name}/hcatalog-${hcatalog.version}-sources.jar">
+      <zipfileset src="${build.dir}/${ant.project.name}/hcatalog-core-${hcatalog.version}-sources.jar"/>
+      <zipfileset src="hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}-sources.jar"/>
+    </jar>
+    <artifact:install file="${build.dir}/${ant.project.name}/${hcatalog.jar}">
+      <artifact:pom file="${build.ivy.dir}/hcatalog-${hcatalog.version}.pom"/>
+      <attach file="${build.dir}/${ant.project.name}/hcatalog-${hcatalog.version}-sources.jar"
+              type="jar" classifier="sources"/>
+    </artifact:install>
   </target>
 
   <!--

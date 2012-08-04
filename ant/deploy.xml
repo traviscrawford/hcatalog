@@ -48,15 +48,17 @@
   <macrodef name="_mvn-deploy">
     <attribute name="jarFile"/>
     <attribute name="pomFile"/>
+    <attribute name="sourcesJarFile"/>
     <sequential>
       <_sign inputFile="@{jarFile}"/>
       <_sign inputFile="@{pomFile}"/>
-      <artifact:pom file="@{pomFile}"
-        id="mvn-deploy.pom"/>
+      <_sign inputFile="@{sourcesJarFile}"/>
       <artifact:deploy file="@{jarFile}">
-        <pom refid="mvn-deploy.pom"/>
+        <artifact:pom file="@{pomFile}"/>
         <attach file="@{jarFile}.asc" type="jar.asc"/>
         <attach file="@{pomFile}.asc" type="pom.asc"/>
+        <attach file="@{sourcesJarFile}" type="jar" classifier="sources"/>
+        <attach file="@{sourcesJarFile}.asc" type="jar.asc"/>
         <remoteRepository id="${mvn.repo.id}" url="${mvn.repo.url}"/>
       </artifact:deploy>
     </sequential>

@@ -77,8 +77,14 @@
     <jar jarfile="${build.dir}/${jar.name}" basedir="${build.classes}">
       <metainf dir="${path.to.basedir}" includes="**/LICENSE.txt,**/NOTICE.txt"/>
     </jar>
+    <jar jarfile="${build.dir}/${ant.project.name}-${hcatalog.version}-sources.jar"
+         basedir="${basedir}/src/main/java">
+      <metainf dir="${path.to.basedir}" includes="**/LICENSE.txt,**/NOTICE.txt"/>
+    </jar>
     <artifact:install file="${build.dir}/${ant.project.name}-${hcatalog.version}.jar">
       <artifact:pom file="${build.dir}/ivy/${ant.project.name}-${hcatalog.version}.pom"/>
+      <attach file="${build.dir}/${ant.project.name}-${hcatalog.version}-sources.jar"
+              type="jar" classifier="sources"/>
     </artifact:install>
   </target>
 
