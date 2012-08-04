@@ -172,7 +172,9 @@
   <!-- Build the hcatalog client jar -->
   <target name="clientjar" depends="compile-src">
     <jar jarfile="${build.dir}/${ant.project.name}/${hcatalog.core.jar}"
-         basedir="${build.classes}"/>
+         basedir="${build.classes}">
+      <metainf dir="${path.to.basedir}" includes="**/LICENSE.txt,**/NOTICE.txt"/>
+    </jar>
     <artifact:install file="${build.dir}/${ant.project.name}/${hcatalog.core.jar}">
       <artifact:pom file="${build.ivy.dir}/hcatalog-core-${hcatalog.version}.pom"/>
     </artifact:install>
@@ -186,7 +188,9 @@
   <target name="server-extensions" depends="compile-src">
     <jar jarfile="${build.dir}/${ant.project.name}/${ant.project.name}-server-extensions-${hcatalog.version}.jar"
          basedir="${build.classes}"
-         includes="org/apache/hcatalog/listener/**,org/apache/hcatalog/metadata/**"/>
+         includes="org/apache/hcatalog/listener/**,org/apache/hcatalog/metadata/**">
+      <metainf dir="${path.to.basedir}" includes="**/LICENSE.txt,**/NOTICE.txt"/>
+    </jar>
     <artifact:install file="${build.dir}/${ant.project.name}/${ant.project.name}-server-extensions-${hcatalog.version}.jar">
       <artifact:pom file="${build.ivy.dir}/hcatalog-server-extensions-${hcatalog.version}.pom"/>
     </artifact:install>
@@ -206,6 +210,7 @@
     <jar jarfile="${build.dir}/${ant.project.name}/${hcatalog.jar}">
       <zipfileset src="${build.dir}/${ant.project.name}/${hcatalog.core.jar}"/>
       <zipfileset src="hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
+      <metainf dir="${path.to.basedir}" includes="**/LICENSE.txt,**/NOTICE.txt"/>
     </jar>
   </target>
 
