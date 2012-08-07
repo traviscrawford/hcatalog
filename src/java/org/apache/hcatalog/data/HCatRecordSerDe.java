@@ -43,6 +43,7 @@ import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Writable;
 import org.apache.hcatalog.common.HCatConstants;
+import org.apache.hcatalog.common.HCatContext;
 import org.apache.hcatalog.data.schema.HCatSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,6 @@ public class HCatRecordSerDe implements SerDe {
   private List<TypeInfo> columnTypes;
   private StructTypeInfo rowTypeInfo;
   private HCatRecordObjectInspector cachedObjectInspector;
-  private boolean convertBooleanToInteger;
 
   @Override
   public void initialize(Configuration conf, Properties tbl)
@@ -96,8 +96,6 @@ public class HCatRecordSerDe implements SerDe {
     rowTypeInfo = (StructTypeInfo) TypeInfoFactory.getStructTypeInfo(columnNames, columnTypes);
     cachedObjectInspector = HCatRecordObjectInspectorFactory.getHCatRecordObjectInspector(rowTypeInfo);
 
-    convertBooleanToInteger = conf.getBoolean(HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER,
-        HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT);
   }
 
   public void initialize(HCatSchema hsch) throws SerDeException {
@@ -190,9 +188,11 @@ public class HCatRecordSerDe implements SerDe {
       throws SerDeException {
     Object res;
     if (fieldObjectInspector.getCategory() == Category.PRIMITIVE){
-      if (convertBooleanToInteger &&
-          field != null &&
-          Boolean.class.isAssignableFrom(field.getClass())) {
+      if (field != null &&
+          HCatContext.get().getConf().getBoolean(
+              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER,
+              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT) &&
+              Boolean.class.isAssignableFrom(field.getClass())) {
         res = ((Boolean) field) ? 1 : 0;
       } else {
         res = ((PrimitiveObjectInspector) fieldObjectInspector).getPrimitiveJavaObject(field);
