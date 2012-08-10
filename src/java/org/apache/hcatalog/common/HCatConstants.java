@@ -122,4 +122,9 @@ public final class HCatConstants {
   public static final String HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER =
       "hcat.data.convert.boolean.to.integer";
   public static final boolean HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT = false;
+
+  public static final String HCAT_INPUT_BAD_RECORD_THRESHOLD_KEY = "hcat.input.bad.record.threshold";
+  public static final float HCAT_INPUT_BAD_RECORD_THRESHOLD_DEFAULT = 0.0001f;
+  public static final String HCAT_INPUT_BAD_RECORD_MIN_KEY = "hcat.input.bad.record.min";
+  public static final int HCAT_INPUT_BAD_RECORD_MIN_DEFAULT = 2;
 }
