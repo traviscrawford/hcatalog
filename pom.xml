@@ -39,4 +39,18 @@
     <packaging>pom</packaging>
   </project>
 
+  <repositories>
+    <!-- This is necessary for hive-metastore dependencies. -->
+    <repository>
+      <id>datanucleus</id>
+      <name>datanucleus maven repository</name>
+      <url>http://www.datanucleus.org/downloads/maven2</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+    </repository>
+  </repositories>
+
 </project>

@@ -19,25 +19,15 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.hcatalog</groupId>
-      <artifactId>hcatalog-core</artifactId>
-      <version>${hcatalog.version}</version>
-      <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.jdo</groupId>
-          <artifactId>jdo2-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.jms</groupId>
-          <artifactId>jms</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase</artifactId>
       <version>${hbase.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hcatalog</groupId>
+      <artifactId>hcatalog-core</artifactId>
+      <version>${hcatalog.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -45,6 +35,14 @@
       <artifactId>zookeeper</artifactId>
       <version>${zookeeper.version}</version>
       <scope>compile</scope>
+    </dependency>
+
+    <!-- test scope -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${commons-io.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -70,12 +68,6 @@
       <artifactId>zookeeper</artifactId>
       <version>${zookeeper.version}</version>
       <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>${commons-io.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
