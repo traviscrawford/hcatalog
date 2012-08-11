@@ -29,7 +29,7 @@
     <checkstyle classpathref="test.class.path" config="coding_style.xml">
       <fileset dir="${basedir}" includes="**/*.java"/>
       <formatter type="plain"/>
-      <formatter type="xml" toFile="${build.dir}/checkstyle/checkstyle_errors.xml"/>
+      <formatter type="xml" toFile="${build.dir}/checkstyle/checkstyle_result.xml"/>
     </checkstyle>
   </target>
 
