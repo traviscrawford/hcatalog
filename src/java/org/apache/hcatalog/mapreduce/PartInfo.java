@@ -21,11 +21,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.ql.plan.TableDesc;
-
 import org.apache.hcatalog.data.schema.HCatSchema;
-import org.apache.hcatalog.mapreduce.HCatStorageHandler;
 
 /** The Class used to serialize the partition information read from the metadata server that maps to a partition. */
 public class PartInfo implements Serializable {

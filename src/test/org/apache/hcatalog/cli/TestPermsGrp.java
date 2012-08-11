@@ -44,7 +44,7 @@ import org.apache.hadoop.hive.serde.Constants;
 import org.apache.hadoop.hive.shims.ShimLoader;
 import org.apache.hcatalog.ExitException;
 import org.apache.hcatalog.NoExitSecurityManager;
-import org.apache.hcatalog.cli.HCatCli;
+
 import org.apache.hcatalog.cli.SemanticAnalysis.HCatSemanticAnalyzer;
 import org.apache.hcatalog.common.HCatConstants;
 import org.apache.thrift.TException;

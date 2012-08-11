@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import junit.framework.TestCase;
-import org.apache.hcatalog.templeton.ColumnDesc;
-import org.apache.hcatalog.templeton.TableDesc;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**

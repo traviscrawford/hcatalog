@@ -19,8 +19,6 @@ package org.apache.hcatalog.data.schema;
 
 import junit.framework.TestCase;
 import org.apache.hcatalog.common.HCatException;
-import org.apache.hcatalog.data.schema.HCatFieldSchema;
-import org.apache.hcatalog.data.schema.HCatSchema;
 
 import java.util.ArrayList;
 import java.util.List;

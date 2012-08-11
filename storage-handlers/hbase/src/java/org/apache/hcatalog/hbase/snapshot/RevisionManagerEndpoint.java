@@ -19,7 +19,6 @@ package org.apache.hcatalog.hbase.snapshot;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.CoprocessorEnvironment;

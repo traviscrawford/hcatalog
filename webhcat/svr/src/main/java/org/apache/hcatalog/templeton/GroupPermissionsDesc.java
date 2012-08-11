@@ -17,8 +17,6 @@
  */
 package org.apache.hcatalog.templeton;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  * The base create permissions for ddl objects.
  */

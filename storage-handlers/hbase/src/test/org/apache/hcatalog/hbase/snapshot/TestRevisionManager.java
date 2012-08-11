@@ -26,7 +26,8 @@ import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hcatalog.hbase.SkeletonHBaseTest;
-import org.apache.hcatalog.hbase.snapshot.transaction.thrift.*;
+import org.apache.hcatalog.hbase.snapshot.transaction.thrift.StoreFamilyRevision;
+import org.apache.hcatalog.hbase.snapshot.transaction.thrift.StoreFamilyRevisionList;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;

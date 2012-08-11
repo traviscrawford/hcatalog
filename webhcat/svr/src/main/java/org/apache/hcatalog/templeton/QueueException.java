@@ -17,8 +17,6 @@
  */
 package org.apache.hcatalog.templeton;
 
-import java.util.HashMap;
-
 /**
  * Unable to queue the job
  */

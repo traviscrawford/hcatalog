@@ -19,7 +19,6 @@ package org.apache.hcatalog.templeton;
 
 import junit.framework.TestCase;
 
-import org.apache.hcatalog.templeton.Main;
 import org.apache.hcatalog.templeton.mock.MockServer;
 import java.util.List;
 

@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.hcatalog.common.HCatException;
-import org.apache.hcatalog.common.HCatUtil;
 import org.apache.hcatalog.data.schema.HCatSchema;
 
 /**

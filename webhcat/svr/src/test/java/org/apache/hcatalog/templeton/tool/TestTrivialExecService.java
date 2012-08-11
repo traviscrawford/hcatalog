@@ -17,12 +17,12 @@
  */
 package org.apache.hcatalog.templeton.tool;
 
-import static org.junit.Assert.*;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestTrivialExecService {
@@ -42,16 +42,16 @@ public class TestTrivialExecService {
                                          process.getInputStream()));
             err = new BufferedReader(new InputStreamReader(
                                          process.getErrorStream()));
-            assertEquals("success", out.readLine());
+            Assert.assertEquals("success", out.readLine());
             out.close();
             String line;
             while ((line = err.readLine()) != null) {
-                fail(line);
+              Assert.fail(line);
             }
             process.waitFor();
         } catch (Exception e) {
             e.printStackTrace();
-            fail("Process caused exception.");
+            Assert.fail("Process caused exception.");
         } finally {
             try {
                 out.close();
