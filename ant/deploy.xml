@@ -23,7 +23,7 @@
   <target name="mvn-init" unless="mvn-init.complete">
     <taskdef resource="org/apache/maven/artifact/ant/antlib.xml"
              uri="artifact:org.apache.maven.artifact.ant"
-             classpath="build/ivy/lib/test/org.apache.maven-maven-ant-tasks-${maven-ant-tasks.version}.jar"/>
+             classpath="${path.to.basedir}/build/ivy/lib/test/org.apache.maven-maven-ant-tasks-${maven-ant-tasks.version}.jar"/>
     <property name="mvn-init.complete" value="true"/>
   </target>
 
