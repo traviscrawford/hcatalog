@@ -39,12 +39,12 @@
         configuration not public in org.apache.hive#hive-builtins;0.10.0-SNAPSHOT: 'compile'.
         It was required from org.apache.hcatalog#hcatalog-core;0.5.0-SNAPSHOT compile
     -->
-    <dependency org="org.apache.hive" name="hive-builtins" rev="${hive.version}"/>
-    <dependency org="org.apache.hive" name="hive-metastore" rev="${hive.version}"/>
-    <dependency org="org.apache.hive" name="hive-common" rev="${hive.version}"/>
-    <dependency org="org.apache.hive" name="hive-exec" rev="${hive.version}"/>
-    <dependency org="org.apache.hive" name="hive-cli" rev="${hive.version}"/>
-    <dependency org="org.apache.hive" name="hive-hbase-handler" rev="${hive.version}">
+    <dependency org="org.apache.hive" name="hive-builtins" rev="${hive.version}" conf="default->default"/>
+    <dependency org="org.apache.hive" name="hive-metastore" rev="${hive.version}" conf="default->default"/>
+    <dependency org="org.apache.hive" name="hive-common" rev="${hive.version}" conf="default->default"/>
+    <dependency org="org.apache.hive" name="hive-exec" rev="${hive.version}" conf="default->default"/>
+    <dependency org="org.apache.hive" name="hive-cli" rev="${hive.version}" conf="default->default"/>
+    <dependency org="org.apache.hive" name="hive-hbase-handler" rev="${hive.version}" conf="default->default">
       <exclude org="org.apache.maven.plugins"/>
       <exclude org="org.jruby"/>
     </dependency>
