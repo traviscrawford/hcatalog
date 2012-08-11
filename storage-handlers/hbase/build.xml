@@ -110,14 +110,11 @@
     </path>
 
     <target name="mvn-dependencies" depends="mvn-init">
-      <copy file='pom.xml' toFile='${build.dir}/pom.xml'>
-        <filterset filtersfile="${path.to.basedir}/ivy/libraries.properties"/>
-      </copy>
-      <artifact:dependencies pathId="mvn.compile.classpath" useScope="compile">
-        <pom file="${build.dir}/pom.xml"/>
+      <artifact:dependencies pathId="mvn.compile.classpath" scopes="compile">
+        <pom file="pom.xml"/>
       </artifact:dependencies>
-      <artifact:dependencies pathId="mvn.test.classpath" useScope="compile, test">
-        <pom file="${build.dir}/pom.xml"/>
+      <artifact:dependencies pathId="mvn.test.classpath" scopes="compile, test">
+        <pom file="pom.xml"/>
       </artifact:dependencies>
     </target>
 
