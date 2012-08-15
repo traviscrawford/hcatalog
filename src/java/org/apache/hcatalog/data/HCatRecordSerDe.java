@@ -41,6 +41,8 @@ import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Writable;
+import org.apache.hcatalog.common.HCatConstants;
+import org.apache.hcatalog.common.HCatContext;
 import org.apache.hcatalog.data.schema.HCatSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,17 +183,29 @@ public class HCatRecordSerDe implements SerDe {
    * Return underlying Java Object from an object-representation
    * that is readable by a provided ObjectInspector.
    */
-  public static Object serializeField(Object field,
-      ObjectInspector fieldObjectInspector) throws SerDeException {
-    Object res = null;
+  public static Object serializeField(Object field, ObjectInspector fieldObjectInspector)
+      throws SerDeException {
+
+    Object res;
     if (fieldObjectInspector.getCategory() == Category.PRIMITIVE){
-      res = ((PrimitiveObjectInspector)fieldObjectInspector).getPrimitiveJavaObject(field);
-      if (res == null) {
-        return res;
-      } else if (Short.class.isAssignableFrom(res.getClass())) {
-        return new Integer((Short) res);
-      } else if (Byte.class.isAssignableFrom(res.getClass())) {
-        return new Integer((Byte) res);
+      if (field != null &&
+          HCatContext.getInstance().getConf().getBoolean(
+              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER,
+              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT) &&
+          field instanceof Boolean) {
+        res = ((Boolean) field) ? 1 : 0;
+      } else if (field != null && field instanceof Short &&
+          HCatContext.getInstance().getConf().getBoolean(
+              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION,
+              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT)) {
+        res = new Integer((Short) field);
+      } else if (field != null && field instanceof Byte &&
+          HCatContext.getInstance().getConf().getBoolean(
+              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION,
+              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT)) {
+        res = new Integer((Byte) field);
+      } else {
+        res = ((PrimitiveObjectInspector) fieldObjectInspector).getPrimitiveJavaObject(field);
       }
     } else if (fieldObjectInspector.getCategory() == Category.STRUCT){
       res = serializeStruct(field,(StructObjectInspector)fieldObjectInspector);

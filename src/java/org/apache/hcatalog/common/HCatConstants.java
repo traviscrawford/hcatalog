@@ -116,4 +116,29 @@ public final class HCatConstants {
   // Hadoop Conf Var Names
   public static final String CONF_MAPREDUCE_JOB_CREDENTIALS_BINARY = "mapreduce.job.credentials.binary";
 
+  //***************************************************************************
+  // Data-related configuration properties.
+  //***************************************************************************
+
+  /**
+   * {@value} (default: {@value #HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT}).
+   * Pig < 0.10.0 does not have boolean support, and scripts written for pre-boolean Pig versions
+   * will not expect boolean values when upgrading Pig. For integration the option is offered to
+   * convert boolean fields to integers by setting this Hadoop configuration key.
+   */
+  public static final String HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER =
+      "hcat.data.convert.boolean.to.integer";
+  public static final boolean HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT = false;
+
+  /**
+   * {@value} (default: {@value #HCAT_DATA_TINY_SMALL_INT_PROMOTION_DEFAULT}).
+   * Hive tables support tinyint and smallint columns, while not all processing frameworks support
+   * these types (Pig only has integer for example). Enable this property to promote tinyint and
+   * smallint columns to integer at runtime. Note that writes to tinyint and smallint columns
+   * enforce bounds checking and jobs will fail if attempting to write values outside the column
+   * bounds.
+   */
+  public static final String HCAT_DATA_TINY_SMALL_INT_PROMOTION =
+      "hcat.data.tiny.small.int.promotion";
+  public static final boolean HCAT_DATA_TINY_SMALL_INT_PROMOTION_DEFAULT = false;
 }
