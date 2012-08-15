@@ -139,7 +139,7 @@ public class HCatSchemaUtils {
     private static Type getPrimitiveHType(TypeInfo basePrimitiveTypeInfo) {
         switch(((PrimitiveTypeInfo)basePrimitiveTypeInfo).getPrimitiveCategory()) {
         case BOOLEAN:
-            return HCatContext.get().getConf().getBoolean(
+            return HCatContext.getInstance().getConf().getBoolean(
                 HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER,
                 HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT) ?
                 Type.INT : Type.BOOLEAN;

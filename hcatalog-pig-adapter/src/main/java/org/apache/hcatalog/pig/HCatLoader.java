@@ -83,7 +83,6 @@ public class HCatLoader extends HCatBaseLoader {
 
 @Override
   public void setLocation(String location, Job job) throws IOException {
-    HCatContext.get(job.getConfiguration());
 
     UDFContext udfContext = UDFContext.getUDFContext();
     Properties udfProps = udfContext.getUDFProperties(this.getClass(),
@@ -187,7 +186,7 @@ public class HCatLoader extends HCatBaseLoader {
 
   @Override
   public ResourceSchema getSchema(String location, Job job) throws IOException {
-    HCatContext.get(job.getConfiguration());
+    HCatContext.getInstance().mergeConf(job.getConfiguration());
 
     Table table = phutil.getTable(location,
         hcatServerUri!=null?hcatServerUri:PigHCatUtil.getHCatServerUri(job),
