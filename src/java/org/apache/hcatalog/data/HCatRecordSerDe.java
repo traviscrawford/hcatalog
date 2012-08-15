@@ -191,7 +191,7 @@ public class HCatRecordSerDe implements SerDe {
           HCatContext.getInstance().getConf().getBoolean(
               HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER,
               HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT) &&
-          Boolean.class.isAssignableFrom(field.getClass())) {
+          field instanceof Boolean) {
         res = ((Boolean) field) ? 1 : 0;
       } else {
         res = ((PrimitiveObjectInspector) fieldObjectInspector).getPrimitiveJavaObject(field);
