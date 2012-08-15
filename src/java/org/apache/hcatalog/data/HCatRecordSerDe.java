@@ -186,6 +186,11 @@ public class HCatRecordSerDe implements SerDe {
     Object res = null;
     if (fieldObjectInspector.getCategory() == Category.PRIMITIVE){
       res = ((PrimitiveObjectInspector)fieldObjectInspector).getPrimitiveJavaObject(field);
+      if (Short.class.isAssignableFrom(res.getClass())) {
+        return new Integer((Short) res);
+      } else if (Byte.class.isAssignableFrom(res.getClass())) {
+        return new Integer((Byte) res);
+      }
     } else if (fieldObjectInspector.getCategory() == Category.STRUCT){
       res = serializeStruct(field,(StructObjectInspector)fieldObjectInspector);
     } else if (fieldObjectInspector.getCategory() == Category.LIST){
