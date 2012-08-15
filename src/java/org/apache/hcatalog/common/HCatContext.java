@@ -29,9 +29,10 @@ public class HCatContext {
 
   private static final HCatContext hCatContext = new HCatContext();
 
-  private Configuration conf = new Configuration();
+  private final Configuration conf;
 
   private HCatContext() {
+    conf = new Configuration();
   }
 
   public static HCatContext getInstance() {
@@ -40,10 +41,6 @@ public class HCatContext {
 
   public Configuration getConf() {
     return conf;
-  }
-
-  public void setConf(Configuration conf) {
-    this.conf = conf;
   }
 
   /**
