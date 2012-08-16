@@ -71,7 +71,6 @@ public abstract class HCatBaseStorer extends StoreFunc implements StoreMetadata 
   protected static final String PIG_SCHEMA = "hcat.pig.store.schema";
   protected String sign;
 
-
   public HCatBaseStorer(String partSpecs, String schema) throws Exception {
 
     partitionKeys = new ArrayList<String>();
