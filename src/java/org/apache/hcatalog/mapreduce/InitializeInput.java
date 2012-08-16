@@ -93,7 +93,7 @@ public class InitializeInput {
       } else {
         hiveConf = new HiveConf(HCatInputFormat.class);
       }
-      client = HCatUtil.createHiveClient(hiveConf);
+      client = HCatUtil.getHiveClient(hiveConf);
 
       Table table =
           HCatUtil.getTable(client, inputJobInfo.getDatabaseName(), inputJobInfo.getTableName());
