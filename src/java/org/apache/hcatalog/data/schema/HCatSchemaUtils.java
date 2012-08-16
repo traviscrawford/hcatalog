@@ -30,8 +30,6 @@ import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
-import org.apache.hcatalog.common.HCatConstants;
-import org.apache.hcatalog.common.HCatContext;
 import org.apache.hcatalog.common.HCatException;
 import org.apache.hcatalog.data.schema.HCatFieldSchema.Type;
 
@@ -139,10 +137,7 @@ public class HCatSchemaUtils {
     private static Type getPrimitiveHType(TypeInfo basePrimitiveTypeInfo) {
         switch(((PrimitiveTypeInfo)basePrimitiveTypeInfo).getPrimitiveCategory()) {
         case BOOLEAN:
-            return HCatContext.get().getConf().getBoolean(
-                HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER,
-                HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT) ?
-                Type.INT : Type.BOOLEAN;
+            return Type.BOOLEAN;
         case BYTE:
             return Type.TINYINT;
         case DOUBLE:

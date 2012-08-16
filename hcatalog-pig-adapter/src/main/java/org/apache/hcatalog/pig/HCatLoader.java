@@ -35,7 +35,6 @@ import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.security.Credentials;
 import org.apache.hcatalog.common.HCatConstants;
-import org.apache.hcatalog.common.HCatContext;
 import org.apache.hcatalog.common.HCatUtil;
 import org.apache.hcatalog.data.Pair;
 import org.apache.hcatalog.data.schema.HCatSchema;
@@ -86,8 +85,6 @@ public class HCatLoader extends HCatBaseLoader {
 
 @Override
   public void setLocation(String location, Job job) throws IOException {
-    HCatContext.get(job.getConfiguration());
-
     UDFContext udfContext = UDFContext.getUDFContext();
     Properties udfProps = udfContext.getUDFProperties(this.getClass(),
         new String[]{signature});
@@ -198,8 +195,6 @@ public class HCatLoader extends HCatBaseLoader {
     } catch (HiveException e) {
       throw new IOException("Failed updating Hive runtime configuration.", e);
     }
-
-    HCatContext.get(job.getConfiguration());
 
     Table table = phutil.getTable(location,
         hcatServerUri!=null?hcatServerUri:PigHCatUtil.getHCatServerUri(job),
