@@ -158,7 +158,7 @@ public class HCatRecordSerDe implements SerDe {
    * @param soi : StructObjectInspector
    * @return HCatRecord
    */
-  private List<?> serializeStruct(Object obj, StructObjectInspector soi)
+  private static List<?> serializeStruct(Object obj, StructObjectInspector soi)
       throws SerDeException {
 
     List<? extends StructField> fields = soi.getAllStructFieldRefs();
@@ -187,16 +187,26 @@ public class HCatRecordSerDe implements SerDe {
    * Return underlying Java Object from an object-representation
    * that is readable by a provided ObjectInspector.
    */
-  public Object serializeField(Object field, ObjectInspector fieldObjectInspector)
+  public static Object serializeField(Object field, ObjectInspector fieldObjectInspector)
       throws SerDeException {
+
     Object res;
     if (fieldObjectInspector.getCategory() == Category.PRIMITIVE){
-      if (field != null &&
+      if (field != null && field instanceof Boolean &&
           HCatContext.getInstance().getConf().getBoolean(
               HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER,
-              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT) &&
-          field instanceof Boolean) {
+              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT)) {
         res = ((Boolean) field) ? 1 : 0;
+      } else if (field != null && field instanceof Short &&
+          HCatContext.getInstance().getConf().getBoolean(
+              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION,
+              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION_DEFAULT)) {
+        res = new Integer((Short) field);
+      } else if (field != null && field instanceof Byte &&
+          HCatContext.getInstance().getConf().getBoolean(
+              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION,
+              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION_DEFAULT)) {
+        res = new Integer((Byte) field);
       } else {
         res = ((PrimitiveObjectInspector) fieldObjectInspector).getPrimitiveJavaObject(field);
       }
@@ -223,7 +233,7 @@ public class HCatRecordSerDe implements SerDe {
    * an object-representation that is readable by a provided
    * MapObjectInspector
    */
-  private Map<?,?> serializeMap(Object f, MapObjectInspector moi) throws SerDeException {
+  private static Map<?,?> serializeMap(Object f, MapObjectInspector moi) throws SerDeException {
     ObjectInspector koi = moi.getMapKeyObjectInspector();
     ObjectInspector voi = moi.getMapValueObjectInspector();
     Map<Object,Object> m = new TreeMap<Object, Object>();
@@ -239,7 +249,7 @@ public class HCatRecordSerDe implements SerDe {
     return m;
   }
 
-  private List<?> serializeList(Object f, ListObjectInspector loi) throws SerDeException {
+  private static List<?> serializeList(Object f, ListObjectInspector loi) throws SerDeException {
     List l = loi.getList(f);
     if (l == null){
       return null;

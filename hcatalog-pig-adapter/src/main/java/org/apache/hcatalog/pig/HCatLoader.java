@@ -189,6 +189,8 @@ public class HCatLoader extends HCatBaseLoader {
   @Override
   public ResourceSchema getSchema(String location, Job job) throws IOException {
     HCatContext.getInstance().mergeConf(job.getConfiguration());
+    HCatContext.getInstance().getConf().setBoolean(
+        HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION, true);
 
     // Pig command-line -D configuration options are not available to HiveConf, as they are not
     // present in new Configuration objects. We explicitly update Hive's configuration so
