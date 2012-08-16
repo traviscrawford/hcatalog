@@ -60,9 +60,8 @@ import org.apache.pig.impl.util.Utils;
 
 public abstract class HCatBaseStorer extends StoreFunc implements StoreMetadata {
 
-  /**
-   *
-   */
+  private static final List<Type> SUPPORTED_INTEGER_CONVERSIONS =
+      Lists.newArrayList(Type.TINYINT, Type.SMALLINT, Type.INT);
   protected static final String COMPUTED_OUTPUT_SCHEMA = "hcat.output.schema";
   protected final List<String> partitionKeys;
   protected final Map<String,String> partitions;
@@ -71,6 +70,7 @@ public abstract class HCatBaseStorer extends StoreFunc implements StoreMetadata 
   protected HCatSchema computedSchema;
   protected static final String PIG_SCHEMA = "hcat.pig.store.schema";
   protected String sign;
+
 
   public HCatBaseStorer(String partSpecs, String schema) throws Exception {
 
@@ -153,9 +153,7 @@ public abstract class HCatBaseStorer extends StoreFunc implements StoreMetadata 
       return new HCatFieldSchema(fSchema.alias, Type.STRING, null);
 
     case DataType.INTEGER:
-      List<Type> supportedIntegerConversions = Lists.newArrayList(
-          Type.TINYINT, Type.SMALLINT, Type.INT);
-      if (!supportedIntegerConversions.contains(hcatFieldSchema.getType())) {
+      if (!SUPPORTED_INTEGER_CONVERSIONS.contains(hcatFieldSchema.getType())) {
         throw new FrontendException("Unsupported type: " + type + "  in Pig's schema",
             PigHCatUtil.PIG_EXCEPTION_CODE);
       }
@@ -308,12 +306,18 @@ public abstract class HCatBaseStorer extends StoreFunc implements StoreMetadata 
       case DOUBLE:
         return pigObj;
       case SMALLINT:
+        if (pigObj == null) {
+          return null;
+        }
         if ((Integer) pigObj < Short.MIN_VALUE || (Integer) pigObj > Short.MAX_VALUE) {
           throw new BackendException("Value " + pigObj + " is outside the bounds of column " +
               hcatFS.getName() + " with type " + hcatFS.getType(), PigHCatUtil.PIG_EXCEPTION_CODE);
         }
         return ((Integer) pigObj).shortValue();
       case TINYINT:
+        if (pigObj == null) {
+          return null;
+        }
         if ((Integer) pigObj < Byte.MIN_VALUE || (Integer) pigObj > Byte.MAX_VALUE) {
           throw new BackendException("Value " + pigObj + " is outside the bounds of column " +
               hcatFS.getName() + " with type " + hcatFS.getType(), PigHCatUtil.PIG_EXCEPTION_CODE);
