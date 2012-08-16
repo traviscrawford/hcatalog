@@ -43,6 +43,7 @@ import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Writable;
 import org.apache.hcatalog.common.HCatConstants;
+import org.apache.hcatalog.common.HCatContext;
 import org.apache.hcatalog.data.schema.HCatSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,9 +191,11 @@ public class HCatRecordSerDe implements SerDe {
       throws SerDeException {
     Object res;
     if (fieldObjectInspector.getCategory() == Category.PRIMITIVE){
-      if (convertBooleanToInteger &&
-          field != null &&
-          Boolean.class.isAssignableFrom(field.getClass())) {
+      if (field != null &&
+          HCatContext.getInstance().getConf().getBoolean(
+              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER,
+              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT) &&
+          field instanceof Boolean) {
         res = ((Boolean) field) ? 1 : 0;
       } else {
         res = ((PrimitiveObjectInspector) fieldObjectInspector).getPrimitiveJavaObject(field);

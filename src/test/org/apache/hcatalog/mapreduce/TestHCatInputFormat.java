@@ -104,7 +104,6 @@ public class TestHCatInputFormat extends HCatBaseTest {
     job.setOutputFormatClass(TextOutputFormat.class);
 
     HCatInputFormat.setInput(job, InputJobInfo.create("default", "test_bad_records", null));
-    HCatContext.get(conf);
 
     job.setMapOutputKeyClass(HCatRecord.class);
     job.setMapOutputValueClass(HCatRecord.class);
