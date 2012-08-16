@@ -196,12 +196,12 @@ public class HCatRecordSerDe implements SerDe {
       } else if (field != null && field instanceof Short &&
           HCatContext.getInstance().getConf().getBoolean(
               HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION,
-              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT)) {
+              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION_DEFAULT)) {
         res = new Integer((Short) field);
       } else if (field != null && field instanceof Byte &&
           HCatContext.getInstance().getConf().getBoolean(
               HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION,
-              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT)) {
+              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION_DEFAULT)) {
         res = new Integer((Byte) field);
       } else {
         res = ((PrimitiveObjectInspector) fieldObjectInspector).getPrimitiveJavaObject(field);
