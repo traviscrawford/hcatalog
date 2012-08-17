@@ -78,7 +78,7 @@ public class HCatStorer extends HCatBaseStorer {
 
   @Override
   public void setStoreLocation(String location, Job job) throws IOException {
-    HCatContext.getInstance().mergeConf(job.getConfiguration());
+    HCatContext.setupHCatContext(job.getConfiguration());
     HCatContext.getInstance().getConf().setBoolean(
         HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION, false);
 

@@ -86,6 +86,8 @@ public class HCatLoader extends HCatBaseLoader {
 
 @Override
   public void setLocation(String location, Job job) throws IOException {
+    setupHCatContext(job);
+
     UDFContext udfContext = UDFContext.getUDFContext();
     Properties udfProps = udfContext.getUDFProperties(this.getClass(),
         new String[]{signature});
@@ -188,18 +190,7 @@ public class HCatLoader extends HCatBaseLoader {
 
   @Override
   public ResourceSchema getSchema(String location, Job job) throws IOException {
-    HCatContext.getInstance().mergeConf(job.getConfiguration());
-    HCatContext.getInstance().getConf().setBoolean(
-        HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION, true);
-
-    // Pig command-line -D configuration options are not available to HiveConf, as they are not
-    // present in new Configuration objects. We explicitly update Hive's configuration so
-    // {@link Table.getDeserializerFromMetaStore()} uses the correct configuration.
-    try {
-      Hive.get(new HiveConf(job.getConfiguration(), this.getClass()), true);
-    } catch (HiveException e) {
-      throw new IOException("Failed updating Hive runtime configuration.", e);
-    }
+    setupHCatContext(job);
 
     Table table = phutil.getTable(location,
         hcatServerUri!=null?hcatServerUri:PigHCatUtil.getHCatServerUri(job),
@@ -243,6 +234,21 @@ public class HCatLoader extends HCatBaseLoader {
       return stats;
     } catch (Exception e) {
       throw new IOException(e);
+    }
+  }
+
+  private void setupHCatContext(Job job) throws IOException {
+    HCatContext.setupHCatContext(job.getConfiguration());
+    HCatContext.getInstance().getConf().setBoolean(
+        HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION, true);
+
+    // Pig command-line -D configuration options are not available to HiveConf, as they are not
+    // present in new Configuration objects. We explicitly update Hive's configuration so
+    // {@link Table.getDeserializerFromMetaStore()} uses the correct configuration.
+    try {
+      Hive.get(new HiveConf(job.getConfiguration(), this.getClass()), true);
+    } catch (HiveException e) {
+      throw new IOException("Failed updating Hive runtime configuration.", e);
     }
   }
 
