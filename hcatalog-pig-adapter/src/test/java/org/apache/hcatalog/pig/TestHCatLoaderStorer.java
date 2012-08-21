@@ -20,6 +20,7 @@ package org.apache.hcatalog.pig;
 
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hcatalog.HcatTestUtils;
+import org.apache.hcatalog.MiniCluster;
 import org.apache.hcatalog.mapreduce.HCatBaseTest;
 import org.apache.pig.ExecType;
 import org.apache.pig.PigServer;
@@ -45,7 +46,6 @@ public class TestHCatLoaderStorer extends HCatBaseTest {
    */
   @Test
   public void testSmallTinyInt() throws Exception {
-
     String readTblName = "test_small_tiny_int";
     File dataDir = new File(TEST_DATA_DIR + "/testSmallTinyIntData");
     File dataFile = new File(dataDir, "testSmallTinyInt.tsv");
@@ -128,7 +128,7 @@ public class TestHCatLoaderStorer extends HCatBaseTest {
     Assert.assertEquals(0, driver.run("create table test_tbl" +
         " (my_small_int smallint, my_tiny_int tinyint) stored as rcfile").getResponseCode());
 
-    PigServer server = new PigServer(ExecType.LOCAL);
+    PigServer server = new PigServer(ExecType.LOCAL, MiniCluster.buildCluster().getProperties());
     server.setBatchOn();
     server.registerQuery("data = load '" + data +
         "' using PigStorage('\t') as (my_small_int:int, my_tiny_int:int);");

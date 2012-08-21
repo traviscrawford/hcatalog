@@ -28,9 +28,9 @@ import java.util.Properties;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
-import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.security.Credentials;
@@ -86,6 +86,8 @@ public class HCatLoader extends HCatBaseLoader {
 
 @Override
   public void setLocation(String location, Job job) throws IOException {
+    setupHCatContext(job);
+
     UDFContext udfContext = UDFContext.getUDFContext();
     Properties udfProps = udfContext.getUDFProperties(this.getClass(),
         new String[]{signature});
@@ -188,18 +190,7 @@ public class HCatLoader extends HCatBaseLoader {
 
   @Override
   public ResourceSchema getSchema(String location, Job job) throws IOException {
-    HCatContext.getInstance().mergeConf(job.getConfiguration());
-    HCatContext.getInstance().getConf().setBoolean(
-        HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION, true);
-
-    // Pig command-line -D configuration options are not available to HiveConf, as they are not
-    // present in new Configuration objects. We explicitly update Hive's configuration so
-    // {@link Table.getDeserializerFromMetaStore()} uses the correct configuration.
-    try {
-      Hive.get(new HiveConf(job.getConfiguration(), this.getClass()), true);
-    } catch (HiveException e) {
-      throw new IOException("Failed updating Hive runtime configuration.", e);
-    }
+    setupHCatContext(job);
 
     Table table = phutil.getTable(location,
         hcatServerUri!=null?hcatServerUri:PigHCatUtil.getHCatServerUri(job),
@@ -281,4 +272,17 @@ public class HCatLoader extends HCatBaseLoader {
     }
   }
 
+  private void setupHCatContext(Job job) throws IOException {
+    HCatContext.setupHCatContext(job.getConfiguration())
+        .getConf().setBoolean(HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION, true);
+
+    // Pig command-line -D configuration options are not available to HiveConf, as they are not
+    // present in new Configuration objects. We explicitly update Hive's configuration so
+    // {@link Table.getDeserializerFromMetaStore()} uses the correct configuration.
+    try {
+      Hive.get(new HiveConf(job.getConfiguration(), this.getClass()), true);
+    } catch (HiveException e) {
+      throw new IOException("Failed updating Hive runtime configuration.", e);
+    }
+  }
 }

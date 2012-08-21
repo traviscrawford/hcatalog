@@ -18,37 +18,58 @@
 
 package org.apache.hcatalog.common;
 
+import com.google.common.base.Preconditions;
 import org.apache.hadoop.conf.Configuration;
 
 import java.util.Map;
 
 /**
- * HCatContext provides global access to configuration data.
+ * HCatContext provides global access to configuration data. It uses a reference to the
+ * job configuration so that all the settings can be passed to the backend. Users are
+ * not required to set the context; for example, a MR job written before HCatContext
+ * existed. For this reason, users must be careful to check for a null context conf.
  */
 public class HCatContext {
 
   private static final HCatContext hCatContext = new HCatContext();
 
-  private final Configuration conf;
+  private Configuration conf = null;
 
   private HCatContext() {
-    conf = new Configuration();
+  }
+
+  /**
+   * Setup the HCatContext as a reference to the given configuration. Keys
+   * exclusive to an existing config are set in the new conf.
+   */
+  public static synchronized HCatContext setupHCatContext(Configuration newConf) {
+    Preconditions.checkNotNull(newConf, "HCatContext must not have a null conf.");
+
+    if (hCatContext.conf == null) {
+      hCatContext.conf = newConf;
+      return hCatContext;
+    }
+
+    if (hCatContext.conf != newConf) {
+      for (Map.Entry<String, String> entry : hCatContext.conf) {
+        if (newConf.get(entry.getKey()) == null) {
+          newConf.set(entry.getKey(), entry.getValue());
+        }
+      }
+      hCatContext.conf = newConf;
+    }
+    return hCatContext;
   }
 
   public static HCatContext getInstance() {
     return hCatContext;
   }
 
+  /**
+   * Get the HCatContext configuration.
+   * @return the current configuration if setup, otherwise null
+   */
   public Configuration getConf() {
     return conf;
-  }
-
-  /**
-   * Merge the given configuration into the HCatContext conf, overwriting any existing keys.
-   */
-  public void mergeConf(Configuration conf) {
-    for (Map.Entry<String, String> entry : conf) {
-      this.conf.set(entry.getKey(), entry.getValue());
-    }
   }
 }
