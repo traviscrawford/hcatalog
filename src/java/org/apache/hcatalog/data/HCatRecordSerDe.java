@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.hadoop.conf.Configuration;
@@ -33,6 +34,8 @@ import org.apache.hadoop.hive.serde2.SerDeStats;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.MapObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
+import org.apache.hadoop.hive.serde2.objectinspector.SetObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
@@ -221,6 +224,8 @@ public class HCatRecordSerDe implements SerDe {
       }
     } else if (fieldObjectInspector.getCategory() == Category.LIST){
       res = serializeList(field,(ListObjectInspector)fieldObjectInspector);
+    } else if (fieldObjectInspector.getCategory() == Category.SET){
+      res = serializeSet(field,(SetObjectInspector)fieldObjectInspector);
     } else if (fieldObjectInspector.getCategory() == Category.MAP){
       res = serializeMap(field,(MapObjectInspector)fieldObjectInspector);
     } else {
@@ -252,6 +257,17 @@ public class HCatRecordSerDe implements SerDe {
     return m;
   }
 
+  private static List<?> serializeSet(Object object, SetObjectInspector soi) throws SerDeException {
+    Set<?> set = soi.getSet(object);
+    if (set == null) {
+      return null;
+    }
+    ObjectInspector eloi = soi.getSetElementObjectInspector();
+    List<?> list = Arrays.asList(set.toArray());
+    ListObjectInspector loi = ObjectInspectorFactory.getStandardListObjectInspector(eloi);
+    return serializeList(list, loi);
+  }
+
   private static List<?> serializeList(Object f, ListObjectInspector loi) throws SerDeException {
     List l = loi.getList(f);
     if (l == null){
@@ -277,6 +293,12 @@ public class HCatRecordSerDe implements SerDe {
         list.add(serializeList(l.get(i), (ListObjectInspector) eloi));
       }
       return list;
+    } else if (eloi.getCategory() == Category.SET){
+      List<List<?>> list = new ArrayList<List<?>>(l.size());
+      for (int i = 0 ; i < l.size() ; i++ ){
+        list.add(serializeSet(l.get(i), (SetObjectInspector) eloi));
+      }
+      return list;
     } else if (eloi.getCategory() == Category.MAP){
       List<Map<?,?>> list = new ArrayList<Map<?,?>>(l.size());
       for (int i = 0 ; i < l.size() ; i++ ){
@@ -289,7 +311,6 @@ public class HCatRecordSerDe implements SerDe {
           + eloi.getCategory() + " , type: " + eloi.getTypeName());
     }
   }
-
 
   /**
    * Return an object inspector that can read through the object
