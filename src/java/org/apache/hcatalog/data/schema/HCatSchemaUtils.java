@@ -127,7 +127,17 @@ public class HCatSchemaUtils {
             HCatSchema subSchema = getHCatSchema(((ListTypeInfo)fieldTypeInfo).getListElementTypeInfo());
             hCatFieldSchema = new HCatFieldSchema(fieldName,HCatFieldSchema.Type.ARRAY,subSchema,null);
         } else if (Category.MAP == typeCategory) {
-            HCatFieldSchema.Type mapKeyType =  getPrimitiveHType(((MapTypeInfo)fieldTypeInfo).getMapKeyTypeInfo());
+            TypeInfo mapKeyTypeInfo = ((MapTypeInfo)fieldTypeInfo).getMapKeyTypeInfo();
+            HCatFieldSchema.Type mapKeyType;
+            if (mapKeyTypeInfo.getCategory() == Category.PRIMITIVE) {
+              mapKeyType =  getPrimitiveHType(mapKeyTypeInfo);
+            } else if (HCatContext.getInstance().getConf().getBoolean(
+                HCatConstants.HCAT_DATA_CONVERT_COMPLEX_MAP_KEY,
+                HCatConstants.HCAT_DATA_CONVERT_COMPLEX_MAP_KEY_DEFAULT)) {
+              mapKeyType = Type.STRING;
+            } else {
+              throw new TypeNotPresentException("Cannot use " + mapKeyTypeInfo.getCategory() + " as map keys", null);
+            }
             HCatSchema subSchema = getHCatSchema(((MapTypeInfo)fieldTypeInfo).getMapValueTypeInfo());
             hCatFieldSchema = new HCatFieldSchema(fieldName,HCatFieldSchema.Type.MAP,mapKeyType,subSchema,null);
         } else{
