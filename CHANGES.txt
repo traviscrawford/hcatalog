@@ -23,6 +23,8 @@ Trunk (unreleased changes)
   INCOMPATIBLE CHANGES
 
   NEW FEATURES
+  HCAT-375 Make HCat work for Hadoop 0.23 (cdrome via toffer)
+
   HCAT-469 HiveClientCache may return a closed client (amalakar via toffer)
 
   HCAT-370 Create a HiveMetaStoreClient cache in hcatalog (amalakar via toffer) 
@@ -79,6 +81,10 @@ Trunk (unreleased changes)
   OPTIMIZATIONS
 
   BUG FIXES
+  HCAT-470 Update HCat version numbers in Templeton doc set (lefty via gates)
+
+  HCAT-472 HCatalog should use Deserializer in the read path instead of SerDe (traviscrawford)
+
   HCAT-467 Templeton scripts point to wrong jar name (jghoman via traviscrawford)
 
   HCAT-436 JSON SerDe column misnaming on CTAS (khorgath via gates)
