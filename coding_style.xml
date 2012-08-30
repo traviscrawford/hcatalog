@@ -20,6 +20,11 @@ imposed on others.
   <!-- See http://checkstyle.sf.net/config_sizes.html -->
   <module name="FileLength"/>
 
+  <module name="Header">
+    <property name="headerFile" value="apache_header_java.txt"/>
+    <property name="fileExtensions" value="java"/>
+  </module>
+
   <module name="TreeWalker">
 
     <!-- Checks for imports                              -->
