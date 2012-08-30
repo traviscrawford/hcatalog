@@ -38,6 +38,16 @@ Trunk (unreleased changes)
   HCAT-427 Document storage-based authorization (lefty via gates)
 
   IMPROVEMENTS
+  HCAT-485 Document that storage-based security ignores GRANT/REVOKE statements (lefty via khorgath)
+
+  HCAT-442 Documentation needs update for using HCatalog with pig (lefty via gates)
+
+  HCAT-482 Document -libjars from HDFS for HCat with MapReduce (lefty via gates)
+
+  HCAT-481 Fix CLI usage syntax in doc & revise HCat docset (lefty via khorgath)
+
+  HCAT-444 Document reader & writer interfaces (lefty via gates)
+
   HCAT-425 Pig cannot read/write SMALLINT/TINYINT columns (traviscrawford)
 
   HCAT-460 Enable boolean to integer conversions (traviscrawford)
@@ -81,6 +91,12 @@ Trunk (unreleased changes)
   OPTIMIZATIONS
 
   BUG FIXES
+  HCAT-483 HCatBaseStorer.getHCatFSFromPigFS fails when Table schema is not provided (pengfeng via traviscrawford)
+
+  HCAT-477 Drop table API in webhcat client does not respect the "ifExists" parameter.
+
+  HCAT-471 Test HCat_ShowDes_1[1-3] fails (vikram.dixit via gates)
+
   HCAT-470 Update HCat version numbers in Templeton doc set (lefty via gates)
 
   HCAT-472 HCatalog should use Deserializer in the read path instead of SerDe (traviscrawford)
