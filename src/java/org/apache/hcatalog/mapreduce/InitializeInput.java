@@ -94,9 +94,8 @@ public class InitializeInput {
         hiveConf = new HiveConf(HCatInputFormat.class);
       }
       client = HCatUtil.getHiveClient(hiveConf);
-
-      Table table =
-          HCatUtil.getTable(client, inputJobInfo.getDatabaseName(), inputJobInfo.getTableName());
+      Table table = HCatUtil.getTable(client, inputJobInfo.getDatabaseName(),
+          inputJobInfo.getTableName());
 
       List<PartInfo> partInfoList = new ArrayList<PartInfo>();
 
@@ -116,10 +115,9 @@ public class InitializeInput {
 
         // populate partition info
         for (Partition ptn : parts){
-          org.apache.hadoop.hive.ql.metadata.Partition mPartition =
-              new org.apache.hadoop.hive.ql.metadata.Partition(table, ptn);
-          HCatSchema schema = HCatUtil.extractSchema(mPartition);
-          PartInfo partInfo = extractPartInfo(schema, mPartition.getTPartition().getSd(),
+          HCatSchema schema = HCatUtil.extractSchema(
+              new org.apache.hadoop.hive.ql.metadata.Partition(table, ptn));
+          PartInfo partInfo = extractPartInfo(schema, ptn.getSd(),
               ptn.getParameters(), job.getConfiguration(), inputJobInfo);
           partInfo.setPartitionValues(createPtnKeyValueMap(table, ptn));
           partInfoList.add(partInfo);
@@ -164,28 +162,24 @@ public class InitializeInput {
   }
 
   private static PartInfo extractPartInfo(HCatSchema schema, StorageDescriptor sd,
-      Map<String, String> parameters, Configuration conf, InputJobInfo inputJobInfo)
-      throws IOException {
+      Map<String,String> parameters, Configuration conf,
+      InputJobInfo inputJobInfo) throws IOException{
 
     StorerInfo storerInfo = InternalUtil.extractStorerInfo(sd,parameters);
 
     Properties hcatProperties = new Properties();
-    HCatStorageHandler storageHandler = HCatUtil.getStorageHandler(conf,
-                                                                   storerInfo);
+    HCatStorageHandler storageHandler = HCatUtil.getStorageHandler(conf, storerInfo);
 
     // copy the properties from storageHandler to jobProperties
-    Map<String, String>jobProperties = HCatUtil.getInputJobProperties(
-                                                            storageHandler,
-                                                            inputJobInfo);
+    Map<String, String>jobProperties = HCatUtil.getInputJobProperties(storageHandler, inputJobInfo);
 
     for (String key : parameters.keySet()){
         hcatProperties.put(key, parameters.get(key));
     }
     // FIXME
     // Bloating partinfo with inputJobInfo is not good
-    return new PartInfo(schema, storageHandler,
-                        sd, hcatProperties,
-                        jobProperties, inputJobInfo.getTableInfo());
+    return new PartInfo(schema, storageHandler, sd.getLocation(),
+        hcatProperties, jobProperties, inputJobInfo.getTableInfo());
   }
 
 }

@@ -187,8 +187,8 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
         Path src;
         OutputJobInfo jobInfo = HCatOutputFormat.getJobInfo(jobContext);
         if (dynamicPartitioningUsed){
-            src = new Path(getPartitionRootLocation(
-                jobInfo.getLocation(), jobInfo.getTableInfo().getTable().getPartitionKeysSize()));
+            src = new Path(getPartitionRootLocation(jobInfo.getLocation(),
+                jobInfo.getTableInfo().getTable().getPartitionKeysSize()));
         }else{
             src = new Path(jobInfo.getLocation());
         }
@@ -279,7 +279,8 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
             HiveConf hiveConf = HCatUtil.getHiveConf(conf);
             client = HCatUtil.getHiveClient(hiveConf);
 
-            StorerInfo storer = InternalUtil.extractStorerInfo(table.getTTable().getSd(),table.getParameters());
+            StorerInfo storer =
+                InternalUtil.extractStorerInfo(table.getTTable().getSd(), table.getParameters());
 
             updateTableSchema(client, table, jobInfo.getOutputSchema());
 
@@ -425,12 +426,10 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
             Table table, FileSystem fs,
             String grpName, FsPermission perms) throws IOException {
 
-        StorageDescriptor tblSD = table.getTTable().getSd();
-
         Partition partition = new Partition();
         partition.setDbName(table.getDbName());
         partition.setTableName(table.getTableName());
-        partition.setSd(new StorageDescriptor(tblSD));
+        partition.setSd(new StorageDescriptor(table.getTTable().getSd()));
 
         List<FieldSchema> fields = new ArrayList<FieldSchema>();
         for(HCatFieldSchema fieldSchema : outputSchema.getFields()) {

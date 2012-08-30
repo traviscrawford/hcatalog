@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.OutputFormat;
@@ -216,9 +217,8 @@ public abstract class HCatBaseOutputFormat extends OutputFormat<WritableComparab
       }
     }
 
-    org.apache.hadoop.hive.ql.metadata.Table mTable =
-        new org.apache.hadoop.hive.ql.metadata.Table(jobInfo.getTableInfo().getTable());
-    HCatUtil.validatePartitionSchema(mTable, schemaWithoutParts);
+    HCatUtil.validatePartitionSchema(
+        new Table(jobInfo.getTableInfo().getTable()), schemaWithoutParts);
     jobInfo.setPosOfPartCols(posOfPartCols);
     jobInfo.setPosOfDynPartCols(posOfDynPartCols);
     jobInfo.setOutputSchema(schemaWithoutParts);
