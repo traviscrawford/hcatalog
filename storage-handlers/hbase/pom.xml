@@ -53,7 +53,7 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-test</artifactId>
-      <version>${hadoop.jars.version}</version>
+      <version>${hadoop20.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

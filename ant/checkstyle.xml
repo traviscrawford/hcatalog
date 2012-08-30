@@ -20,7 +20,6 @@
 <project xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
 
   <target name="checkstyle-init" depends="ivy-retrieve">
-    <!-- classpath="${test}/ivy/lib/test/com.puppycrawl.tools-checkstyle-${checkstyle.version}.jar"/> -->
     <taskdef resource="checkstyletask.properties" classpathref="test.class.path"/>
     <mkdir dir="${build.dir}/checkstyle"/>
   </target>
