@@ -188,7 +188,7 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
         OutputJobInfo jobInfo = HCatOutputFormat.getJobInfo(jobContext);
         if (dynamicPartitioningUsed){
             src = new Path(getPartitionRootLocation(jobInfo.getLocation(),
-                jobInfo.getTableInfo().getTable().getTTable().getPartitionKeysSize()));
+                jobInfo.getTableInfo().getTable().getPartitionKeysSize()));
         }else{
             src = new Path(jobInfo.getLocation());
         }
@@ -242,7 +242,7 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
 
         OutputJobInfo jobInfo = HCatOutputFormat.getJobInfo(context);
         Configuration conf = context.getConfiguration();
-        Table table = jobInfo.getTableInfo().getTable();
+        Table table = new Table(jobInfo.getTableInfo().getTable());
         Path tblPath = new Path(table.getTTable().getSd().getLocation());
         FileSystem fs = tblPath.getFileSystem(conf);
 
