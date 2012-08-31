@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -178,7 +178,7 @@ public class InitializeInput {
     }
     // FIXME
     // Bloating partinfo with inputJobInfo is not good
-    return new PartInfo(schema, storageHandler, sd.getLocation(),
+    return new PartInfo(schema, storageHandler, sd,
         hcatProperties, jobProperties, inputJobInfo.getTableInfo());
   }
 

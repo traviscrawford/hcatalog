@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import junit.framework.Assert;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.serde.Constants;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
@@ -30,8 +31,6 @@ import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 
 import org.apache.hcatalog.data.schema.HCatSchema;
 import org.apache.hcatalog.data.schema.HCatSchemaUtils;
-
-import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -55,10 +54,10 @@ public class TestLazyHCatRecord {
   @Test
   public void testGet() throws Exception {
     HCatRecord r = new LazyHCatRecord(getHCatRecord(), getObjectInspector(), HCAT_RECORD_SERDE);
-    Assert.assertEquals(INT_CONST, ((Integer)r.get(0)).intValue());
-    Assert.assertEquals(LONG_CONST, ((Long)r.get(1)).longValue());
-    Assert.assertEquals(DOUBLE_CONST, ((Double)r.get(2)).doubleValue());
-    Assert.assertEquals(STRING_CONST, (String)r.get(3));
+    Assert.assertEquals(INT_CONST, ((Integer) r.get(0)).intValue());
+    Assert.assertEquals(LONG_CONST, ((Long) r.get(1)).longValue());
+    Assert.assertEquals(DOUBLE_CONST, ((Double) r.get(2)).doubleValue());
+    Assert.assertEquals(STRING_CONST, (String) r.get(3));
   }
 
   @Test
@@ -67,20 +66,20 @@ public class TestLazyHCatRecord {
     HCatRecord r = new LazyHCatRecord(getHCatRecord(), getObjectInspector(ti), HCAT_RECORD_SERDE);
     HCatSchema schema = HCatSchemaUtils.getHCatSchema(ti)
                                           .get(0).getStructSubSchema();
-    Assert.assertEquals(INT_CONST, ((Integer)r.get("an_int", schema)).intValue());
-    Assert.assertEquals(LONG_CONST, ((Long)r.get("a_long", schema)).longValue());
-    Assert.assertEquals(DOUBLE_CONST, ((Double)r.get("a_double", schema)).doubleValue());
-    Assert.assertEquals(STRING_CONST, (String)r.get("a_string", schema));
+    Assert.assertEquals(INT_CONST, ((Integer) r.get("an_int", schema)).intValue());
+    Assert.assertEquals(LONG_CONST, ((Long) r.get("a_long", schema)).longValue());
+    Assert.assertEquals(DOUBLE_CONST, ((Double) r.get("a_double", schema)).doubleValue());
+    Assert.assertEquals(STRING_CONST, (String) r.get("a_string", schema));
   }
 
   @Test
   public void testGetAll() throws Exception {
     HCatRecord r = new LazyHCatRecord(getHCatRecord(), getObjectInspector(), HCAT_RECORD_SERDE);
     List<Object> list = r.getAll();
-    Assert.assertEquals(INT_CONST, ((Integer)list.get(0)).intValue());
-    Assert.assertEquals(LONG_CONST, ((Long)list.get(1)).longValue());
-    Assert.assertEquals(DOUBLE_CONST, ((Double)list.get(2)).doubleValue());
-    Assert.assertEquals(STRING_CONST, (String)list.get(3));
+    Assert.assertEquals(INT_CONST, ((Integer) list.get(0)).intValue());
+    Assert.assertEquals(LONG_CONST, ((Long) list.get(1)).longValue());
+    Assert.assertEquals(DOUBLE_CONST, ((Double) list.get(2)).doubleValue());
+    Assert.assertEquals(STRING_CONST, (String) list.get(3));
   }
 
   @Test
@@ -164,10 +163,10 @@ public class TestLazyHCatRecord {
   @Test
   public void testGetWritable() throws Exception {
     HCatRecord r = new LazyHCatRecord(getHCatRecord(), getObjectInspector(), HCAT_RECORD_SERDE).getWritable();
-    Assert.assertEquals(INT_CONST, ((Integer)r.get(0)).intValue());
-    Assert.assertEquals(LONG_CONST, ((Long)r.get(1)).longValue());
-    Assert.assertEquals(DOUBLE_CONST, ((Double)r.get(2)).doubleValue());
-    Assert.assertEquals(STRING_CONST, (String)r.get(3));
+    Assert.assertEquals(INT_CONST, ((Integer) r.get(0)).intValue());
+    Assert.assertEquals(LONG_CONST, ((Long) r.get(1)).longValue());
+    Assert.assertEquals(DOUBLE_CONST, ((Double) r.get(2)).doubleValue());
+    Assert.assertEquals(STRING_CONST, (String) r.get(3));
     Assert.assertEquals("org.apache.hcatalog.data.DefaultHCatRecord", r.getClass().getName());
   }
 

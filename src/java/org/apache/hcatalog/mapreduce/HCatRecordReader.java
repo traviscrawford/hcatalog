@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.hadoop.hive.serde2.Deserializer;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.serde2.Deserializer;
 import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
@@ -247,7 +247,7 @@ class HCatRecordReader extends RecordReader<WritableComparable, HCatRecord> {
       return false;
     }
 
-    /* (non-Javadoc)
+  /* (non-Javadoc)
      * @see org.apache.hadoop.mapreduce.RecordReader#close()
      */
     @Override

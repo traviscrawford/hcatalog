@@ -36,42 +36,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class TestHCatStorer extends HCatBaseTest {
-  private static final String INPUT_FILE_NAME = TEST_DATA_DIR + "/input.data";
 
-//  public void testStoreFuncMap() throws IOException{
-//
-//    driver.run("drop table junit_unparted");
-//    String createTable = "create table junit_unparted(b string,arr_of_maps array<map<string,string>>) stored as RCFILE " +
-//        "tblproperties('hcat.isd'='org.apache.hadoop.hive.hCatalog.rcfile.RCFileInputStorageDriver'," +
-//        "'hcat.osd'='org.apache.hadoop.hive.hCatalog.rcfile.RCFileOutputStorageDriver') ";
-//    int retCode = driver.run(createTable).getResponseCode();
-//    if(retCode != 0) {
-//      throw new IOException("Failed to create table.");
-//    }
-//
-//    MiniCluster.deleteFile(cluster, fileName);
-//    MiniCluster.createInputFile(cluster, fileName, new String[]{"test\t{([a#haddop,b#pig])}","data\t{([b#hive,a#hcat])}"});
-//
-//    PigServer server = new PigServer(ExecType.LOCAL);
-//    server.setBatchOn();
-//    server.registerQuery("A = load '"+ fullFileName +"' as (b:chararray,arr_of_maps:bag{mytup:tuple ( mymap:map[ ])});");
-//    server.registerQuery("store A into 'default.junit_unparted' using org.apache.hadoop.hive.hCatalog.pig.HCatStorer('','b:chararray,arr_of_maps:bag{mytup:tuple ( mymap:map[ ])}');");
-//    server.executeBatch();
-//
-//
-//
-//    MiniCluster.deleteFile(cluster, fileName);
-//
-//    driver.run("select * from junit_unparted");
-//    ArrayList<String> res = new ArrayList<String>();
-//    driver.getResults(res);
-//    driver.run("drop table junit_unparted");
-//    Iterator<String> itr = res.iterator();
-//    System.out.println(itr.next());
-//    System.out.println(itr.next());
-//   Assert.assertFalse(itr.hasNext());
-//
-//  }
+  private static final String INPUT_FILE_NAME = TEST_DATA_DIR + "/input.data";
 
   @Test
   public void testPartColsInData() throws IOException, CommandNeedRetryException{
