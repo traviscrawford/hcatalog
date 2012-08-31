@@ -104,7 +104,6 @@
   <target name="ivy-report" depends="ivy-retrieve">
     <antcall target="_ivy-report"/>
     <ant target="_ivy-report" dir="hcatalog-pig-adapter" inheritAll="false" useNativeBasedir="true"/>
-    <ant target="_ivy-report" dir="server-extensions" inheritAll="false" useNativeBasedir="true"/>
     <ant target="ivy-report" dir="storage-handlers" inheritAll="false" useNativeBasedir="true"/>
   </target>
 
