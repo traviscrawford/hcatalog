@@ -37,7 +37,7 @@
     <dependency org="org.slf4j" name="jul-to-slf4j" rev="${slf4j.version}"/>
 
     <!-- test dependencies -->
-    <dependency org="org.apache.hcatalog" name="hcatalog-pig-adapter" rev="${hcatalog.version}"
+    <dependency org="org.apache.hcatalog" name="hcatalog-pig-adapter" rev="${hcatalog.version}"/>
     <dependency org="org.apache.hbase" name="hbase" rev="${hbase.version}" conf="test->default">
       <artifact name="hbase" type="jar" ext="jar"/>
       <artifact name="hbase" type="test-jar" ext="jar" m:classifier="tests"/>

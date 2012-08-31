@@ -21,12 +21,25 @@
          xmlns:artifact="artifact:org.apache.maven.artifact.ant">
 
   <target name="mvn-init" unless="mvn-init.complete">
+    <echo message="${ant.project.name}"/>
     <get src="${mvnrepo}/org/apache/maven/maven-ant-tasks/${maven-ant-tasks.version}/maven-ant-tasks-${maven-ant-tasks.version}.jar"
-         dest="${path.to.basedir}/build/maven-ant-tasks-${maven-ant-tasks.version}.jar" usetimestamp="true" skipexisting="true"/>
+         dest="${path.to.basedir}/build/maven-ant-tasks-${maven-ant-tasks.version}.jar"
+         usetimestamp="true"
+         skipexisting="true"/>
     <taskdef resource="org/apache/maven/artifact/ant/antlib.xml"
              uri="artifact:org.apache.maven.artifact.ant"
              classpath="${path.to.basedir}/build/maven-ant-tasks-${maven-ant-tasks.version}.jar"/>
     <property name="mvn-init.complete" value="true"/>
+  </target>
+
+  <target name="mvn-dependencies" depends="mvn-init">
+    <echo message="${ant.project.name}"/>
+    <artifact:dependencies pathId="mvn.compile.classpath" scopes="compile">
+      <pom file="pom.xml"/>
+    </artifact:dependencies>
+    <artifact:dependencies pathId="mvn.test.classpath" scopes="compile, test">
+      <pom file="pom.xml"/>
+    </artifact:dependencies>
   </target>
 
 </project>

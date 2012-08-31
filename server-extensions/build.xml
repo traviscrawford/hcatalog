@@ -19,21 +19,26 @@
 
 <project name="hcatalog-server-extensions">
   <property name="path.to.basedir" value="${basedir}/.."/>
+  <property name="pom.file" location="pom.xml"/>
+
   <import file="../build-common.xml"/>
 
   <path id="compile.class.path">
-    <fileset dir="${build.dir}/ivy/lib/default" includes="*.jar"/>
+    <path refid="mvn.compile.classpath"/>
   </path>
 
   <path id="test.class.path">
-    <fileset dir="${build.dir}/ivy/lib/test" includes="*.jar"/>
+    <path refid="mvn.test.classpath"/>
     <dirset dir="${basedir}/../build/test/classes"/>
     <dirset dir="${basedir}/build/classes"/>
     <dirset dir="${basedir}/build/test/classes"/>
   </path>
 
   <path id="findbugs.class.path">
-    <fileset dir="${build.dir}/ivy/lib/default" includes="*.jar"/>
+    <path refid="mvn.compile.classpath"/>
   </path>
+
+  <!-- Use Maven (instead of Ivy) for dependencies. -->
+  <target name="ivy-retrieve" depends="mvn-dependencies"/>
 
 </project>
