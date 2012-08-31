@@ -195,57 +195,57 @@ class HCatRecordReader extends RecordReader<WritableComparable, HCatRecord> {
         return 0.0f; // errored
     }
 
-    /**
-     * Check if the wrapped RecordReader has another record, and if so convert it into an
-     * HCatRecord. We both check for records and convert here so a configurable percent of
-     * bad records can be tolerated.
-     *
-     * @return if there is a next record
-     * @throws IOException on error
-     * @throws InterruptedException on error
-     */
-    @Override
-    public boolean nextKeyValue() throws IOException, InterruptedException {
-      if (currentKey == null) {
-        currentKey = baseRecordReader.createKey();
-        currentValue = baseRecordReader.createValue();
-      }
-
-      while (baseRecordReader.next(currentKey, currentValue)) {
-        HCatRecord r = null;
-        Throwable t = null;
-
-        errorTracker.incRecords();
-
-        try {
-          Object o = deserializer.deserialize(currentValue);
-          r = new LazyHCatRecord(o, deserializer.getObjectInspector(), hCatRecordSerDe);
-        } catch (Throwable throwable) {
-          t = throwable;
-        }
-
-        if (r == null) {
-          errorTracker.incErrors(t);
-          continue;
-        }
-
-        DefaultHCatRecord dr = new DefaultHCatRecord(outputSchema.size());
-        int i = 0;
-        for (String fieldName : outputSchema.getFieldNames()) {
-          if (dataSchema.getPosition(fieldName) != null) {
-            dr.set(i, r.get(fieldName, dataSchema));
-          } else {
-            dr.set(i, valuesNotInDataCols.get(fieldName));
-          }
-          i++;
-        }
-
-        currentHCatRecord = dr;
-        return true;
-      }
-
-      return false;
+  /**
+   * Check if the wrapped RecordReader has another record, and if so convert it into an
+   * HCatRecord. We both check for records and convert here so a configurable percent of
+   * bad records can be tolerated.
+   *
+   * @return if there is a next record
+   * @throws IOException on error
+   * @throws InterruptedException on error
+   */
+  @Override
+  public boolean nextKeyValue() throws IOException, InterruptedException {
+    if (currentKey == null) {
+      currentKey = baseRecordReader.createKey();
+      currentValue = baseRecordReader.createValue();
     }
+
+    while (baseRecordReader.next(currentKey, currentValue)) {
+      HCatRecord r = null;
+      Throwable t = null;
+
+      errorTracker.incRecords();
+
+      try {
+        Object o = deserializer.deserialize(currentValue);
+        r = new LazyHCatRecord(o, deserializer.getObjectInspector(), hCatRecordSerDe);
+      } catch (Throwable throwable) {
+        t = throwable;
+      }
+
+      if (r == null) {
+        errorTracker.incErrors(t);
+        continue;
+      }
+
+      DefaultHCatRecord dr = new DefaultHCatRecord(outputSchema.size());
+      int i = 0;
+      for (String fieldName : outputSchema.getFieldNames()) {
+        if (dataSchema.getPosition(fieldName) != null) {
+          dr.set(i, r.get(fieldName, dataSchema));
+        } else {
+          dr.set(i, valuesNotInDataCols.get(fieldName));
+        }
+        i++;
+      }
+
+      currentHCatRecord = dr;
+      return true;
+    }
+
+    return false;
+  }
 
   /* (non-Javadoc)
      * @see org.apache.hadoop.mapreduce.RecordReader#close()
