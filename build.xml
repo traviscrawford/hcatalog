@@ -45,6 +45,7 @@
 
   <!-- ivy properties set here -->
   <property name="ivy.repo.dir" value="${user.home}/ivyrepo" />
+  <!-- property name="ivy.repo.dir" value="${user.home}/.ivy2/local" /-->
   <property name="ivy.dir" location="ivy" />
   <loadproperties srcfile="${ivy.dir}/libraries.properties"/>
   <property name="asfrepo" value="https://repository.apache.org"/>

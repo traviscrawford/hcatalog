@@ -37,6 +37,7 @@ public final class HCatConstants {
   public static final String HCAT_PIG_STORER_ARGS = "hcat.pig.storer.args";
   public static final String HCAT_PIG_ARGS_DELIMIT = "hcat.pig.args.delimiter";
   public static final String HCAT_PIG_ARGS_DELIMIT_DEFAULT = ",";
+  public static final String HCAT_PIG_STORER_REAL_LOCATION = HCAT_PIG_STORER + ".real.location" ;
   public static final String HCAT_PIG_STORER_LOCATION_SET = HCAT_PIG_STORER + ".location.set" ;
   public static final String HCAT_PIG_INNER_TUPLE_NAME = "hcat.pig.inner.tuple.name";
   public static final String HCAT_PIG_INNER_TUPLE_NAME_DEFAULT = "innertuple";
