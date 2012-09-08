@@ -38,6 +38,12 @@ Trunk (unreleased changes)
   HCAT-427 Document storage-based authorization (lefty via gates)
 
   IMPROVEMENTS
+  HCAT-489 HCatalog style cleanups and readd javac debug option (traviscrawford)
+
+  HCAT-431 document hcat type to java class/pig type mapping (lefty via khorgath)
+
+  HCAT-492 Document CTAS workaround for Hive with JSON serde (lefty via khorgath)
+
   HCAT-487 HCatalog should tolerate a user-defined amount of bad records (traviscrawford)
 
   HCAT-488 TestHCatStorer should extend HCatBaseTest so it uses junit4 and runs inside an IDE (traviscrawford)
@@ -99,6 +105,8 @@ Trunk (unreleased changes)
   OPTIMIZATIONS
 
   BUG FIXES
+  HCAT-397 Removal of unused parameter hadoop.clientside.fs.operations (khorgath via traviscrawford)
+
   HCAT-483 HCatBaseStorer.getHCatFSFromPigFS fails when Table schema is not provided (pengfeng via traviscrawford)
 
   HCAT-477 Drop table API in webhcat client does not respect the "ifExists" parameter.

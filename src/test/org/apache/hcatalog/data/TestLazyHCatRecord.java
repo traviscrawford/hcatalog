@@ -28,10 +28,10 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
-
 import org.apache.hcatalog.data.schema.HCatSchema;
 import org.apache.hcatalog.data.schema.HCatSchemaUtils;
 import org.junit.BeforeClass;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestLazyHCatRecord {
@@ -56,7 +56,7 @@ public class TestLazyHCatRecord {
     HCatRecord r = new LazyHCatRecord(getHCatRecord(), getObjectInspector(), HCAT_RECORD_SERDE);
     Assert.assertEquals(INT_CONST, ((Integer) r.get(0)).intValue());
     Assert.assertEquals(LONG_CONST, ((Long) r.get(1)).longValue());
-    Assert.assertEquals(DOUBLE_CONST, ((Double) r.get(2)).doubleValue());
+    Assert.assertEquals(DOUBLE_CONST, ((Double) r.get(2)).doubleValue(), 0);
     Assert.assertEquals(STRING_CONST, (String) r.get(3));
   }
 
@@ -68,7 +68,7 @@ public class TestLazyHCatRecord {
                                           .get(0).getStructSubSchema();
     Assert.assertEquals(INT_CONST, ((Integer) r.get("an_int", schema)).intValue());
     Assert.assertEquals(LONG_CONST, ((Long) r.get("a_long", schema)).longValue());
-    Assert.assertEquals(DOUBLE_CONST, ((Double) r.get("a_double", schema)).doubleValue());
+    Assert.assertEquals(DOUBLE_CONST, ((Double) r.get("a_double", schema)).doubleValue(), 0);
     Assert.assertEquals(STRING_CONST, (String) r.get("a_string", schema));
   }
 
@@ -78,7 +78,7 @@ public class TestLazyHCatRecord {
     List<Object> list = r.getAll();
     Assert.assertEquals(INT_CONST, ((Integer) list.get(0)).intValue());
     Assert.assertEquals(LONG_CONST, ((Long) list.get(1)).longValue());
-    Assert.assertEquals(DOUBLE_CONST, ((Double) list.get(2)).doubleValue());
+    Assert.assertEquals(DOUBLE_CONST, ((Double) list.get(2)).doubleValue(), 0);
     Assert.assertEquals(STRING_CONST, (String) list.get(3));
   }
 
@@ -165,11 +165,10 @@ public class TestLazyHCatRecord {
     HCatRecord r = new LazyHCatRecord(getHCatRecord(), getObjectInspector(), HCAT_RECORD_SERDE).getWritable();
     Assert.assertEquals(INT_CONST, ((Integer) r.get(0)).intValue());
     Assert.assertEquals(LONG_CONST, ((Long) r.get(1)).longValue());
-    Assert.assertEquals(DOUBLE_CONST, ((Double) r.get(2)).doubleValue());
+    Assert.assertEquals(DOUBLE_CONST, ((Double) r.get(2)).doubleValue(), 0);
     Assert.assertEquals(STRING_CONST, (String) r.get(3));
     Assert.assertEquals("org.apache.hcatalog.data.DefaultHCatRecord", r.getClass().getName());
   }
-
 
   private HCatRecord getHCatRecord() throws Exception {
 
