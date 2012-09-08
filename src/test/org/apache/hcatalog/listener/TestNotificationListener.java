@@ -91,20 +91,20 @@ public class TestNotificationListener extends HCatBaseTest implements MessageLis
     client = new HiveMetaStoreClient(hiveConf);
   }
 
-    @After
-    public void tearDown() throws Exception {
-        List<String> expectedMessages = Arrays.asList(
-                HCatConstants.HCAT_ADD_DATABASE_EVENT,
-                HCatConstants.HCAT_ADD_TABLE_EVENT,
-                HCatConstants.HCAT_ADD_PARTITION_EVENT,
-                HCatConstants.HCAT_PARTITION_DONE_EVENT,
-                HCatConstants.HCAT_DROP_PARTITION_EVENT,
-                HCatConstants.HCAT_DROP_TABLE_EVENT,
-                HCatConstants.HCAT_DROP_DATABASE_EVENT);
-        Assert.assertEquals(expectedMessages, actualMessages);
-    }
+  @After
+  public void tearDown() throws Exception {
+    List<String> expectedMessages = Arrays.asList(
+        HCatConstants.HCAT_ADD_DATABASE_EVENT,
+        HCatConstants.HCAT_ADD_TABLE_EVENT,
+        HCatConstants.HCAT_ADD_PARTITION_EVENT,
+        HCatConstants.HCAT_PARTITION_DONE_EVENT,
+        HCatConstants.HCAT_DROP_PARTITION_EVENT,
+        HCatConstants.HCAT_DROP_TABLE_EVENT,
+        HCatConstants.HCAT_DROP_DATABASE_EVENT);
+    Assert.assertEquals(expectedMessages, actualMessages);
+  }
 
-    @Test
+  @Test
   public void testAMQListener() throws Exception {
     driver.run("create database mydb");
     driver.run("use mydb");
