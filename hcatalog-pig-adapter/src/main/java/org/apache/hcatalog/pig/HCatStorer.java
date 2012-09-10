@@ -115,7 +115,7 @@ public class HCatStorer extends HCatBaseStorer {
             "Schema for data cannot be determined.",
             PigHCatUtil.PIG_EXCEPTION_CODE);
       }
-      String realLocation = (String) udfProps.getProperty(HCatConstants.HCAT_PIG_STORER_REAL_LOCATION);
+      String realLocation = (String) udfProps.getProperty(HCatConstants.HCAT_PIG_STORER_EXTERNAL_LOCATION);
       if (realLocation != null) {
         outputJobInfo.setLocation(realLocation);
       }
