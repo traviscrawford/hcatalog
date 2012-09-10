@@ -288,7 +288,7 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
             if (!dynamicPartitioningUsed){
                 partitionsToAdd.add(
                         constructPartition(
-                                context,
+                                context, jobInfo,
                                 tblPath.toString(), jobInfo.getPartitionValues()
                                 ,jobInfo.getOutputSchema(), getStorerParameterMap(storer)
                                 ,table, fs
@@ -297,7 +297,7 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
                 for (Entry<String,Map<String,String>> entry : partitionsDiscoveredByPath.entrySet()){
                     partitionsToAdd.add(
                             constructPartition(
-                                    context,
+                                    context, jobInfo,
                                     getPartitionRootLocation(entry.getKey(),entry.getValue().size()), entry.getValue()
                                     ,jobInfo.getOutputSchema(), getStorerParameterMap(storer)
                                     ,table, fs
@@ -402,6 +402,7 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
 
     /**
      * Generate partition metadata object to be used to add to metadata.
+     * @param jobInfo The OutputJobContext
      * @param partLocnRoot The table-equivalent location root of the partition
      *                       (temporary dir if dynamic partition, table dir if static)
      * @param partKVs The keyvalue pairs that form the partition
@@ -416,7 +417,7 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
      */
 
     private Partition constructPartition(
-            JobContext context,
+            JobContext context, OutputJobInfo jobInfo,
             String partLocnRoot, Map<String,String> partKVs,
             HCatSchema outputSchema, Map<String, String> params,
             Table table, FileSystem fs,
@@ -446,12 +447,12 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
             if (i++ != 0) {
                 applyGroupAndPerms(fs, partPath, perms, grpName, false);
             }
-            partPath = constructPartialPartPath(partPath, partKey.getName().toLowerCase(), partKVs);
+            partPath = constructPartialPartPath(jobInfo, table, partPath, partKey.getName().toLowerCase(), partKVs);
         }
         // Apply the group and permissions to the leaf partition and files.
         applyGroupAndPerms(fs, partPath, perms, grpName, true);
         if (dynamicPartitioningUsed){
-            String dynamicPartitionDestination = getFinalDynamicPartitionDestination(table,partKVs);
+            String dynamicPartitionDestination = getFinalDynamicPartitionDestination(jobInfo, table, partKVs);
             if (harProcessor.isEnabled()){
                 harProcessor.exec(context, partition, partPath);
                 partition.getSd().setLocation(
@@ -491,12 +492,12 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
         }
     }
 
-    private String getFinalDynamicPartitionDestination(Table table, Map<String,String> partKVs) {
+    private String getFinalDynamicPartitionDestination(OutputJobInfo jobInfo, Table table, Map<String,String> partKVs) {
         // file:///tmp/hcat_junit_warehouse/employee/_DYN0.7770480401313761/emp_country=IN/emp_state=KA  ->
         // file:///tmp/hcat_junit_warehouse/employee/emp_country=IN/emp_state=KA
         Path partPath = new Path(table.getTTable().getSd().getLocation());
         for(FieldSchema partKey : table.getPartitionKeys()){
-            partPath = constructPartialPartPath(partPath, partKey.getName().toLowerCase(), partKVs);
+            partPath = constructPartialPartPath(jobInfo, table, partPath, partKey.getName().toLowerCase(), partKVs);
         }
         return partPath.toString();
     }
@@ -511,8 +512,13 @@ class FileOutputCommitterContainer extends OutputCommitterContainer {
         return params;
     }
 
-    private Path constructPartialPartPath(Path partialPath, String partKey, Map<String,String> partKVs){
-
+    private Path constructPartialPartPath(OutputJobInfo jobInfo, Table table,
+        Path partialPath, String partKey, Map<String,String> partKVs) {
+        if (Boolean.valueOf((String)table.getProperty("EXTERNAL"))
+            && jobInfo.getLocation() != null && jobInfo.getLocation().length() > 0) {
+            // honor external table that specifies the location
+            return new Path(jobInfo.getLocation());
+        }
         StringBuilder sb = new StringBuilder(FileUtils.escapePathName(partKey));
         sb.append("=");
         sb.append(FileUtils.escapePathName(partKVs.get(partKey)));
