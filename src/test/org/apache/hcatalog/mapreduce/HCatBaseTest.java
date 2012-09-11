@@ -78,8 +78,8 @@ public class HCatBaseTest {
         hiveConf.set(HiveConf.ConfVars.METASTOREWAREHOUSE.varname, TEST_WAREHOUSE_DIR);
     }
 
-  protected void logAndRegister(PigServer server, String query) throws IOException {
-    LOG.info("Registering pig query: " + query);
-    server.registerQuery(query);
-  }
+    protected void logAndRegister(PigServer server, String query) throws IOException {
+        LOG.info("Registering pig query: " + query);
+        server.registerQuery(query);
+    }
 }
