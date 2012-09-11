@@ -89,11 +89,11 @@ public class NotificationListener extends MetaStoreEventListener {
     }
 
     private static String getTopicName(Partition partition,
-            ListenerEvent partitionEvent) throws MetaException {
+                                       ListenerEvent partitionEvent) throws MetaException {
         try {
             return partitionEvent.getHandler()
-                    .get_table(partition.getDbName(), partition.getTableName())
-                    .getParameters().get(HCatConstants.HCAT_MSGBUS_TOPIC_NAME);
+                .get_table(partition.getDbName(), partition.getTableName())
+                .getParameters().get(HCatConstants.HCAT_MSGBUS_TOPIC_NAME);
         } catch (NoSuchObjectException e) {
             throw new MetaException(e.toString());
         }
@@ -101,7 +101,7 @@ public class NotificationListener extends MetaStoreEventListener {
 
     @Override
     public void onAddPartition(AddPartitionEvent partitionEvent)
-            throws MetaException {
+        throws MetaException {
         // Subscriber can get notification of newly add partition in a
         // particular table by listening on a topic named "dbName.tableName"
         // and message selector string as "HCAT_EVENT = HCAT_ADD_PARTITION"
@@ -113,12 +113,12 @@ public class NotificationListener extends MetaStoreEventListener {
                 send(partition, topicName, HCatConstants.HCAT_ADD_PARTITION_EVENT);
             } else {
                 LOG.info("Topic name not found in metastore. Suppressing HCatalog notification for "
-                        + partition.getDbName()
-                        + "."
-                        + partition.getTableName()
-                        + " To enable notifications for this table, please do alter table set properties ("
-                        + HCatConstants.HCAT_MSGBUS_TOPIC_NAME
-                        + "=<dbname>.<tablename>) or whatever you want topic name to be.");
+                    + partition.getDbName()
+                    + "."
+                    + partition.getTableName()
+                    + " To enable notifications for this table, please do alter table set properties ("
+                    + HCatConstants.HCAT_MSGBUS_TOPIC_NAME
+                    + "=<dbname>.<tablename>) or whatever you want topic name to be.");
             }
         }
 
@@ -126,7 +126,7 @@ public class NotificationListener extends MetaStoreEventListener {
 
     @Override
     public void onDropPartition(DropPartitionEvent partitionEvent)
-            throws MetaException {
+        throws MetaException {
         // Subscriber can get notification of dropped partition in a
         // particular table by listening on a topic named "dbName.tableName"
         // and message selector string as "HCAT_EVENT = HCAT_DROP_PARTITION"
@@ -146,25 +146,25 @@ public class NotificationListener extends MetaStoreEventListener {
                 send(partition, topicName, HCatConstants.HCAT_DROP_PARTITION_EVENT);
             } else {
                 LOG.info("Topic name not found in metastore. Suppressing HCatalog notification for "
-                        + partition.getDbName()
-                        + "."
-                        + partition.getTableName()
-                        + " To enable notifications for this table, please do alter table set properties ("
-                        + HCatConstants.HCAT_MSGBUS_TOPIC_NAME
-                        + "=<dbname>.<tablename>) or whatever you want topic name to be.");
+                    + partition.getDbName()
+                    + "."
+                    + partition.getTableName()
+                    + " To enable notifications for this table, please do alter table set properties ("
+                    + HCatConstants.HCAT_MSGBUS_TOPIC_NAME
+                    + "=<dbname>.<tablename>) or whatever you want topic name to be.");
             }
         }
     }
 
     @Override
     public void onCreateDatabase(CreateDatabaseEvent dbEvent)
-            throws MetaException {
+        throws MetaException {
         // Subscriber can get notification about addition of a database in HCAT
         // by listening on a topic named "HCAT" and message selector string
         // as "HCAT_EVENT = HCAT_ADD_DATABASE"
         if (dbEvent.getStatus())
             send(dbEvent.getDatabase(), getTopicPrefix(dbEvent.getHandler()
-                    .getHiveConf()), HCatConstants.HCAT_ADD_DATABASE_EVENT);
+                .getHiveConf()), HCatConstants.HCAT_ADD_DATABASE_EVENT);
     }
 
     @Override
@@ -174,7 +174,7 @@ public class NotificationListener extends MetaStoreEventListener {
         // as "HCAT_EVENT = HCAT_DROP_DATABASE"
         if (dbEvent.getStatus())
             send(dbEvent.getDatabase(), getTopicPrefix(dbEvent.getHandler()
-                    .getHiveConf()), HCatConstants.HCAT_DROP_DATABASE_EVENT);
+                .getHiveConf()), HCatConstants.HCAT_DROP_DATABASE_EVENT);
     }
 
     @Override
@@ -189,11 +189,11 @@ public class NotificationListener extends MetaStoreEventListener {
             Table newTbl;
             try {
                 newTbl = handler.get_table(tbl.getDbName(), tbl.getTableName())
-                        .deepCopy();
+                    .deepCopy();
                 newTbl.getParameters().put(
-                        HCatConstants.HCAT_MSGBUS_TOPIC_NAME,
-                        getTopicPrefix(conf) + "." + newTbl.getDbName().toLowerCase() + "."
-                                + newTbl.getTableName().toLowerCase());
+                    HCatConstants.HCAT_MSGBUS_TOPIC_NAME,
+                    getTopicPrefix(conf) + "." + newTbl.getDbName().toLowerCase() + "."
+                        + newTbl.getTableName().toLowerCase());
                 handler.alter_table(newTbl.getDbName(), newTbl.getTableName(), newTbl);
             } catch (InvalidOperationException e) {
                 MetaException me = new MetaException(e.toString());
@@ -205,14 +205,14 @@ public class NotificationListener extends MetaStoreEventListener {
                 throw me;
             }
             send(newTbl, getTopicPrefix(conf) + "."
-                    + newTbl.getDbName().toLowerCase(),
-                    HCatConstants.HCAT_ADD_TABLE_EVENT);
+                + newTbl.getDbName().toLowerCase(),
+                HCatConstants.HCAT_ADD_TABLE_EVENT);
         }
     }
 
     private String getTopicPrefix(HiveConf conf) {
         return conf.get(HCatConstants.HCAT_MSGBUS_TOPIC_PREFIX,
-                HCatConstants.HCAT_DEFAULT_TOPIC_PREFIX);
+            HCatConstants.HCAT_DEFAULT_TOPIC_PREFIX);
     }
 
     @Override
@@ -232,8 +232,8 @@ public class NotificationListener extends MetaStoreEventListener {
             sd.setParameters(new HashMap<String, String>());
             sd.getSerdeInfo().setParameters(new HashMap<String, String>());
             send(table, getTopicPrefix(tableEvent.getHandler().getHiveConf()) + "."
-                    + table.getDbName().toLowerCase(),
-                    HCatConstants.HCAT_DROP_TABLE_EVENT);
+                + table.getDbName().toLowerCase(),
+                HCatConstants.HCAT_DROP_TABLE_EVENT);
         }
     }
 
@@ -260,7 +260,7 @@ public class NotificationListener extends MetaStoreEventListener {
                 if (null == session) {
                     // Still not successful, return from here.
                     LOG.error("Invalid session. Failed to send message on topic: "
-                            + topicName + " event: " + event);
+                        + topicName + " event: " + event);
                     return;
                 }
             }
@@ -279,7 +279,7 @@ public class NotificationListener extends MetaStoreEventListener {
             if (null == topic) {
                 // Still not successful, return from here.
                 LOG.error("Invalid session. Failed to send message on topic: "
-                        + topicName + " event: " + event);
+                    + topicName + " event: " + event);
                 return;
             }
             MessageProducer producer = session.createProducer(topic);
@@ -302,7 +302,7 @@ public class NotificationListener extends MetaStoreEventListener {
         } catch (Exception e) {
             // Gobble up the exception. Message delivery is best effort.
             LOG.error("Failed to send message on topic: " + topicName + " event: "
-                    + event, e);
+                + event, e);
         }
     }
 
@@ -312,7 +312,7 @@ public class NotificationListener extends MetaStoreEventListener {
         try {
             jndiCntxt = new InitialContext();
             ConnectionFactory connFac = (ConnectionFactory) jndiCntxt
-                    .lookup("ConnectionFactory");
+                .lookup("ConnectionFactory");
             Connection conn = connFac.createConnection();
             conn.start();
             conn.setExceptionListener(new ExceptionListener() {
@@ -326,8 +326,8 @@ public class NotificationListener extends MetaStoreEventListener {
             session = conn.createSession(true, Session.SESSION_TRANSACTED);
         } catch (NamingException e) {
             LOG.error("JNDI error while setting up Message Bus connection. "
-                    + "Please make sure file named 'jndi.properties' is in "
-                    + "classpath and contains appropriate key-value pairs.", e);
+                + "Please make sure file named 'jndi.properties' is in "
+                + "classpath and contains appropriate key-value pairs.", e);
         } catch (JMSException e) {
             LOG.error("Failed to initialize connection to message bus", e);
         } catch (Throwable t) {
@@ -352,13 +352,13 @@ public class NotificationListener extends MetaStoreEventListener {
 
     @Override
     public void onLoadPartitionDone(LoadPartitionDoneEvent lpde)
-            throws MetaException {
+        throws MetaException {
         if (lpde.getStatus())
             send(
-                    lpde.getPartitionName(),
-                    lpde.getTable().getParameters()
-                            .get(HCatConstants.HCAT_MSGBUS_TOPIC_NAME),
-                    HCatConstants.HCAT_PARTITION_DONE_EVENT);
+                lpde.getPartitionName(),
+                lpde.getTable().getParameters()
+                    .get(HCatConstants.HCAT_MSGBUS_TOPIC_NAME),
+                HCatConstants.HCAT_PARTITION_DONE_EVENT);
     }
 
     @Override
