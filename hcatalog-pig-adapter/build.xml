@@ -19,6 +19,7 @@
 
 <project name="hcatalog-pig-adapter">
   <property name="path.to.basedir" value="${basedir}/.."/>
+  <property name="pom.file" location="${basedir}/ivy/${ant.project.name}-${hcatalog.version}.pom"/>
   <import file="../build-common.xml"/>
 
   <path id="compile.class.path">
