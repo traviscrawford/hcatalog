@@ -18,9 +18,10 @@
 
 <project name="webhcat-java-client">
   <property name="path.to.basedir" location="${basedir}/../.."/>
+  <import file="${path.to.basedir}/build-common.xml"/>
+
   <property name="pom.file" location="${basedir}/ivy/${ant.project.name}-${hcatalog.version}.pom"/>
 
-  <import file="../../build-common.xml"/>
   <path id="compile.class.path">
     <fileset dir="${build.dir}/ivy/lib/default" includes="*.jar"/>
   </path>
