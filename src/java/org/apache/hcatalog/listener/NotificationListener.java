@@ -141,6 +141,7 @@ public class NotificationListener extends MetaStoreEventListener {
       sd.setSortCols(new ArrayList<Order>());
       sd.setParameters(new HashMap<String, String>());
       sd.getSerdeInfo().setParameters(new HashMap<String, String>());
+      sd.getSkewedInfo().setSkewedColNames(new ArrayList<String>());
       String topicName = getTopicName(partition, partitionEvent);
       if (topicName != null && !topicName.equals("")) {
         send(partition, topicName, HCatConstants.HCAT_DROP_PARTITION_EVENT);
@@ -231,6 +232,7 @@ public class NotificationListener extends MetaStoreEventListener {
       sd.setSortCols(new ArrayList<Order>());
       sd.setParameters(new HashMap<String, String>());
       sd.getSerdeInfo().setParameters(new HashMap<String, String>());
+      sd.getSkewedInfo().setSkewedColNames(new ArrayList<String>());
       send(table, getTopicPrefix(tableEvent.getHandler().getHiveConf()) + "."
           + table.getDbName().toLowerCase(),
           HCatConstants.HCAT_DROP_TABLE_EVENT);

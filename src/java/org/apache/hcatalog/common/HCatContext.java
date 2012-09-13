@@ -18,6 +18,7 @@
 
 package org.apache.hcatalog.common;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import org.apache.hadoop.conf.Configuration;
 
@@ -25,9 +26,8 @@ import java.util.Map;
 
 /**
  * HCatContext provides global access to configuration data. It uses a reference to the
- * job configuration so that all the settings can be passed to the backend. Users are
- * not required to set the context; for example, a MR job written before HCatContext
- * existed. For this reason, users must be careful to check for a null context conf.
+ * job configuration so that settings are automatically passed to the backend by the
+ * MR framework.
  */
 public class HCatContext {
 
@@ -64,12 +64,8 @@ public class HCatContext {
   public static HCatContext getInstance() {
     return hCatContext;
   }
-
-  /**
-   * Get the HCatContext configuration.
-   * @return the current configuration if setup, otherwise null
-   */
-  public Configuration getConf() {
-    return conf;
+ 
+  public Optional<Configuration> getConf() {
+    return Optional.fromNullable(conf);
   }
 }

@@ -195,27 +195,7 @@ public class HCatRecordSerDe implements SerDe {
 
     Object res;
     if (fieldObjectInspector.getCategory() == Category.PRIMITIVE){
-      if (field != null && field instanceof Boolean &&
-          HCatContext.getInstance().getConf() != null &&
-          HCatContext.getInstance().getConf().getBoolean(
-              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER,
-              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT)) {
-        res = ((Boolean) field) ? 1 : 0;
-      } else if (field != null && field instanceof Short &&
-          HCatContext.getInstance().getConf() != null &&
-          HCatContext.getInstance().getConf().getBoolean(
-              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION,
-              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION_DEFAULT)) {
-        res = new Integer((Short) field);
-      } else if (field != null && field instanceof Byte &&
-          HCatContext.getInstance().getConf() != null &&
-          HCatContext.getInstance().getConf().getBoolean(
-              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION,
-              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION_DEFAULT)) {
-        res = new Integer((Byte) field);
-      } else {
-        res = ((PrimitiveObjectInspector) fieldObjectInspector).getPrimitiveJavaObject(field);
-      }
+      res = serializePrimitiveField(field, fieldObjectInspector);
     } else if (fieldObjectInspector.getCategory() == Category.STRUCT){
       if (field != null && ByteBuffer.class.isAssignableFrom(field.getClass())) {
         res = ((ByteBuffer) field).array();
@@ -234,6 +214,33 @@ public class HCatRecordSerDe implements SerDe {
           + fieldObjectInspector.getCategory() + " , type: " + fieldObjectInspector.getTypeName());
     }
     return res;
+  }
+
+  private static Object serializePrimitiveField(Object field,
+      ObjectInspector fieldObjectInspector) {
+
+    if (field != null && HCatContext.getInstance().getConf().isPresent()) {
+      Configuration conf = HCatContext.getInstance().getConf().get();
+
+      if (field instanceof Boolean &&
+          conf.getBoolean(
+              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER,
+              HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT)) {
+        return ((Boolean) field) ? 1 : 0;
+      } else if (field instanceof Short &&
+          conf.getBoolean(
+              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION,
+              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION_DEFAULT)) {
+        return new Integer((Short) field);
+      } else if (field instanceof Byte &&
+          conf.getBoolean(
+              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION,
+              HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION_DEFAULT)) {
+        return new Integer((Byte) field);
+      }
+    }
+
+    return ((PrimitiveObjectInspector) fieldObjectInspector).getPrimitiveJavaObject(field);
   }
 
   /**
