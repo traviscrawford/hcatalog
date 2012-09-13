@@ -52,7 +52,7 @@ public class HCatStorerWrapper extends HCatStorer {
     udfProps.setProperty(HCatConstants.HCAT_PIG_STORER_EXTERNAL_LOCATION, externalDir);
     super.setStoreLocation(location, job);
   }
-  
+
   @Override
   public void setStoreFuncUDFContextSignature(String signature) {
     sign = signature;
