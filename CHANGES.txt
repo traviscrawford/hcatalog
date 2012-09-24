@@ -38,6 +38,8 @@ Trunk (unreleased changes)
   HCAT-427 Document storage-based authorization (lefty via gates)
 
   IMPROVEMENTS
+  HCAT-493 Convert classes with 2 space indentation to 4 space indentation for consistent style (amalakar via traviscrawford)
+
   HCAT-489 HCatalog style cleanups and readd javac debug option (traviscrawford)
 
   HCAT-431 document hcat type to java class/pig type mapping (lefty via khorgath)
@@ -105,6 +107,12 @@ Trunk (unreleased changes)
   OPTIMIZATIONS
 
   BUG FIXES
+  HCAT-499 Multiple store commands does not work with Hadoop23 (rohinip via avandana)
+
+  HCAT-501 HBase storage handler tests failing in trunk (traviscrawford)
+
+  HCAT-498 TestNotificationListener failing in trunk (traviscrawford)
+
   HCAT-397 Removal of unused parameter hadoop.clientside.fs.operations (khorgath via traviscrawford)
 
   HCAT-483 HCatBaseStorer.getHCatFSFromPigFS fails when Table schema is not provided (pengfeng via traviscrawford)

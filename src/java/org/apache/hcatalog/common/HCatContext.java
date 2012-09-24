@@ -31,41 +31,41 @@ import java.util.Map;
  */
 public class HCatContext {
 
-  private static final HCatContext hCatContext = new HCatContext();
+    private static final HCatContext hCatContext = new HCatContext();
 
-  private Configuration conf = null;
+    private Configuration conf = null;
 
-  private HCatContext() {
-  }
-
-  /**
-   * Setup the HCatContext as a reference to the given configuration. Keys
-   * exclusive to an existing config are set in the new conf.
-   */
-  public static synchronized HCatContext setupHCatContext(Configuration newConf) {
-    Preconditions.checkNotNull(newConf, "HCatContext must not have a null conf.");
-
-    if (hCatContext.conf == null) {
-      hCatContext.conf = newConf;
-      return hCatContext;
+    private HCatContext() {
     }
 
-    if (hCatContext.conf != newConf) {
-      for (Map.Entry<String, String> entry : hCatContext.conf) {
-        if (newConf.get(entry.getKey()) == null) {
-          newConf.set(entry.getKey(), entry.getValue());
+    /**
+     * Setup the HCatContext as a reference to the given configuration. Keys
+     * exclusive to an existing config are set in the new conf.
+     */
+    public static synchronized HCatContext setupHCatContext(Configuration newConf) {
+        Preconditions.checkNotNull(newConf, "HCatContext must not have a null conf.");
+
+        if (hCatContext.conf == null) {
+            hCatContext.conf = newConf;
+            return hCatContext;
         }
-      }
-      hCatContext.conf = newConf;
+
+        if (hCatContext.conf != newConf) {
+            for (Map.Entry<String, String> entry : hCatContext.conf) {
+                if (newConf.get(entry.getKey()) == null) {
+                    newConf.set(entry.getKey(), entry.getValue());
+                }
+            }
+            hCatContext.conf = newConf;
+        }
+        return hCatContext;
     }
-    return hCatContext;
-  }
 
-  public static HCatContext getInstance() {
-    return hCatContext;
-  }
+    public static HCatContext getInstance() {
+        return hCatContext;
+    }
 
-  public Optional<Configuration> getConf() {
-    return Optional.fromNullable(conf);
-  }
+    public Optional<Configuration> getConf() {
+        return Optional.fromNullable(conf);
+    }
 }
