@@ -23,6 +23,8 @@ Trunk (unreleased changes)
   INCOMPATIBLE CHANGES
 
   NEW FEATURES
+  HCAT-132 Add HCatalog to Maven Repository (traviscrawford)
+
   HCAT-375 Make HCat work for Hadoop 0.23 (cdrome via toffer)
 
   HCAT-469 HiveClientCache may return a closed client (amalakar via toffer)
@@ -38,6 +40,10 @@ Trunk (unreleased changes)
   HCAT-427 Document storage-based authorization (lefty via gates)
 
   IMPROVEMENTS
+  HCAT-461 Refactor server-extensions as a subproject (traviscrawford)
+
+  HCAT-500 HCatStorer should honor user-specified path for external tables (pengfeng via traviscrawford)
+
   HCAT-493 Convert classes with 2 space indentation to 4 space indentation for consistent style (amalakar via traviscrawford)
 
   HCAT-489 HCatalog style cleanups and readd javac debug option (traviscrawford)
@@ -107,6 +113,14 @@ Trunk (unreleased changes)
   OPTIMIZATIONS
 
   BUG FIXES
+  HCAT-494 MultiOutputFormat in 0.23 fails to setAliasConf() correctly. (mithun via toffer)
+
+  HCAT-507 e2e harness failing on 0.23 (toffer)
+
+  HCAT-502 HCatalog dependency resolution fails due to missing repo (traviscrawford)
+
+  HCAT-490 HCatStorer() throws error when the same partition key is present in records in more than one tasks running as part of the same job (amalakar via traviscrawford)
+
   HCAT-499 Multiple store commands does not work with Hadoop23 (rohinip via avandana)
 
   HCAT-501 HBase storage handler tests failing in trunk (traviscrawford)
