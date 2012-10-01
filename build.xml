@@ -332,7 +332,9 @@
             <packageset dir="webhcat/java-client/src/main/java"/>
             <classpath>
                 <path refid="uber.classpath"/>
+                <fileset dir="hcatalog-pig-adapter/build/lib/compile"/>
                 <fileset dir="server-extensions/build/lib/compile"/>
+                <fileset dir="webhcat/svr/build/lib/compile"/>
             </classpath>
             <group title="hcatalog" packages="org.apache.hcatalog.*"/>
         </javadoc>
