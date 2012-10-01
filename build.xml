@@ -146,6 +146,11 @@
     -->
     <target name="jar" depends="checkstyle,compile-src" description="build all jars">
 
+        <!-- Shims are bundled inside the hcatalog-core jar and must be compiled first.
+        This is a candidate for cleanup using maven profiles in the future.
+        -->
+        <ant target="jar" dir="shims" inheritAll="false"/>
+
         <!-- Build and install the hcatalog-core jar, as its not yet a subproject. -->
         <jar jarfile="${build.dir}/${ant.project.name}/${hcatalog.core.jar}"
              basedir="${build.classes}"/>
@@ -153,7 +158,6 @@
             <artifact:pom file="${build.ivy.dir}/hcatalog-core-${hcatalog.version}.pom"/>
         </artifact:install>
 
-        <ant target="jar" dir="shims" inheritAll="false"/>
         <ant target="jar" dir="hcatalog-pig-adapter" inheritAll="false"/>
         <ant target="jar" dir="server-extensions" inheritAll="false"/>
         <ant target="jar" dir="webhcat/svr" inheritAll="false"/>
