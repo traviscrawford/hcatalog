@@ -35,6 +35,8 @@
     <dependency org="org.eclipse.jetty.aggregate" name="jetty-all-server"
       rev="${jetty.webhcat.version}"/>
     <dependency org="org.slf4j" name="jul-to-slf4j" rev="${slf4j.version}"/>
+    <dependency org="com.sun.jersey" name="jersey-core" rev="1.8"/>
+    <dependency org="com.sun.jersey" name="jersey-server" rev="1.8"/>
 
     <!-- test dependencies -->
     <dependency org="org.apache.hcatalog" name="hcatalog-pig-adapter" rev="${hcatalog.version}"
