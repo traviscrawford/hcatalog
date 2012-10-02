@@ -28,7 +28,6 @@
 ./build/ivy/lib/default/hsqldb-hsqldb-1.8.0.10.jar
 ./build/ivy/lib/default/javax.jdo-jdo2-api-2.3-ec.jar
 ./build/ivy/lib/default/javax.servlet-servlet-api-2.5.jar
-./build/ivy/lib/default/javax.transaction-jta-1.1.jar
 ./build/ivy/lib/default/jline-jline-0.9.94.jar
 ./build/ivy/lib/default/log4j-log4j-1.2.16.jar
 ./build/ivy/lib/default/net.java.dev.jets3t-jets3t-0.7.1.jar
@@ -110,7 +109,6 @@
 ./build/ivy/lib/test/hsqldb-hsqldb-1.8.0.10.jar
 ./build/ivy/lib/test/javax.jdo-jdo2-api-2.3-ec.jar
 ./build/ivy/lib/test/javax.servlet-servlet-api-2.5.jar
-./build/ivy/lib/test/javax.transaction-jta-1.1.jar
 ./build/ivy/lib/test/jline-jline-0.9.94.jar
 ./build/ivy/lib/test/junit-junit-4.10.jar
 ./build/ivy/lib/test/log4j-log4j-1.2.16.jar
