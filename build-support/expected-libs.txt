@@ -358,7 +358,6 @@
 ./hcatalog-pig-adapter/build/ivy/lib/test/tomcat-jasper-compiler-5.5.12.jar
 ./hcatalog-pig-adapter/build/ivy/lib/test/tomcat-jasper-runtime-5.5.12.jar
 ./hcatalog-pig-adapter/build/ivy/lib/test/xmlenc-xmlenc-0.52.jar
-./ivy/ivy-2.1.0.jar
 ./ivy/ivy-2.2.0.jar
 ./server-extensions/build/hcatalog-server-extensions-0.5.0-SNAPSHOT.jar
 ./server-extensions/build/lib/compile/JavaEWAH-0.3.2.jar

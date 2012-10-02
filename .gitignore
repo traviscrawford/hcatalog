@@ -25,5 +25,3 @@ build-eclipse
 .git
 .svn
 metastore_db
-hive/external
-ivy-*.jar
