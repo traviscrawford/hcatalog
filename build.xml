@@ -179,6 +179,28 @@
             <zipfileset src="hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
             <zipfileset src="server-extensions/build/hcatalog-server-extensions-${hcatalog.version}.jar"/>
         </jar>
+
+        <exec executable="${basedir}/build-support/scripts/list-libs.py">
+            <arg value="--input_dir=."/>
+            <arg value="--output_file=build/actual-libs.txt"/>
+        </exec>
+        <exec executable="diff"
+              outputproperty="list-libs.diff.output"
+              resultproperty="list-libs.result">
+            <arg value="-u"/>
+            <arg value="${basedir}/build-support/expected-libs.txt"/>
+            <arg value="build/actual-libs.txt"/>
+        </exec>
+
+        <loadfile property="failwhale" srcFile="${basedir}/build-support/failwhale.txt"/>
+        <fail message="${line.separator}${failwhale}Expected and actual libs do not match.${line.separator}${line.separator}You probably need to: ./build-support/scripts/list-libs.py --input_dir=. --output_file=build-support/expected-libs.txt${line.separator}${line.separator}${list-libs.diff.output}">
+            <condition>
+                <not>
+                    <equals arg1="${list-libs.result}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
+
     </target>
 
     <!--
