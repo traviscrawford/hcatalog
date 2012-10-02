@@ -99,7 +99,6 @@
     <property name="ivy.artifact.retrieve.pattern" value="${ant.project.name}/[artifact]-[revision](-[classifier]).[ext]"/>
 
     <path id="compile.classpath">
-      <path refid="mvn.compile.classpath"/>
       <fileset dir="${build.dir}/lib/compile"/>
     </path>
 
