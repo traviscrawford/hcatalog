@@ -35,7 +35,7 @@
 
   <dependencies>
     <!-- hadoop20 dependencies -->
-    <!-- Pig should not be a dependency of hcatalog-core. See HCATALOG-375. -->
+    <!-- Pig should not be a dependency of hcatalog-core. See HCATALOG-522. -->
     <dependency org="org.apache.pig" name="pig" rev="${pig.version}" conf="default->*">
         <exclude org="junit"/>
     </dependency>
