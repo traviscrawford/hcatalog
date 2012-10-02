@@ -212,38 +212,11 @@
     </target>
 
     <!--
-    ================================================================================
-    Docs Section
-    ================================================================================
-    -->
-    <target name="docs" depends="javadoc">
-    </target>
-
-    <target name="javadoc" depends="jar" description="Create documentation">
-        <mkdir dir="${build.javadoc}"/>
-        <javadoc
-          packagenames="org.apache.hcatalog.*"
-          destdir="${build.javadoc}"
-          author="true"
-          version="true"
-          use="true"
-          windowtitle="HCatalog ${hcatalog.version} API"
-          doctitle="HCatalog ${hcatalog.version} API"
-          sourcepath="${src.dir}:${basedir}/src/gen-java">
-        <classpath>
-          <path refid="compile.classpath"/>
-        </classpath>
-        <group title="hcatalog" packages="org.apache.hcatalog.*"/>
-      </javadoc>
-    </target>
-
-
-    <!--
     ===============================================================================
     Distribution Section
     ===============================================================================
     -->
-    <target name="package" depends="jar, docs" description="Create an HCatalog release">
+    <target name="package" depends="jar" description="Create an HCatalog release">
         <mkdir dir="${dist.dir}" />
         <mkdir dir="${dist.dir}/conf" />
         <mkdir dir="${dist.dir}/lib" />
@@ -256,10 +229,6 @@
             </fileset>
         </copy>
 
-
-        <copy todir="${dist.dir}/docs">
-            <fileset dir="${build.docs}" />
-        </copy>
         <copy todir="${dist.dir}/conf">
             <fileset dir="${basedir}/conf" />
         </copy>

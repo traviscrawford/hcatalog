@@ -335,6 +335,8 @@
         </copy>
     </target>
 
+    <!-- To simplify, javadocs for all subprojects are generated together as a single set.
+    Subprojects should hook in here rather than having their own javadoc target. -->
     <target name="javadoc" depends="jar" description="Generate Javadoc documentation">
         <mkdir dir="${build.javadoc}"/>
         <javadoc overview="${src.dir}/../docs/overview.html"
@@ -350,11 +352,13 @@
             <packageset dir="${src.dir}"/>
             <packageset dir="hcatalog-pig-adapter/src/main/java"/>
             <packageset dir="server-extensions/src/main/java"/>
+            <packageset dir="storage-handlers/hbase/src/java"/>
             <packageset dir="webhcat/svr/src/main/java"/>
             <packageset dir="webhcat/java-client/src/main/java"/>
             <classpath>
                 <path refid="uber.classpath"/>
                 <fileset dir="server-extensions/build/lib/compile"/>
+                <fileset dir="storage-handlers/hbase/build/lib/compile"/>
             </classpath>
             <group title="hcatalog" packages="org.apache.hcatalog.*"/>
         </javadoc>
