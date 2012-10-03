@@ -412,6 +412,7 @@ public class PigHCatUtil {
                     throw new PigException("Incompatible type found in HCat table schema: "
                             + hcatField, PigHCatUtil.PIG_EXCEPTION_CODE);
                 }
+                break;
             case ARRAY:
                 validateHCatSchemaFollowsPigRules(hcatField.getArrayElementSchema());
                 break;
