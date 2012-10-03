@@ -19,8 +19,6 @@ package org.apache.hcatalog.pig;
 
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,7 +43,6 @@ import org.apache.hcatalog.data.schema.HCatFieldSchema;
 import org.apache.hcatalog.data.schema.HCatFieldSchema.Type;
 import org.apache.hcatalog.data.schema.HCatSchema;
 import org.apache.pig.LoadPushDown.RequiredField;
-import org.apache.pig.Main;
 import org.apache.pig.PigException;
 import org.apache.pig.ResourceSchema;
 import org.apache.pig.ResourceSchema.ResourceFieldSchema;
@@ -55,9 +52,15 @@ import org.apache.pig.data.DataType;
 import org.apache.pig.data.DefaultDataBag;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.data.TupleFactory;
+import org.apache.pig.impl.logicalLayer.schema.Schema;
 import org.apache.pig.impl.util.UDFContext;
+import org.apache.pig.impl.util.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PigHCatUtil {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PigHCatUtil.class);
 
     static final int PIG_EXCEPTION_CODE = 1115; // http://wiki.apache.org/pig/PigErrorHandlingFunctionalSpecification#Error_codes
     private static final String DEFAULT_DB = MetaStoreUtils.DEFAULT_DATABASE_NAME;
@@ -67,8 +70,38 @@ public class PigHCatUtil {
 
     private static final TupleFactory tupFac = TupleFactory.getInstance();
 
-    // The version of Pig on the classpath. Access via getPigVersion instead of using directly.
-    private static String pigVersion = null;
+    private static boolean pigHasBooleanSupport = false;
+
+    /**
+     * Determine if the current Pig version supports boolean columns. This works around a
+     * dependency conflict preventing HCatalog from requiring a version of Pig with boolean
+     * field support and should be removed once HCATALOG-466 has been resolved.
+     */
+    static {
+        // DETAILS:
+        //
+        // PIG-1429 added support for boolean fields, which shipped in 0.10.0;
+        // this version of Pig depends on antlr 3.4.
+        //
+        // HCatalog depends heavily on Hive, which at this time uses antlr 3.0.1.
+        //
+        // antlr 3.0.1 and 3.4 are incompatible, so Pig 0.10.0 and Hive cannot be depended on in the
+        // same project. Pig 0.8.0 did not use antlr for its parser and can coexist with Hive,
+        // so that Pig version is depended on by HCatalog at this time.
+        try {
+            Schema schema = Utils.getSchemaFromString("myBooleanField: boolean");
+            pigHasBooleanSupport = (schema.getField("myBooleanField").type == DataType.BOOLEAN);
+        } catch (Throwable e) {
+            // pass
+        }
+
+        if (!pigHasBooleanSupport) {
+            LOG.info("This version of Pig does not support boolean fields. To enable "
+                    + "boolean-to-integer conversion, set the "
+                    + HCatConstants.HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER
+                    + "=true configuration parameter.");
+        }
+    }
 
     static public Pair<String, String> getDBTableNames(String location) throws IOException {
         // the location string will be of the form:
@@ -300,12 +333,12 @@ public class PigHCatUtil {
             return DataType.BYTEARRAY;
         }
 
-        if (type == Type.BOOLEAN && hasBooleanSupport()) {
+        if (type == Type.BOOLEAN && pigHasBooleanSupport) {
             return DataType.BOOLEAN;
         }
 
-        throw new PigException("Column type '" + type.toString() + "' is not supported in "
-                + getPigVersion(), PIG_EXCEPTION_CODE);
+        throw new PigException("Column type '" + type.toString() + "' is not supported.",
+                PIG_EXCEPTION_CODE);
     }
 
     public static Tuple transformToTuple(HCatRecord hr, HCatSchema hs) throws Exception {
@@ -408,7 +441,7 @@ public class PigHCatUtil {
             Type hType = hcatField.getType();
             switch (hType) {
             case BOOLEAN:
-                if (!hasBooleanSupport()) {
+                if (!pigHasBooleanSupport) {
                     throw new PigException("Incompatible type found in HCat table schema: "
                             + hcatField, PigHCatUtil.PIG_EXCEPTION_CODE);
                 }
@@ -446,60 +479,4 @@ public class PigHCatUtil {
         }
     }
 
-    /**
-     * Determine if the current Pig version supports boolean columns. This method works
-     * around a dependency conflict preventing HCatalog from requiring a version of Pig
-     * with boolean field support and should be removed once HCATALOG-466 has been resolved.
-     *
-     * @return true if pig currently on the classpath supports boolean columns
-     * @see <a href="https://issues.apache.org/jira/browse/HCATALOG-466">HCATALOG-466</a>
-     */
-    public static boolean hasBooleanSupport() {
-        // DETAILS:
-        //
-        // PIG-1429 added support for boolean fields, which shipped in 0.10.0;
-        // this version of Pig depends on antlr 3.4.
-        //
-        // HCatalog depends heavily on Hive, which at this time uses antlr 3.0.1.
-        //
-        // antlr 3.0.1 and 3.4 are incompatible, so Pig 0.10.0 and Hive cannot be depended on in the
-        // same project. Pig 0.8.0 did not use antlr for its parser and can coexist with Hive,
-        // so that Pig version is depended on by HCatalog at this time.
-
-        String[] parts = getPigVersion().split(" ")[3].split("\\.");
-        int majorVersion = Integer.parseInt(parts[0]);
-        int minorVersion = Integer.parseInt(parts[1]);
-        return majorVersion > 0 || minorVersion >= 10;
-    }
-
-    /**
-     * Return the Pig version string for the version currently on the classpath. The format is:
-     *
-     * <p><code>return "Apache Pig version " + version + " (r" + svnRevision + ") \ncompiled "+buildTime;</code></p>
-     *
-     * @return pig version string from the version currently on the classpath
-     */
-    private static String getPigVersion() {
-        // Pig has been able to report its version string for some time, however, the visibility
-        // of the method has just recently changed to public (in trunk, which is 0.11.0 at this
-        // time).
-
-        if (pigVersion == null) {
-            Main pigMain = new Main();
-            try {
-                Method m = Main.class.getDeclaredMethod("getVersionString", null);
-                m.setAccessible(true);
-                pigVersion = (String) m.invoke(pigMain, null);
-                m.setAccessible(false);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        return pigVersion;
-    }
 }
