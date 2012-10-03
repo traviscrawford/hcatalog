@@ -36,7 +36,6 @@
 
   <dependencies>
     <!-- hadoop20 dependencies -->
-    <dependency org="org.apache.pig" name="pig" rev="${pig.version}" conf="test->*"/>
     <dependency org="org.apache.hadoop" name="hadoop-tools" rev="${hadoop20.version}" conf="default->*"/>
     <dependency org="javax.management.j2ee" name="management-api" rev="${javax-mgmt.version}"/>
     <dependency org="org.codehaus.jackson" name="jackson-mapper-asl" rev="${jackson.version}"/>
@@ -63,6 +62,7 @@
     <dependency org="com.google.code.p.arat" name="rat-lib" rev="${rats-lib.version}" conf="test->default"/>
     <dependency org="org.apache.maven" name="maven-ant-tasks" rev="${maven-ant-tasks.version}" conf="test->*"/>
     <dependency org="org.apache.hadoop" name="hadoop-test" rev="${hadoop20.version}" conf="test->default"/>
+    <dependency org="org.apache.pig" name="pig" rev="${pig.version}" conf="test->*"/>
     <dependency org="com.puppycrawl.tools" name="checkstyle" rev="${checkstyle.version}" conf="test->default">
       <exclude org="com.google.collections"/>
     </dependency>
