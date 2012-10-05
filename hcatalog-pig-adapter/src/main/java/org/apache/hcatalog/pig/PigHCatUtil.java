@@ -337,8 +337,8 @@ public class PigHCatUtil {
             return DataType.BOOLEAN;
         }
 
-        throw new PigException("Column type '" + type.toString() + "' is not supported.",
-                PIG_EXCEPTION_CODE);
+        throw new PigException("HCatalog column type '" + type.toString()
+                + "' is not supported in Pig as a column type", PIG_EXCEPTION_CODE);
     }
 
     public static Tuple transformToTuple(HCatRecord hr, HCatSchema hs) throws Exception {
