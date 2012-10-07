@@ -78,7 +78,7 @@ public enum HCatContext {
      * Get the configuration, if there is one. Users are not required to setup HCatContext
      * unless they wish to override default behavior, so the configuration may not be present.
      *
-     * @return an Optional that contains the Configuration, if one has been set
+     * @return an Optional that might contain a Configuration
      */
     public Optional<Configuration> getConf() {
         return Optional.fromNullable(conf);
