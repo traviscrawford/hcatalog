@@ -28,41 +28,23 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.hcatalog</groupId>
-    <artifactId>hcatalog-server-extensions</artifactId>
+    <artifactId>hcatalog-pig-adapter</artifactId>
     <packaging>jar</packaging>
     <version>${hcatalog.version}</version>
-    <name>server-extensions</name>
+    <name>hcatalog-pig-adapter</name>
     <url>http://maven.apache.org</url>
 
     <dependencies>
         <dependency>
-            <groupId>javax.jms</groupId>
-            <artifactId>jms</artifactId>
-            <version>${jms.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-core</artifactId>
-            <version>${activemq.version}</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-context</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>kahadb</artifactId>
-            <version>${activemq.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.hcatalog</groupId>
             <artifactId>hcatalog-core</artifactId>
             <version>${hcatalog.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.pig</groupId>
+            <artifactId>pig</artifactId>
+            <version>${pig.version}</version>
             <scope>compile</scope>
         </dependency>
 
@@ -77,12 +59,6 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-test</artifactId>
             <version>${hadoop20.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.pig</groupId>
-            <artifactId>pig</artifactId>
-            <version>${pig.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
