@@ -149,6 +149,15 @@ public final class HCatConstants {
     public static final boolean HCAT_DATA_CONVERT_BOOLEAN_TO_INTEGER_DEFAULT = false;
 
     /**
+     * {@value} (default: {@value #HCAT_DATA_CONVERT_COMPLEX_MAP_KEY_DEFAULT}).
+     * Thrift allows struct to be used as map key. Setting this property to true will call toString()
+     * function of the struct and use the result as the key.
+     */
+    public static final String HCAT_DATA_CONVERT_COMPLEX_MAP_KEY =
+            "hcat.data.convert.complex.map.key";
+    public static final boolean HCAT_DATA_CONVERT_COMPLEX_MAP_KEY_DEFAULT = false;
+
+    /**
      * {@value} (default: {@value #HCAT_DATA_TINY_SMALL_INT_PROMOTION_DEFAULT}).
      * Hive tables support tinyint and smallint columns, while not all processing frameworks support
      * these types (Pig only has integer for example). Enable this property to promote tinyint and

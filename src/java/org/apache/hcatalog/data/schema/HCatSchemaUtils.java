@@ -27,6 +27,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
 import org.apache.hadoop.hive.serde2.typeinfo.ListTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.MapTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.SetTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
@@ -118,6 +119,7 @@ public class HCatSchemaUtils {
     private static HCatFieldSchema getHCatFieldSchema(String fieldName, TypeInfo fieldTypeInfo) throws HCatException {
         Category typeCategory = fieldTypeInfo.getCategory();
         HCatFieldSchema hCatFieldSchema;
+        // TODO: Switch to case statement.
         if (Category.PRIMITIVE == typeCategory) {
             hCatFieldSchema = new HCatFieldSchema(fieldName, getPrimitiveHType(fieldTypeInfo), null);
         } else if (Category.STRUCT == typeCategory) {
@@ -126,8 +128,22 @@ public class HCatSchemaUtils {
         } else if (Category.LIST == typeCategory) {
             HCatSchema subSchema = getHCatSchema(((ListTypeInfo) fieldTypeInfo).getListElementTypeInfo());
             hCatFieldSchema = new HCatFieldSchema(fieldName, HCatFieldSchema.Type.ARRAY, subSchema, null);
+        } else if (Category.SET == typeCategory) {
+            HCatSchema subSchema = getHCatSchema(((SetTypeInfo)fieldTypeInfo).getSetElementTypeInfo());
+            hCatFieldSchema = new HCatFieldSchema(fieldName,HCatFieldSchema.Type.ARRAY,subSchema,null);
         } else if (Category.MAP == typeCategory) {
-            HCatFieldSchema.Type mapKeyType = getPrimitiveHType(((MapTypeInfo) fieldTypeInfo).getMapKeyTypeInfo());
+            TypeInfo mapKeyTypeInfo = ((MapTypeInfo) fieldTypeInfo).getMapKeyTypeInfo();
+            HCatFieldSchema.Type mapKeyType;
+            if (mapKeyTypeInfo.getCategory() == Category.PRIMITIVE) {
+                mapKeyType = getPrimitiveHType(mapKeyTypeInfo);
+            } else if (HCatContext.getInstance().getConf().isPresent() &&
+                    HCatContext.getInstance().getConf().get().getBoolean(
+                            HCatConstants.HCAT_DATA_CONVERT_COMPLEX_MAP_KEY,
+                            HCatConstants.HCAT_DATA_CONVERT_COMPLEX_MAP_KEY_DEFAULT)) {
+                mapKeyType = Type.STRING;
+            } else {
+                throw new TypeNotPresentException("Cannot use " + mapKeyTypeInfo.getCategory() + " as map keys", null);
+            }
             HCatSchema subSchema = getHCatSchema(((MapTypeInfo) fieldTypeInfo).getMapValueTypeInfo());
             hCatFieldSchema = new HCatFieldSchema(fieldName, HCatFieldSchema.Type.MAP, mapKeyType, subSchema, null);
         } else {
@@ -196,6 +212,7 @@ public class HCatSchemaUtils {
     public static HCatSchema getHCatSchema(TypeInfo typeInfo) throws HCatException {
         Category typeCategory = typeInfo.getCategory();
         HCatSchema hCatSchema;
+        // TODO: Switch to case statement.
         if (Category.PRIMITIVE == typeCategory) {
             hCatSchema = getStructSchemaBuilder().addField(new HCatFieldSchema(null, getPrimitiveHType(typeInfo), null)).build();
         } else if (Category.STRUCT == typeCategory) {
@@ -204,6 +221,10 @@ public class HCatSchemaUtils {
         } else if (Category.LIST == typeCategory) {
             CollectionBuilder builder = getListSchemaBuilder();
             builder.addField(getHCatFieldSchema(null, ((ListTypeInfo) typeInfo).getListElementTypeInfo()));
+            hCatSchema = new HCatSchema(Arrays.asList(new HCatFieldSchema("", Type.ARRAY, builder.build(), "")));
+        } else if (Category.SET == typeCategory) {
+            CollectionBuilder builder = getListSchemaBuilder();
+            builder.addField(getHCatFieldSchema(null, ((SetTypeInfo) typeInfo).getSetElementTypeInfo()));
             hCatSchema = new HCatSchema(Arrays.asList(new HCatFieldSchema("", Type.ARRAY, builder.build(), "")));
         } else if (Category.MAP == typeCategory) {
             HCatFieldSchema.Type mapKeyType = getPrimitiveHType(((MapTypeInfo) typeInfo).getMapKeyTypeInfo());
