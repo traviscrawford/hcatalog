@@ -23,6 +23,8 @@ Trunk (unreleased changes)
   INCOMPATIBLE CHANGES
 
   NEW FEATURES
+  HCAT-364 HCatalog pig adapter should handle boolean fields (traviscrawford)
+
   HCAT-515 Upgrade hadoop23 version to use 0.23.3 (cdrome via toffer)
 
   HCAT-132 Add HCatalog to Maven Repository (traviscrawford)
@@ -42,6 +44,10 @@ Trunk (unreleased changes)
   HCAT-427 Document storage-based authorization (lefty via gates)
 
   IMPROVEMENTS
+  HCAT-521 Ignore .reviewboardrc in git (nitay via traviscrawford)
+
+  HCAT-519 Migrate pig-adapter/webhcat to maven dependencies and continue build cleanup (traviscrawford)
+
   HCAT-517 Misc. build cleanup (traviscrawford)
 
   HCAT-506 desired number of input splits for large files (gmalewicz via traviscrawford)
@@ -119,6 +125,14 @@ Trunk (unreleased changes)
   OPTIMIZATIONS
 
   BUG FIXES
+  HCAT-453 HCatalog queries fail due to exceeding max jobconf size (pengfeng via traviscrawford)
+
+  HCAT-523 PigHCatUtil should not assume map key type can be casted to String (pengfeng via traviscrawford)
+
+  HCAT-522 Make HCatHadoopShims.commitJob() generic (traviscrawford)
+
+  HCAT-451 Partitions are created even when Jobs are aborted (avandana)
+
   HCAT-513  Data Store onto HCatalog table fails for dynamic partitioning as the temporary directory gets deleted by the completed map tasks  (amalakar via toffer)
 
   HCAT-497 HCatContext should use the jobconf instead of its own conf (traviscrawford)

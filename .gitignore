@@ -24,4 +24,5 @@ build-eclipse
 *~
 .git
 .svn
+.reviewboardrc
 metastore_db
