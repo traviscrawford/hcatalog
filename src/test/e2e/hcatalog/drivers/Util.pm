@@ -412,10 +412,10 @@ sub getHiveLibsForPig($$)
         /hive-.*\.jar$/ && do {
             $cp .= $cfg->{'hivelib'} . '/' . $_ . ':';
         };
-        /libfb303.jar/ && do {
+        /libfb303-.*\.jar/ && do {
             $cp .= $cfg->{'hivelib'} . '/' . $_ . ':';
         };
-        /libthrift.jar/ && do {
+        /libthrift-.*\.jar/ && do {
             $cp .= $cfg->{'hivelib'} . '/' . $_ . ':';
         };
         /datanucleus-.*\.jar$/ && do {

@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<!-- ant clean package test-e2e-setup test-e2e-deploy test-e2e -->
+<project>
+
+  <property name="buildsupport.e2e.conf.dir" location="${path.to.basedir}/build-support/e2e/conf"/>
+  <property name="buildsupport.e2e.resources.dir" location="${path.to.basedir}/build-support/resources"/>
+  <property name="e2e.build.dir" location="${path.to.basedir}/build/e2e"/>
+
+  <target name="test-e2e-setup">
+
+    <delete dir="${e2e.build.dir}"/>
+    <mkdir dir="${e2e.build.dir}"/>
+
+    <!-- Setup Hadoop -->
+    <get src="http://mirrors.gigenet.com/apache/hadoop/common/hadoop-1.0.4/hadoop-1.0.4.tar.gz"
+      dest="${buildsupport.e2e.resources.dir}/hadoop-1.0.4.tar.gz"
+      verbose="on" skipexisting="true"/>
+    <exec executable="tar" dir="${e2e.build.dir}">
+      <arg value="xzf"/>
+      <arg value="${buildsupport.e2e.resources.dir}/hadoop-1.0.4.tar.gz"/>
+    </exec>
+    <copy todir="${e2e.build.dir}/hadoop-1.0.4/conf">
+      <fileset dir="${buildsupport.e2e.conf.dir}/hadoop"/>
+    </copy>
+    <exec executable="${e2e.build.dir}/hadoop-1.0.4/bin/stop-all.sh"/>
+    <delete dir="/tmp/hadoop-${user.name}/dfs/name" verbose="true"/>
+    <delete dir="/tmp/hadoop-${user.name}/dfs/data" verbose="true"/>
+    <exec executable="${e2e.build.dir}/hadoop-1.0.4/bin/hadoop">
+      <arg value="namenode"/>
+      <arg value="-format"/>
+    </exec>
+    <exec executable="${e2e.build.dir}/hadoop-1.0.4/bin/start-all.sh"/>
+
+    <!-- Setup Hive -->
+    <get src="https://builds.apache.org/view/G-L/view/Hive/job/Hive-trunk-h0.21/ws/hive/build/hive-0.10.0-SNAPSHOT.tar.gz"
+      dest="${buildsupport.e2e.resources.dir}/hive-0.10.0-SNAPSHOT.tar.gz"
+      verbose="on" skipexisting="true"/>
+    <exec executable="tar" dir="${e2e.build.dir}">
+      <arg value="xzf"/>
+      <arg value="${buildsupport.e2e.resources.dir}/hive-0.10.0-SNAPSHOT.tar.gz"/>
+    </exec>
+    <copy todir="${e2e.build.dir}/hive-0.10.0-SNAPSHOT/conf">
+      <fileset dir="${buildsupport.e2e.conf.dir}/hive"/>
+    </copy>
+    <exec executable="${e2e.build.dir}/hive-0.10.0-SNAPSHOT/bin/hive" spawn="true">
+      <arg value="--service"/>
+      <arg value="metastore"/>
+    </exec>
+
+    <!-- Setup Pig -->
+    <get src="http://mirrors.gigenet.com/apache/pig/pig-0.10.0/pig-0.10.0.tar.gz"
+      dest="${buildsupport.e2e.resources.dir}/pig-0.10.0.tar.gz"
+      verbose="on" skipexisting="true"/>
+    <exec executable="tar" dir="${e2e.build.dir}">
+      <arg value="xzf"/>
+      <arg value="${buildsupport.e2e.resources.dir}/pig-0.10.0.tar.gz"/>
+    </exec>
+
+    <!-- Setup HBase -->
+    <get src="http://mirrors.gigenet.com/apache/hbase/hbase-0.94.2/hbase-0.94.2.tar.gz"
+      dest="${buildsupport.e2e.resources.dir}/hbase-0.94.2.tar.gz"
+      verbose="on" skipexisting="true"/>
+    <exec executable="tar" dir="${e2e.build.dir}">
+      <arg value="xzf"/>
+      <arg value="${buildsupport.e2e.resources.dir}/hbase-0.94.2.tar.gz"/>
+    </exec>
+    <exec executable="${e2e.build.dir}/hbase-0.94.2/bin/start-hbase.sh"/>
+
+    <!-- Set home properties for apps. -->
+    <property name="hadoop.home" location="${e2e.build.dir}/hadoop-1.0.4"/>
+    <property name="hive.home" location="${e2e.build.dir}/hive-0.10.0-SNAPSHOT"/>
+    <property name="pig.home" location="${e2e.build.dir}/pig-0.10.0"/>
+    <property name="hbase.home" location="${e2e.build.dir}/hbase-0.94.2"/>
+    <property name="hcat.home" location="${basedir}/build/hcatalog-0.5.0-SNAPSHOT"/>
+    <property name="harness.cluster.conf" location="${hadoop.home}/conf"/>
+
+  </target>
+
+</project>

@@ -567,5 +567,6 @@
     <import file="ant/deploy.xml"/>
     <import file="ant/findbugs.xml"/>
     <import file="ant/test.xml"/>
+    <import file="ant/e2e.xml"/>
 
 </project>
