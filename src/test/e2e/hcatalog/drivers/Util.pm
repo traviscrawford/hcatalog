@@ -460,6 +460,9 @@ sub getHBaseLibs($$)
         /zookeeper.*\.jar$/ && do {
             $cp .= $cfg->{'zklibdir'} . '/' . $_ . ':';
         };
+        /protobuf-java-.*\.jar/ && do {
+            $cp .= $cfg->{'zklibdir'} . '/' . $_ . ':';
+        }
     }
     closedir(LIB);
     return $cp;

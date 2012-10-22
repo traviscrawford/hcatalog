@@ -17,7 +17,10 @@
   limitations under the License.
 -->
 
-<!-- ant clean package test-e2e-setup test-e2e-deploy test-e2e -->
+<!--
+ant clean package test-e2e-setup test-e2e-deploy test-e2e
+ant clean package test-e2e-setup test-e2e-deploy test-e2e -Dtests.to.run='-t Pig_Write_3'
+-->
 <project>
 
   <property name="buildsupport.e2e.conf.dir" location="${path.to.basedir}/build-support/e2e/conf"/>
@@ -26,6 +29,7 @@
 
   <target name="test-e2e-setup">
 
+    <exec executable="${path.to.basedir}/build-support/scripts/e2e-stop-daemons.sh"/>
     <delete dir="${e2e.build.dir}"/>
     <mkdir dir="${e2e.build.dir}"/>
 
@@ -53,10 +57,15 @@
     <get src="https://builds.apache.org/view/G-L/view/Hive/job/Hive-trunk-h0.21/ws/hive/build/hive-0.10.0-SNAPSHOT.tar.gz"
       dest="${buildsupport.e2e.resources.dir}/hive-0.10.0-SNAPSHOT.tar.gz"
       verbose="on" skipexisting="true"/>
+    <get src="http://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/5.1.21/mysql-connector-java-5.1.21.jar"
+      dest="${buildsupport.e2e.resources.dir}/mysql-connector-java-5.1.21.jar"
+      verbose="on" skipexisting="true"/>
     <exec executable="tar" dir="${e2e.build.dir}">
       <arg value="xzf"/>
       <arg value="${buildsupport.e2e.resources.dir}/hive-0.10.0-SNAPSHOT.tar.gz"/>
     </exec>
+    <copy file="${buildsupport.e2e.resources.dir}/mysql-connector-java-5.1.21.jar"
+      todir="${e2e.build.dir}/hive-0.10.0-SNAPSHOT/lib"/>
     <copy todir="${e2e.build.dir}/hive-0.10.0-SNAPSHOT/conf">
       <fileset dir="${buildsupport.e2e.conf.dir}/hive"/>
     </copy>
@@ -81,6 +90,15 @@
     <exec executable="tar" dir="${e2e.build.dir}">
       <arg value="xzf"/>
       <arg value="${buildsupport.e2e.resources.dir}/hbase-0.94.2.tar.gz"/>
+    </exec>
+    <copy todir="${e2e.build.dir}/hbase-0.94.2/conf">
+      <fileset dir="${buildsupport.e2e.conf.dir}/hbase"/>
+    </copy>
+    <exec executable="./build/e2e/hbase-0.94.2/bin/hbase-daemons.sh">
+      <arg value="--config"/>
+      <arg value="${e2e.build.dir}/hbase-0.94.2/conf"/>
+      <arg value="start"/>
+      <arg value="zookeeper"/>
     </exec>
     <exec executable="${e2e.build.dir}/hbase-0.94.2/bin/start-hbase.sh"/>
 
