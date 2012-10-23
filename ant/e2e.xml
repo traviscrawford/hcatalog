@@ -27,6 +27,7 @@ ant clean package test-e2e-setup test-e2e-deploy test-e2e -Dtests.to.run='-t Pig
 -->
 <project>
 
+  <property name="test.e2e.dir" value="${path.to.basedir}/src/test/e2e/hcatalog"/>
   <property name="buildsupport.e2e.conf.dir" location="${path.to.basedir}/build-support/e2e/conf"/>
   <property name="buildsupport.e2e.resources.dir" location="${path.to.basedir}/build-support/resources"/>
   <property name="e2e.build.dir" location="${path.to.basedir}/build/e2e"/>
@@ -36,6 +37,10 @@ ant clean package test-e2e-setup test-e2e-deploy test-e2e -Dtests.to.run='-t Pig
   <property name="e2e.pig.version" value="0.10.0"/>
   <property name="e2e.hbase.version" value="0.94.2"/>
 
+  <!-- Performs a number of setup steps necessary to run the e2e tests on the local machine:
+  installs & configures Hadoop, Hive, Pig, HBase, and ZooKeeper. Note this does not perform
+  all steps, such as setting up MySQL, installing perl modules, or setting up passwordless ssh.
+  Those steps are very machine-specific and must be done manually at this time. -->
   <target name="test-e2e-setup">
 
     <exec executable="${path.to.basedir}/build-support/scripts/e2e-stop-daemons.sh"/>
@@ -116,6 +121,18 @@ ant clean package test-e2e-setup test-e2e-deploy test-e2e -Dtests.to.run='-t Pig
     <property name="hcat.home" location="${basedir}/build/hcatalog-${hcatalog.version}"/>
     <property name="harness.cluster.conf" location="${hadoop.home}/conf"/>
 
+  </target>
+
+  <target name="test-e2e" description="run end-to-end tests">
+    <ant dir="${test.e2e.dir}"/>
+  </target>
+
+  <target name="test-e2e-install" description="deploy end-to-end tests to existing cluster">
+    <ant dir="${test.e2e.dir}" target="install"/>
+  </target>
+
+  <target name="test-e2e-deploy" description="deploy end-to-end tests to existing cluster">
+    <ant dir="${test.e2e.dir}" target="deploy"/>
   </target>
 
 </project>

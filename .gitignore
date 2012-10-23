@@ -26,6 +26,4 @@ build-support/resources
 .git
 .svn
 .reviewboardrc
-metastore_db
-hive/external
 ivy-*.jar
