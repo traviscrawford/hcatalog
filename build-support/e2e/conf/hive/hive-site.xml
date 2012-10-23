@@ -1,5 +1,3 @@
-<?xml version="1.0"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <!--
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
@@ -18,92 +16,8 @@
 -->
 
 <configuration>
-
-<!-- Clients will use this to connect to the HiveMetaStore thrift service. -->
-<property>
-  <name>hive.metastore.uris</name>
-  <value>thrift://localhost:9083</value>
-</property>
-
-<property>
-  <name>javax.jdo.option.ConnectionURL</name>
-  <value>jdbc:mysql://127.0.0.1/hivemetastore_testdb?createDatabaseIfNotExist=true</value>
-  <description>JDBC connect string for a JDBC metastore</description>
-</property>
-
-<property>
-  <name>javax.jdo.option.ConnectionDriverName</name>
-  <value>com.mysql.jdbc.Driver</value>
-  <description>Driver class name for a JDBC metastore</description>
-</property>
-
-<property>
-  <name>javax.jdo.option.ConnectionUserName</name>
-  <value>hcattest</value>
-  <description>username to use against metastore database</description>
-</property>
-
-<property>
-  <name>javax.jdo.option.ConnectionPassword</name>
-  <value>hcattest</value>
-  <description>password to use against metastore database</description>
-</property>
-
-<property>
-  <name>hive.metastore.cache.pinobjtypes</name>
-  <value>Table,Database,Type,FieldSchema,Order</value>
-  <description>List of comma separated metastore object types that should be pinned in the cache</description>
-</property>
-
-<property>
-  <name>hadoop.clientside.fs.operations</name>
-  <value>true</value>
-  <description>FS operations are owned by client</description>
-</property>
-
-<property>
-  <name>hive.metastore.client.socket.timeout</name>
-  <value>60</value>
-  <description>MetaStore Client socket timeout in seconds</description>
-</property>
-
-<!-- to make it work with our MySQL -->
-<property>
-  <name>datanucleus.transactionIsolation</name>
-  <value>repeatable-read</value>
-</property>
-
-<property>
-  <name>datanucleus.valuegeneration.transactionIsolation</name>
-  <value>repeatable-read</value>
-</property>
-
-
-<!-- Always set to true so new HiveMetaStore instances create their schema automatically.
-In production we override this property by setting datanucleus.fixedDatastore=false
-instead of providing an option.
-
-Says http://www.datanucleus.org/products/datanucleus/schema.html
-
-If you want to create the schema ("tables"+"columns"+"constraints")
-during the persistence process, the property datanucleus.autoCreateSchema provides
-a way of telling DataNucleus to do this.
--->
-<property>
-  <name>datanucleus.autoCreateSchema</name>
-  <value>true</value>
-</property>
-
-<!-- Says http://www.datanucleus.org/products/datanucleus/schema.html
-
-If you want to keep your schema fixed (i.e don't allow any modifications at runtime) then the
-property datanucleus.fixedDatastore should be set to true and this has the effect of setting the
-"table"+"columns"+"constraints" autoCreate values to false.
--->
-<property>
-  <name>datanucleus.fixedDatastore</name>
-  <value>false</value>
-</property>
-
+  <property>
+    <name>hive.metastore.uris</name>
+    <value>thrift://localhost:9083</value>
+  </property>
 </configuration>
-
