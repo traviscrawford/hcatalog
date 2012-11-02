@@ -147,7 +147,7 @@ public class HCatSemanticAnalyzer extends HCatSemanticAnalyzerBase {
 
         // In all other cases, throw an exception. Its a white-list of allowed operations.
         default:
-            throw new SemanticException("Operation not supported.");
+            throw new SemanticException("Operation not supported. AST token " + ast.getToken());
 
         }
     }
