@@ -25,12 +25,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
-import org.apache.hadoop.hive.ql.metadata.Hive;
-import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.Job;
@@ -88,7 +84,6 @@ public class HCatLoader extends HCatBaseLoader {
     public void setLocation(String location, Job job) throws IOException {
         HCatContext.setupHCatContext(job.getConfiguration()).getConf().get()
             .setBoolean(HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION, true);
-        setHiveProperties(job.getConfiguration());
 
         UDFContext udfContext = UDFContext.getUDFContext();
         Properties udfProps = udfContext.getUDFProperties(this.getClass(),
@@ -194,7 +189,6 @@ public class HCatLoader extends HCatBaseLoader {
     public ResourceSchema getSchema(String location, Job job) throws IOException {
         HCatContext.setupHCatContext(job.getConfiguration()).getConf().get()
             .setBoolean(HCatConstants.HCAT_DATA_TINY_SMALL_INT_PROMOTION, true);
-        setHiveProperties(job.getConfiguration());
 
         Table table = phutil.getTable(location,
             hcatServerUri != null ? hcatServerUri : PigHCatUtil.getHCatServerUri(job),
@@ -273,22 +267,6 @@ public class HCatLoader extends HCatBaseLoader {
         } else {
             // should be a constant or column
             return expr.toString();
-        }
-    }
-
-    /**
-     * Pig command-line -D configuration options are not available to HiveConf, as they are not
-     * present in new Configuration objects. We explicitly update Hive's configuration so
-     * {@link Table#getDeserializerFromMetaStore()} uses the correct configuration.
-     *
-     * TODO(travis): The final version of Hive's enum-to-string conversion always happens
-     *               so this is not necessary anymore after updating Hive.
-     */
-    private void setHiveProperties(Configuration conf) throws IOException {
-        try {
-            Hive.get(new HiveConf(conf, this.getClass()), true);
-        } catch (HiveException e) {
-            throw new IOException("Failed updating Hive runtime configuration.", e);
         }
     }
 }
