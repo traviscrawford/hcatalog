@@ -28,10 +28,9 @@
 
   <path id="test.class.path">
     <fileset dir="${build.dir}/lib/test"/>
-    <dirset dir="${path.to.basedir}/build/test/classes"/>
+    <dirset dir="${path.to.basedir}/core/build/test/classes"/>
     <dirset dir="${basedir}/build/classes"/>
     <dirset dir="${basedir}/build/test/classes"/>
-    <dirset dir="../../build/classes"/>
   </path>
 
   <path id="findbugs.class.path">

@@ -31,6 +31,9 @@
     <fileset dir="${build.dir}/lib/test"/>
     <dirset dir="${basedir}/build/classes"/>
     <dirset dir="${basedir}/build/test/classes"/>
+    <!-- TODO: break circular dependency -->
+    <fileset dir="${path.to.basedir}/hcatalog-pig-adapter/build/lib/test"/>
+    <dirset dir="${path.to.basedir}/hcatalog-pig-adapter/build/classes"/>
   </path>
 
   <path id="findbugs.class.path">
