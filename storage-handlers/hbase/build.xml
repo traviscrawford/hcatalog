@@ -75,7 +75,6 @@
 
     <!-- ivy properteis set here -->
     <property name="ivy.dir" location="../../ivy" />
-    <loadproperties srcfile="${ivy.dir}/libraries.properties"/>
     <property name="ivy.jar" location="${ivy.dir}/ivy-${ivy.version}.jar"/>
     <property name="ivysettings.xml" location="${ivy.dir}/ivysettings.xml" />
     <property name="build.ivy.dir" location="${build.dir}/ivy" />
@@ -277,7 +276,6 @@
         </copy>
     </target>
 
-    <import file="../../ant/dependencies.xml"/>
     <import file="../../ant/deploy.xml"/>
 
 </project>
