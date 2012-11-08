@@ -38,7 +38,4 @@
     <fileset dir="${build.dir}/lib/compile"/>
   </path>
 
-  <!-- Use Maven (instead of Ivy) for dependencies. -->
-  <target name="ivy-retrieve" depends="mvn-dependencies"/>
-
 </project>

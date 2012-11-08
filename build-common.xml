@@ -18,7 +18,6 @@
 -->
 
 <project name="build-common" default="jar"
-         xmlns:ivy="antlib:org.apache.ivy.ant"
          xmlns:artifact="artifact:org.apache.maven.artifact.ant">
 
   <loadproperties srcfile="${path.to.basedir}/build.properties"/>

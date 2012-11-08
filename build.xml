@@ -18,7 +18,6 @@
 -->
 
 <project name="hcatalog" default="jar"
-         xmlns:ivy="antlib:org.apache.ivy.ant"
          xmlns:artifact="artifact:org.apache.maven.artifact.ant">
 
     <property name="path.to.basedir" location="${basedir}"/>
@@ -38,18 +37,6 @@
     <!-- e2e test properties -->
     <property name="test.e2e.dir" value="${basedir}/src/test/e2e/hcatalog"/>
 
-    <!-- ivy properties set here -->
-    <property name="ivy.dir" location="ivy"/>
-    <property name="ivy.jar" location="${ivy.dir}/ivy-${ivy.version}.jar"/>
-    <property name="ivy_repo_url" value="${mvnrepo}/org/apache/ivy/ivy/${ivy.version}/ivy-${ivy.version}.jar"/>
-
-    <property name="ivysettings.xml" location="${ivy.dir}/ivysettings.xml"/>
-    <property name="build.ivy.dir" location="${build.dir}/ivy"/>
-    <property name="pom.file" location="${build.ivy.dir}/${ant.project.name}-${hcatalog.version}.pom"/>
-    <property name="build.ivy.lib.dir" location="${build.ivy.dir}/lib"/>
-    <property name="ivy.lib.dir" location="${build.ivy.lib.dir}/${ant.project.name}"/>
-    <property name="build.ivy.report.dir" location="${build.ivy.dir}/report"/>
-
     <!-- packaging properties -->
     <property name="package.prefix" value="/usr"/>
     <property name="package.conf.dir" value="/etc/hcatalog"/>
@@ -62,22 +49,6 @@
 
     <!-- rats properties -->
     <property name="rat.reporting.classname" value="rat.Report"/>
-
-    <path id="compile.classpath">
-        <fileset dir="${build.dir}/ivy/lib/default">
-            <include name="**/*.jar"/>
-        </fileset>
-    </path>
-
-    <path id="test.class.path">
-        <pathelement location="${test.classes}"/>
-        <pathelement location="${build.classes}"/>
-        <pathelement location="conf"/>
-        <fileset dir="${build.dir}/ivy/lib/test">
-            <include name="**/*.jar"/>
-        </fileset>
-        <pathelement location="${basedir}/hcatalog-pig-adapter/build/hcatalog-pig-adapter-${hcatalog.version}.jar"/>
-    </path>
 
     <target name="init">
         <mkdir dir="${dist.dir}"/>
@@ -94,7 +65,7 @@
         <ant target="jar" dir="server-extensions" inheritAll="false"/>
         <ant target="jar" dir="webhcat/svr" inheritAll="false"/>
         <ant target="jar" dir="webhcat/java-client" inheritAll="false"/>
-        <ant target="jar" dir="storage-handlers" inheritAll="false"/>
+        <ant target="jar" dir="storage-handlers/hbase" inheritAll="false"/>
     </target>
 
     <!--
@@ -109,7 +80,7 @@
         <ant target="test" dir="server-extensions" inheritAll="false"/>
         <ant target="test" dir="webhcat/svr" inheritAll="false"/>
         <ant target="test" dir="webhcat/java-client" inheritAll="false"/>
-        <ant target="test" dir="storage-handlers" inheritAll="false" useNativeBasedir="true"/>
+        <ant target="test" dir="storage-handlers/hbase" inheritAll="false"/>
     </target>
 
     <target name="test-with-clover" depends="clover-init"
@@ -121,7 +92,7 @@
         <ant target="_test-with-clover" dir="webhcat/java-client" inheritAll="false"/>
         <!-- storage-handlers do not have coverage as they have not
              yet been migrated to the new build files. -->
-        <ant target="test" dir="storage-handlers" inheritAll="false" useNativeBasedir="true"/>
+        <ant target="test" dir="storage-handlers/hbase" inheritAll="false"/>
     </target>
 
 
@@ -160,8 +131,8 @@
         <ant target="clean" dir="server-extensions" inheritAll="false"/>
         <ant target="clean" dir="webhcat/svr" inheritAll="false"/>
         <ant target="clean" dir="webhcat/java-client" inheritAll="false"/>
-        <ant target="clean" dir="storage-handlers" inheritAll="false" useNativeBasedir="true"/>
-        <ant target="clean" dir="shims" inheritAll="false" useNativeBasedir="true"/>
+        <ant target="clean" dir="storage-handlers/hbase" inheritAll="false"/>
+        <ant target="clean" dir="shims" inheritAll="false"/>
     </target>
 
     <!--
@@ -198,12 +169,15 @@
             <packageset dir="core/src/main/java"/>
             <packageset dir="hcatalog-pig-adapter/src/main/java"/>
             <packageset dir="server-extensions/src/main/java"/>
+            <packageset dir="storage-handlers/hbase/src/gen-java"/>
+            <packageset dir="storage-handlers/hbase/src/java"/>
             <packageset dir="webhcat/svr/src/main/java"/>
             <packageset dir="webhcat/java-client/src/main/java"/>
             <classpath>
                 <fileset dir="core/build/lib/compile"/>
                 <fileset dir="hcatalog-pig-adapter/build/lib/compile"/>
                 <fileset dir="server-extensions/build/lib/compile"/>
+                <fileset dir="storage-handlers/hbase/build/lib/compile"/>
                 <fileset dir="webhcat/svr/build/lib/compile"/>
             </classpath>
             <group title="hcatalog" packages="org.apache.hcatalog.*"/>
@@ -266,19 +240,6 @@
     Distribution Section
     ===============================================================================
     -->
-    <target name="package-storage-handlers">
-        <property name="handlers.dir" value="${dist.dir}/share/hcatalog/storage-handlers"/>
-        <mkdir dir="${handlers.dir}"/>
-        <ant target="package" dir="storage-handlers" inheritAll="false" useNativeBasedir="true">
-            <property name="dist.handlers.dir" value="${handlers.dir}"/>
-        </ant>
-        <copy todir="${dist.dir}/share/${ant.project.name}/lib" includeEmptyDirs="false" flatten="true">
-            <fileset dir="${dist.dir}/share/${ant.project.name}/storage-handlers">
-                <include name="*/lib/*"/>
-            </fileset>
-        </copy>
-    </target>
-
     <target name="package" depends="jar, docs" description="Create an HCatalog release">
         <mkdir dir="${dist.dir}"/>
         <mkdir dir="${dist.dir}/share/${ant.project.name}/lib"/>
@@ -371,8 +332,14 @@
             <fileset dir="${dist.dir}/bin"/>
             <fileset dir="${dist.dir}/sbin"/>
         </chmod>
+
         <!--package storage-handlers -->
-        <antcall target="package-storage-handlers"/>
+
+        <property name="handlers.dir" value="${dist.dir}/share/hcatalog/storage-handlers"/>
+        <mkdir dir="${handlers.dir}"/>
+        <ant target="package" dir="storage-handlers/hbase" inheritAll="false">
+            <property name="dist.handlers.dir" value="${handlers.dir}"/>
+        </ant>
     </target>
 
     <target name="releaseaudit" description="Release Audit activities">
@@ -395,8 +362,6 @@
                 <include name="hcatalog-pig-adapter/**"/>
                 <include name="server-extensions/**"/>
                 <include name="webhcat/**"/>
-                <include name="ivy/**"/>
-                <exclude name="ivy/*.jar"/>
                 <include name="license/**"/>
                 <include name="shims/**"/>
                 <include name="src/**"/>
