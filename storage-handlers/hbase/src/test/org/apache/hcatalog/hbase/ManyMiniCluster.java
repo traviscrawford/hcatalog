@@ -245,7 +245,7 @@ public class ManyMiniCluster {
 
         try {
             hbaseDir = new File(workDir, "hbase").getAbsolutePath();
-            hbaseRoot = "file://" + hbaseDir;
+            hbaseRoot = "file:///" + hbaseDir;
 
             if (hbaseConf == null)
                 hbaseConf = HBaseConfiguration.create();
