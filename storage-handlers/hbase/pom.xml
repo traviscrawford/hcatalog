@@ -17,6 +17,7 @@
   <name>hbase-storage-handler</name>
   <url>http://maven.apache.org</url>
 
+  <!-- TODO: Move profiles to parent pom when webhcat support hadoop23. -->
   <profiles>
     <profile>
       <id>hadoop20</id>
