@@ -48,9 +48,27 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-tools</artifactId>
+          <version>${hadoop20.version}</version>
+          <scope>compile</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-test</artifactId>
+          <version>${hadoop20.version}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.hcatalog</groupId>
             <artifactId>hcatalog-core</artifactId>
             <version>${hcatalog.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>${jackson.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
