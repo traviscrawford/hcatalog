@@ -11,9 +11,12 @@ function run_cmd() {
 
 umask 0022
 
-cmd='ant clean package test -Dtest.junit.output.format=xml -Dmvn.profile=hadoop20'
+# Build with hadoop23, but do not run tests as they do not pass.
+cmd='ant clean package -Dmvn.profile=hadoop23'
 run_cmd
 
-cmd='ant clean package -Dmvn.profile=hadoop23'
+# Build and run tests with hadoop20. This must happen afterwards so test results
+# are available for CI to publish.
+cmd='ant clean package test -Dtest.junit.output.format=xml -Dmvn.profile=hadoop20'
 run_cmd
 
