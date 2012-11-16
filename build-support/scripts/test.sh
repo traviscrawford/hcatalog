@@ -12,6 +12,6 @@ function run_cmd() {
 cmd='ant clean package -Dmvn.profile=hadoop20'
 run_cmd
 
-cmd='ant -v clean package -Dmvn.profile=hadoop23'
+cmd='ant clean package -Dmvn.profile=hadoop23'
 run_cmd
 
