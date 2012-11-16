@@ -9,7 +9,9 @@ function run_cmd() {
   fi
 }
 
-cmd='ant clean package test -Dmvn.profile=hadoop20'
+umask 0022
+
+cmd='ant clean package test -Dtest.junit.output.format=xml -Dmvn.profile=hadoop20'
 run_cmd
 
 cmd='ant clean package -Dmvn.profile=hadoop23'
