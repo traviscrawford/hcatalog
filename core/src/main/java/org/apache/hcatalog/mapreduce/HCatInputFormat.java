@@ -19,32 +19,45 @@
 package org.apache.hcatalog.mapreduce;
 
 import java.io.IOException;
+import java.util.Properties;
 
+import com.google.common.base.Preconditions;
+import org.apache.hadoop.classification.InterfaceAudience;
+import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
 
-/** The InputFormat to use to read data from HCatalog. */
+import javax.annotation.Nullable;
+
+/**
+ * The InputFormat to use to read data from HCatalog.
+ */
+@InterfaceAudience.Public
+@InterfaceStability.Evolving
 public class HCatInputFormat extends HCatBaseInputFormat {
 
     /**
-     * @see org.apache.hcatalog.mapreduce.HCatInputFormat#setInput(org.apache.hadoop.conf.Configuration, InputJobInfo)
+     * @deprecated As of release 0.5, replaced by
+     * {@link #setInput(Configuration, String, String, String, Properties)}
+     * Will be removed in a future release.
      */
-    public static void setInput(Job job,
-                                InputJobInfo inputJobInfo) throws IOException {
-        setInput(job.getConfiguration(), inputJobInfo);
+    @Deprecated
+    public static void setInput(Job job, InputJobInfo inputJobInfo) throws IOException {
+        setInput(job.getConfiguration(),
+            inputJobInfo.getDatabaseName(),
+            inputJobInfo.getTableName(),
+            inputJobInfo.getFilter(),
+            inputJobInfo.getProperties());
     }
 
     /**
-     * Set the input information to use for the job. This queries the metadata server
-     * with the specified partition predicates, gets the matching partitions, and
-     * puts the information in the conf object. The inputInfo object is updated
-     * with information needed in the client context.
-     * @param conf the job Configuration object
-     * @param inputJobInfo the input information about the table to read
-     * @throws IOException the exception in communicating with the metadata server
+     * @deprecated As of release 0.5, replaced by
+     * {@link #setInput(Configuration, String, String, String, Properties)}.
+     * Will be removed in a future release.
      */
-    public static void setInput(Configuration conf,
-                                InputJobInfo inputJobInfo) throws IOException {
+    @Deprecated
+    public static void setInput(Configuration conf, InputJobInfo inputJobInfo)
+        throws IOException {
         try {
             InitializeInput.setInput(conf, inputJobInfo);
         } catch (Exception e) {
@@ -52,5 +65,29 @@ public class HCatInputFormat extends HCatBaseInputFormat {
         }
     }
 
+    /**
+     * Set inputs to use for the job. This queries the metastore with the given input
+     * specification and serializes matching partitions into the job conf for use by MR tasks.
+     *
+     * @param conf the job configuration
+     * @param dbName database name
+     * @param tableName table name
+     * @param filter filter specification
+     * @param properties properties for the input specification
+     * @throws IOException on all errors
+     */
+    public static void setInput(Configuration conf, String dbName, String tableName,
+                                @Nullable String filter, @Nullable Properties properties)
+        throws IOException {
 
+        Preconditions.checkNotNull(conf, "Required argument conf is null");
+        Preconditions.checkNotNull(dbName, "Required argument dbName is null");
+        Preconditions.checkNotNull(tableName, "Required argument tableName is null");
+
+        try {
+            InitializeInput.setInput(conf, InputJobInfo.create(dbName, tableName, filter, properties));
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
 }

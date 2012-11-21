@@ -37,7 +37,6 @@ import org.apache.hcatalog.data.transfer.ReadEntity;
 import org.apache.hcatalog.data.transfer.ReaderContext;
 import org.apache.hcatalog.data.transfer.state.StateProvider;
 import org.apache.hcatalog.mapreduce.HCatInputFormat;
-import org.apache.hcatalog.mapreduce.InputJobInfo;
 import org.apache.hcatalog.shims.HCatHadoopShims;
 
 /**
@@ -63,9 +62,8 @@ public class HCatInputFormatReader extends HCatReader {
 
         try {
             Job job = new Job(conf);
-            InputJobInfo jobInfo = InputJobInfo.create(re.getDbName(),
-                re.getTableName(), re.getFilterString());
-            HCatInputFormat.setInput(job, jobInfo);
+            HCatInputFormat.setInput(job.getConfiguration(),
+                    re.getDbName(), re.getTableName(), re.getFilterString(), null);
             HCatInputFormat hcif = new HCatInputFormat();
             ReaderContext cntxt = new ReaderContext();
             cntxt.setInputSplits(hcif.getSplits(
