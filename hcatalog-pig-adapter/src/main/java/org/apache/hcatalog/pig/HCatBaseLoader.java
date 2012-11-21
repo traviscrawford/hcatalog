@@ -46,7 +46,7 @@ import org.apache.pig.impl.util.UDFContext;
  * Base class for HCatLoader and HCatEximLoader
  */
 
-public abstract class HCatBaseLoader extends LoadFunc implements LoadMetadata, LoadPushDown {
+abstract class HCatBaseLoader extends LoadFunc implements LoadMetadata, LoadPushDown {
 
     protected static final String PRUNE_PROJECTION_INFO = "prune.projection.info";
 
@@ -135,8 +135,11 @@ public abstract class HCatBaseLoader extends LoadFunc implements LoadMetadata, L
                 if (p.getFileSystem(conf).isFile(p)) {
                     sizeInBytes += p.getFileSystem(conf).getFileStatus(p).getLen();
                 } else {
-                    for (FileStatus child : p.getFileSystem(conf).listStatus(p)) {
-                        sizeInBytes += child.getLen();
+                    FileStatus[] fileStatuses = p.getFileSystem(conf).listStatus(p);
+                    if (fileStatuses != null) {
+                        for (FileStatus child : fileStatuses) {
+                            sizeInBytes += child.getLen();
+                        }
                     }
                 }
             } catch (IOException e) {

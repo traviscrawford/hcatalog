@@ -44,6 +44,22 @@ Trunk (unreleased changes)
   HCAT-427 Document storage-based authorization (lefty via gates)
 
   IMPROVEMENTS
+  HCAT-530 HCatBaseLoader.getSizeInBytes NPE when partition path is missing (traviscrawford)
+
+  HCAT-518 Refactor hcatalog-core as subproject (traviscrawford and toffer)
+
+  HCAT-548 Move topic creation in NotificationListener to a separate method (amalakar via avandana)
+
+  HCAT-538 HCatalogStorer fails for 100GB of data with dynamic partitioning, number of partition is 300 (amalakar via toffer)
+
+  HCAT-532 HiveClientCache shutdown hook should log at debug level (traviscrawford)
+
+  HCAT-528 ivysettings.xml does not let you override .m2/repository or ivy.cache.dir setting (raja@cmbasics.com via traviscrawford)
+
+  HCAT-516 HCOF should use less generic parameters (nitay via traviscrawford)
+
+  HCAT-525 Remove dead classes from HCatalog Source Tree (amalakar via traviscrawford)
+
   HCAT-521 Ignore .reviewboardrc in git (nitay via traviscrawford)
 
   HCAT-519 Migrate pig-adapter/webhcat to maven dependencies and continue build cleanup (traviscrawford)
