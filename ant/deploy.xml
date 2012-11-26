@@ -46,7 +46,7 @@
                  uri="artifact:org.apache.maven.artifact.ant"
                  classpath="${path.to.basedir}/build/maven-ant-tasks-${maven-ant-tasks.version}.jar"/>
         <artifact:pom id="mvn.pom" file="pom.xml">
-            <profile id="${_mvn.profile}"/>
+            <profile id="${_mvn.hadoop.profile}"/>
         </artifact:pom>
         <property name="mvn-init.complete" value="true"/>
     </target>

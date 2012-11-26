@@ -12,7 +12,7 @@ function run_cmd() {
 umask 0022
 
 # Build with hadoop23, but do not run tests as they do not pass.
-cmd='ant clean package -Dmvn.profile=hadoop23'
+cmd='ant clean package -Dmvn.hadoop.profile=hadoop23'
 run_cmd
 
 # Build and run tests with hadoop20. This must happen afterwards so test results
