@@ -51,7 +51,6 @@
     <property name="rat.reporting.classname" value="rat.Report"/>
 
     <target name="init">
-        <fail message="Required property 'mvn.profile' not set!" unless="mvn.profile"/>
         <mkdir dir="${dist.dir}"/>
     </target>
 

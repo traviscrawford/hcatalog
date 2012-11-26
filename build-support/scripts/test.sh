@@ -17,6 +17,6 @@ run_cmd
 
 # Build and run tests with hadoop20. This must happen afterwards so test results
 # are available for CI to publish.
-cmd='ant clean package test -Dtest.junit.output.format=xml -Dmvn.profile=hadoop20'
+cmd='ant clean package test -Dtest.junit.output.format=xml'
 run_cmd
 
