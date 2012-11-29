@@ -27,8 +27,6 @@ import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
 
-import javax.annotation.Nullable;
-
 /**
  * The InputFormat to use to read data from HCatalog.
  */
@@ -36,58 +34,101 @@ import javax.annotation.Nullable;
 @InterfaceStability.Evolving
 public class HCatInputFormat extends HCatBaseInputFormat {
 
+    private Configuration conf;
+    private InputJobInfo inputJobInfo;
+
     /**
-     * @deprecated As of release 0.5, replaced by
-     * {@link #setInput(Configuration, String, String, String, Properties)}
-     * Will be removed in a future release.
+     * @deprecated as of release 0.5, and will be removed in a future release
      */
     @Deprecated
     public static void setInput(Job job, InputJobInfo inputJobInfo) throws IOException {
-        setInput(job.getConfiguration(),
-            inputJobInfo.getDatabaseName(),
-            inputJobInfo.getTableName(),
-            inputJobInfo.getFilter(),
-            inputJobInfo.getProperties());
+        setInput(job.getConfiguration(), inputJobInfo);
     }
 
     /**
-     * @deprecated As of release 0.5, replaced by
-     * {@link #setInput(Configuration, String, String, String, Properties)}.
-     * Will be removed in a future release.
+     * @deprecated as of release 0.5, and will be removed in a future release
      */
     @Deprecated
-    public static void setInput(Configuration conf, InputJobInfo inputJobInfo)
-        throws IOException {
-        try {
-            InitializeInput.setInput(conf, inputJobInfo);
-        } catch (Exception e) {
-            throw new IOException(e);
-        }
+    public static void setInput(Configuration conf, InputJobInfo inputJobInfo) throws IOException {
+        setInput(conf, inputJobInfo.getDatabaseName(), inputJobInfo.getTableName())
+            .setFilter(inputJobInfo.getFilter())
+            .setProperties(inputJobInfo.getProperties());
+    }
+
+    /**
+     * See {@link #setInput(org.apache.hadoop.conf.Configuration, String, String)}
+     */
+    public static HCatInputFormat setInput(Job job, String dbName, String tableName) throws IOException {
+        return setInput(job.getConfiguration(), dbName, tableName);
     }
 
     /**
      * Set inputs to use for the job. This queries the metastore with the given input
      * specification and serializes matching partitions into the job conf for use by MR tasks.
-     *
      * @param conf the job configuration
      * @param dbName database name
      * @param tableName table name
-     * @param filter filter specification
-     * @param properties properties for the input specification
      * @throws IOException on all errors
      */
-    public static void setInput(Configuration conf, String dbName, String tableName,
-                                @Nullable String filter, @Nullable Properties properties)
+    public static HCatInputFormat setInput(Configuration conf, String dbName, String tableName)
         throws IOException {
 
-        Preconditions.checkNotNull(conf, "Required argument conf is null");
-        Preconditions.checkNotNull(dbName, "Required argument dbName is null");
-        Preconditions.checkNotNull(tableName, "Required argument tableName is null");
+        Preconditions.checkNotNull(conf, "required argument 'conf' is null");
+        Preconditions.checkNotNull(dbName, "required argument 'dbName' is null");
+        Preconditions.checkNotNull(tableName, "required argument 'tableName' is null");
+
+        HCatInputFormat hCatInputFormat = new HCatInputFormat();
+        hCatInputFormat.conf = conf;
+        hCatInputFormat.inputJobInfo = InputJobInfo.create(dbName, tableName, null, null);
 
         try {
-            InitializeInput.setInput(conf, InputJobInfo.create(dbName, tableName, filter, properties));
+            InitializeInput.setInput(conf, hCatInputFormat.inputJobInfo);
         } catch (Exception e) {
             throw new IOException(e);
         }
+
+        return hCatInputFormat;
+    }
+
+    /**
+     * Set a filter on the input table.
+     * @param filter the filter specification
+     * @return this
+     * @throws IOException on all errors
+     */
+    public HCatInputFormat setFilter(String filter) throws IOException {
+        Preconditions.checkNotNull(filter, "required argument 'filter' is null");
+        inputJobInfo = InputJobInfo.create(
+            inputJobInfo.getDatabaseName(),
+            inputJobInfo.getTableName(),
+            filter,
+            inputJobInfo.getProperties());
+        try {
+            InitializeInput.setInput(conf, inputJobInfo);
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+        return this;
+    }
+
+    /**
+     * Set properties for the input format.
+     * @param properties properties for the input specification
+     * @return this
+     * @throws IOException on all errors
+     */
+    public HCatInputFormat setProperties(Properties properties) throws IOException {
+        Preconditions.checkNotNull(properties, "required argument 'properties' is null");
+        inputJobInfo = InputJobInfo.create(
+            inputJobInfo.getDatabaseName(),
+            inputJobInfo.getTableName(),
+            inputJobInfo.getFilter(),
+            properties);
+        try {
+            InitializeInput.setInput(conf, inputJobInfo);
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+        return this;
     }
 }

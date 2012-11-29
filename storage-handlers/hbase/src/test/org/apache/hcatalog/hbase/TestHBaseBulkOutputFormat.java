@@ -591,7 +591,7 @@ public class TestHBaseBulkOutputFormat extends SkeletonHBaseTest {
         job.setJarByClass(this.getClass());
         job.setMapperClass(MapReadAbortedTransaction.class);
         job.setInputFormatClass(HCatInputFormat.class);
-        HCatInputFormat.setInput(job.getConfiguration(), databaseName, tableName, null, null);
+        HCatInputFormat.setInput(job, databaseName, tableName);
         job.setOutputFormatClass(TextOutputFormat.class);
         TextOutputFormat.setOutputPath(job, outputDir);
         job.setMapOutputKeyClass(BytesWritable.class);
