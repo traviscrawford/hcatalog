@@ -59,7 +59,6 @@ public class HCatInputFormatReader extends HCatReader {
 
     @Override
     public ReaderContext prepareRead() throws HCatException {
-
         try {
             Job job = new Job(conf);
             HCatInputFormat hcif = HCatInputFormat.setInput(

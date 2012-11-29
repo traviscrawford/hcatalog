@@ -66,7 +66,7 @@ public class HCatInputFormat extends HCatBaseInputFormat {
      * Set inputs to use for the job. This queries the metastore with the given input
      * specification and serializes matching partitions into the job conf for use by MR tasks.
      * @param conf the job configuration
-     * @param dbName database name
+     * @param dbName database name, which if null 'default' is used
      * @param tableName table name
      * @throws IOException on all errors
      */
@@ -74,7 +74,6 @@ public class HCatInputFormat extends HCatBaseInputFormat {
         throws IOException {
 
         Preconditions.checkNotNull(conf, "required argument 'conf' is null");
-        Preconditions.checkNotNull(dbName, "required argument 'dbName' is null");
         Preconditions.checkNotNull(tableName, "required argument 'tableName' is null");
 
         HCatInputFormat hCatInputFormat = new HCatInputFormat();
@@ -92,21 +91,23 @@ public class HCatInputFormat extends HCatBaseInputFormat {
 
     /**
      * Set a filter on the input table.
-     * @param filter the filter specification
+     * @param filter the filter specification, which may be null
      * @return this
      * @throws IOException on all errors
      */
     public HCatInputFormat setFilter(String filter) throws IOException {
-        Preconditions.checkNotNull(filter, "required argument 'filter' is null");
-        inputJobInfo = InputJobInfo.create(
-            inputJobInfo.getDatabaseName(),
-            inputJobInfo.getTableName(),
-            filter,
-            inputJobInfo.getProperties());
-        try {
-            InitializeInput.setInput(conf, inputJobInfo);
-        } catch (Exception e) {
-            throw new IOException(e);
+        // null filters are supported to simplify client code
+        if (filter != null) {
+            inputJobInfo = InputJobInfo.create(
+                inputJobInfo.getDatabaseName(),
+                inputJobInfo.getTableName(),
+                filter,
+                inputJobInfo.getProperties());
+            try {
+                InitializeInput.setInput(conf, inputJobInfo);
+            } catch (Exception e) {
+                throw new IOException(e);
+            }
         }
         return this;
     }
