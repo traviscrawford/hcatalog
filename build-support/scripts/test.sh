@@ -11,6 +11,14 @@ function run_cmd() {
 
 umask 0022
 
+cmd='ant clean src-release'
+run_cmd
+
+cd build
+tar -xzvf hcatalog-src-*.tar.gz
+cd hcatalog-src-*
+echo "Running tests from $(pwd)"
+
 # Build with hadoop23, but do not run tests as they do not pass.
 cmd='ant clean package -Dmvn.hadoop.profile=hadoop23'
 run_cmd

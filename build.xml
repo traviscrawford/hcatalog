@@ -369,6 +369,8 @@
         <tar compression="gzip" longfile="gnu"
              destfile="${build.dir}/${ant.project.name}-src-${hcatalog.version}.tar.gz">
             <tarfileset dir="${basedir}" mode="644" prefix="${ant.project.name}-src-${hcatalog.version}">
+                <include name="build-support/**"/>
+                <exclude name="build-support/scripts/**"/>
                 <include name="conf/**"/>
                 <include name="core/**"/>
                 <include name="hcatalog-pig-adapter/**"/>
@@ -378,13 +380,15 @@
                 <include name="shims/**"/>
                 <include name="src/**"/>
                 <include name="storage-handlers/**"/>
+                <include name="*.properties"/>
                 <include name="*.txt"/>
                 <include name="*.xml"/>
                 <include name="KEYS"/>
             </tarfileset>
-            <tarfileset dir="" mode="755" prefix="${ant.project.name}-src-${hcatalog.version}">
-                <include name="scripts/**"/>
+            <tarfileset dir="${basedir}" mode="755" prefix="${ant.project.name}-src-${hcatalog.version}">
                 <include name="bin/**"/>
+                <include name="build-support/scripts/**"/>
+                <include name="scripts/**"/>
             </tarfileset>
         </tar>
     </target>
@@ -424,8 +428,8 @@
         <ant dir="${test.e2e.dir}" target="deploy"/>
     </target>
 
-    <import file="ant/deploy.xml"/>
-    <import file="ant/findbugs.xml"/>
-    <import file="ant/test.xml"/>
+    <import file="build-support/ant/deploy.xml"/>
+    <import file="build-support/ant/findbugs.xml"/>
+    <import file="build-support/ant/test.xml"/>
 
 </project>
