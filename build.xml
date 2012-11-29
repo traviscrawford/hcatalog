@@ -366,8 +366,9 @@
     <!-- ================================================================== -->
     <target name="src-release" depends="clean" description="Source distribution">
         <mkdir dir="${build.dir}"/>
-        <tar compression="gzip" longfile="gnu"
-             destfile="${build.dir}/${ant.project.name}-src-${hcatalog.version}.tar.gz">
+        <property name="src-release-tarball"
+                  value="${build.dir}/${ant.project.name}-src-${hcatalog.version}.tar.gz"/>
+        <tar compression="gzip" longfile="gnu" destfile="${src-release-tarball}">
             <tarfileset dir="${basedir}" mode="644" prefix="${ant.project.name}-src-${hcatalog.version}">
                 <include name="build-support/**"/>
                 <exclude name="build-support/scripts/**"/>
@@ -391,6 +392,7 @@
                 <include name="scripts/**"/>
             </tarfileset>
         </tar>
+        <checksum file="${src-release-tarball}" forceOverwrite="yes"/>
     </target>
 
     <!-- ================================================================== -->
