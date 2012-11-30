@@ -20,9 +20,18 @@ imposed on others.
     <!-- See http://checkstyle.sf.net/config_sizes.html -->
     <module name="FileLength"/>
 
+    <!--
     <module name="Header">
         <property name="headerFile" value="build-support/checkstyle/apache_header_java.txt"/>
         <property name="fileExtensions" value="java"/>
+    </module>
+    -->
+
+    <!-- Ensure files contain the Apache source file headers -->
+    <!-- http://www.apache.org/legal/src-headers.html -->
+    <module name="RegexpHeader">
+        <property name="headerFile" value="build-support/checkstyle/apache_header.txt"/>
+        <property name="multiLines" value="1,2,3"/>
     </module>
 
     <module name="TreeWalker">
