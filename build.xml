@@ -346,12 +346,25 @@
         </chmod>
 
         <!--package storage-handlers -->
-
         <property name="handlers.dir" value="${dist.dir}/share/hcatalog/storage-handlers"/>
         <mkdir dir="${handlers.dir}"/>
         <ant target="package" dir="storage-handlers/hbase" inheritAll="false">
             <property name="dist.handlers.dir" value="${handlers.dir}"/>
         </ant>
+
+        <!--
+        While ant has a native tar task, we call out to the command-line
+        tar command because it preserves file permissions of our carefully
+        constructed package dir.
+        -->
+        <exec executable="tar">
+            <arg value="-C"/>
+            <arg value="${build.dir}"/>
+            <arg value="-czf"/>
+            <arg value="${build.dir}/${final.name}.tar.gz"/>
+            <arg value="${final.name}"/>
+        </exec>
+        <checksum file="${build.dir}/${final.name}.tar.gz" forceOverwrite="yes"/>
     </target>
 
     <target name="releaseaudit" description="Release Audit activities">
@@ -393,25 +406,6 @@
             </tarfileset>
         </tar>
         <checksum file="${src-release-tarball}" forceOverwrite="yes"/>
-    </target>
-
-    <!-- ================================================================== -->
-    <!-- Make release binary packages                                       -->
-    <!-- ================================================================== -->
-    <target name="tar" depends="package" description="Create release tarball">
-        <tar compression="gzip" longfile="gnu" destfile="${build.dir}/${final.name}.tar.gz">
-            <tarfileset dir="${build.dir}" mode="664">
-                <include name="${final.name}/**"/>
-                <exclude name="${final.name}/bin/*"/>
-                <exclude name="${final.name}/sbin/*"/>
-                <exclude name="${final.name}/share/hcatalog/scripts/*"/>
-            </tarfileset>
-            <tarfileset dir="${build.dir}" mode="755">
-                <include name="${final.name}/bin/*"/>
-                <include name="${final.name}/sbin/*"/>
-                <include name="${final.name}/share/hcatalog/scripts/*"/>
-            </tarfileset>
-        </tar>
     </target>
 
     <!-- ================================================================== -->

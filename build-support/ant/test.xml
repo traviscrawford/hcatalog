@@ -75,8 +75,7 @@
     </clover-setup>
   </target>
 
-  <target name="_test-with-clover" depends="clover-init, test"
-          description="run unit tests and generate code coverage reports">
+  <target name="_test-with-clover" depends="clover-init, test">
     <echo message="${ant.project.name}"/>
     <mkdir dir="${clover.report.dir}"/>
       <clover-report>
