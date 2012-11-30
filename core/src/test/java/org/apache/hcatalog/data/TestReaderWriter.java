@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.metastore.MetaStoreUtils;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.ql.CommandNeedRetryException;
 import org.apache.hadoop.mapreduce.InputSplit;
@@ -111,8 +110,7 @@ public class TestReaderWriter extends HCatBaseTest {
 
     private ReaderContext runsInMaster(Map<String, String> config, boolean bogus)
         throws HCatException {
-        ReadEntity entity = new ReadEntity.Builder()
-            .withDatabase(MetaStoreUtils.DEFAULT_DATABASE_NAME).withTable("mytbl").build();
+        ReadEntity entity = new ReadEntity.Builder().withTable("mytbl").build();
         HCatReader reader = DataTransferFactory.getHCatReader(entity, config);
         ReaderContext cntxt = reader.prepareRead();
         return cntxt;
