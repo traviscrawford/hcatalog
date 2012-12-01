@@ -1,5 +1,5 @@
 ^#!
-^<\?xml.*>$
+^<\?(xml|xml-stylesheet).*>$
 ^\W*$
 ^\W*Licensed to the Apache Software Foundation \(ASF\) under one$
 ^\W*or more contributor license agreements.  See the NOTICE file$

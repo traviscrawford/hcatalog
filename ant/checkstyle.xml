@@ -35,9 +35,12 @@
           <exclude name="**/license/*-LICENSE.txt"/>
           <exclude name="build-support/checkstyle/apache_header.txt"/>
           <exclude name="src/docs/src/documentation/**"/>
-          <exclude name="src/packages/**"/> <!-- I think this can be deleted -->
-          <!-- data files that cannot have headers -->
+          <exclude name="src/packages/**"/> <!-- TODO: delete packages configs -->
           <exclude name="src/test/e2e/hcatalog/data/**"/>
+          <exclude name="src/test/e2e/templeton/inpdir/nums.txt"/>
+          <exclude name="storage-handlers/hbase/src/gen-java/**"/>
+          <exclude name="storage-handlers/hbase/src/test/all-tests"/>
+          <exclude name="storage-handlers/hbase/src/test/excluded-tests"/>
           <exclude name="KEYS"/>
           <exclude name="LICENSE.txt"/>
           <exclude name="NOTICE.txt"/>

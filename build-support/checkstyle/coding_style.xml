@@ -51,7 +51,7 @@ imposed on others.
     <!-- http://www.apache.org/legal/src-headers.html -->
     <module name="RegexpHeader">
         <property name="headerFile" value="build-support/checkstyle/apache_header.txt"/>
-        <property name="multiLines" value="1,2,3"/>
+        <property name="multiLines" value="1,2,3,4"/>
     </module>
 
     <module name="TreeWalker">
