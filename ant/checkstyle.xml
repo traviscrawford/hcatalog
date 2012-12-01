@@ -1,35 +1,48 @@
 <?xml version="1.0"?>
 
 <!--
-  Licensed to the Apache Software Foundation (ASF) under one or more
-  contributor license agreements.  See the NOTICE file distributed with
-  this work for additional information regarding copyright ownership.
-  The ASF licenses this file to You under the Apache License, Version 2.0
-  (the "License"); you may not use this file except in compliance with
-  the License.  You may obtain a copy of the License at
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+        http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
 -->
 
 <project xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
 
   <target name="checkstyle-init">
-    <taskdef resource="checkstyletask.properties" classpathref="test.class.path"/>
+    <taskdef resource="checkstyletask.properties" classpathref="checkstyle.class.path"/>
     <mkdir dir="${build.dir}/checkstyle"/>
   </target>
 
   <target name="checkstyle" depends="checkstyle-init" description="run checkstyle">
     <echo message="${ant.project.name}"/>
-    <checkstyle classpathref="test.class.path"
+    <checkstyle classpathref="checkstyle.class.path"
                 config="${path.to.basedir}/build-support/checkstyle/coding_style.xml">
       <fileset dir="${basedir}">
           <exclude name="**/build/**"/>
+          <exclude name="**/license/*-LICENSE.txt"/>
+          <exclude name="build-support/checkstyle/apache_header.txt"/>
+          <exclude name="src/docs/src/documentation/**"/>
+          <exclude name="src/packages/**"/> <!-- I think this can be deleted -->
+          <!-- data files that cannot have headers -->
+          <exclude name="src/test/e2e/hcatalog/data/**"/>
+          <exclude name="KEYS"/>
+          <exclude name="LICENSE.txt"/>
+          <exclude name="NOTICE.txt"/>
+          <exclude name="README.txt"/>
+          <exclude name="RELEASE_NOTES.txt"/>
       </fileset>
       <formatter type="plain"/>
       <formatter type="xml" toFile="${build.dir}/checkstyle/checkstyle_result.xml"/>
