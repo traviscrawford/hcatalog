@@ -69,9 +69,6 @@
     <property name="test.output" value="no"/>
     <property name="hive.conf.dir" value="${hive.root}/conf"/>
 
-    <!-- rats properties -->
-    <property name="rat.reporting.classname" value="rat.Report"/>
-
     <path id="compile.class.path">
       <fileset dir="${build.dir}/lib/compile"/>
     </path>
