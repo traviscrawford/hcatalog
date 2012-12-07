@@ -45,6 +45,8 @@ import org.apache.hadoop.hive.metastore.api.UnknownPartitionException;
 import org.apache.hadoop.hive.metastore.api.UnknownTableException;
 import org.apache.hcatalog.common.HCatException;
 import org.apache.hcatalog.common.HCatUtil;
+import org.apache.hcatalog.data.schema.HCatFieldSchema;
+import org.apache.hcatalog.data.schema.HCatSchemaUtils;
 import org.apache.thrift.TException;
 
 /**
@@ -59,7 +61,7 @@ public class HCatClientHMSImpl extends HCatClient {
 
     @Override
     public List<String> listDatabaseNamesByPattern(String pattern)
-        throws HCatException, ConnectionFailureException {
+        throws HCatException {
         List<String> dbNames = null;
         try {
             dbNames = hmsClient.getDatabases(pattern);
@@ -70,8 +72,7 @@ public class HCatClientHMSImpl extends HCatClient {
     }
 
     @Override
-    public HCatDatabase getDatabase(String dbName) throws HCatException,
-        ConnectionFailureException {
+    public HCatDatabase getDatabase(String dbName) throws HCatException {
         HCatDatabase db = null;
         try {
             Database hiveDB = hmsClient.getDatabase(checkDB(dbName));
@@ -92,8 +93,7 @@ public class HCatClientHMSImpl extends HCatClient {
     }
 
     @Override
-    public void createDatabase(HCatCreateDBDesc dbInfo) throws HCatException,
-        ConnectionFailureException {
+    public void createDatabase(HCatCreateDBDesc dbInfo) throws HCatException {
         try {
             hmsClient.createDatabase(dbInfo.toHiveDb());
         } catch (AlreadyExistsException exp) {
@@ -114,14 +114,9 @@ public class HCatClientHMSImpl extends HCatClient {
     }
 
     @Override
-    public void dropDatabase(String dbName, boolean ifExists, DROP_DB_MODE mode)
-        throws HCatException, ConnectionFailureException {
-        boolean isCascade;
-        if (mode.toString().equalsIgnoreCase("cascade")) {
-            isCascade = true;
-        } else {
-            isCascade = false;
-        }
+    public void dropDatabase(String dbName, boolean ifExists, DropDBMode mode)
+        throws HCatException {
+        boolean isCascade = mode.toString().equalsIgnoreCase("cascade");
         try {
             hmsClient.dropDatabase(checkDB(dbName), true, ifExists, isCascade);
         } catch (NoSuchObjectException e) {
@@ -142,7 +137,7 @@ public class HCatClientHMSImpl extends HCatClient {
 
     @Override
     public List<String> listTableNamesByPattern(String dbName,
-                                                String tablePattern) throws HCatException, ConnectionFailureException {
+                                                String tablePattern) throws HCatException {
         List<String> tableNames = null;
         try {
             tableNames = hmsClient.getTables(checkDB(dbName), tablePattern);
@@ -155,7 +150,7 @@ public class HCatClientHMSImpl extends HCatClient {
 
     @Override
     public HCatTable getTable(String dbName, String tableName)
-        throws HCatException, ConnectionFailureException {
+        throws HCatException {
         HCatTable table = null;
         try {
             Table hiveTable = hmsClient.getTable(checkDB(dbName), tableName);
@@ -176,11 +171,11 @@ public class HCatClientHMSImpl extends HCatClient {
 
     @Override
     public void createTable(HCatCreateTableDesc createTableDesc)
-        throws HCatException, ConnectionFailureException {
+        throws HCatException {
         try {
             hmsClient.createTable(createTableDesc.toHiveTable(hiveConfig));
         } catch (AlreadyExistsException e) {
-            if (createTableDesc.getIfNotExists() == false) {
+            if (!createTableDesc.getIfNotExists()) {
                 throw new HCatException(
                     "AlreadyExistsException while creating table.", e);
             }
@@ -202,9 +197,33 @@ public class HCatClientHMSImpl extends HCatClient {
     }
 
     @Override
+    public void updateTableSchema(String dbName, String tableName, List<HCatFieldSchema> columnSchema)
+        throws HCatException {
+        try {
+            Table table = hmsClient.getTable(dbName, tableName);
+            table.getSd().setCols(HCatSchemaUtils.getFieldSchemas(columnSchema));
+            hmsClient.alter_table(dbName, tableName, table);
+        }
+        catch (InvalidOperationException e) {
+            throw new HCatException("InvalidOperationException while updating table schema.", e);
+        }
+        catch (MetaException e) {
+            throw new HCatException("MetaException while updating table schema.", e);
+        }
+        catch (NoSuchObjectException e) {
+            throw new HCatException(
+                    "NoSuchObjectException while updating table schema.", e);
+        }
+        catch (TException e) {
+            throw new ConnectionFailureException(
+                    "TException while updating table schema.", e);
+        }
+    }
+
+    @Override
     public void createTableLike(String dbName, String existingTblName,
                                 String newTableName, boolean ifNotExists, boolean isExternal,
-                                String location) throws HCatException, ConnectionFailureException {
+                                String location) throws HCatException {
 
         Table hiveTable = getHiveTableLike(checkDB(dbName), existingTblName,
             newTableName, ifNotExists, location);
@@ -237,7 +256,7 @@ public class HCatClientHMSImpl extends HCatClient {
 
     @Override
     public void dropTable(String dbName, String tableName, boolean ifExists)
-        throws HCatException, ConnectionFailureException {
+        throws HCatException {
         try {
             hmsClient.dropTable(checkDB(dbName), tableName, true, ifExists);
         } catch (NoSuchObjectException e) {
@@ -255,7 +274,7 @@ public class HCatClientHMSImpl extends HCatClient {
 
     @Override
     public void renameTable(String dbName, String oldName, String newName)
-        throws HCatException, ConnectionFailureException {
+        throws HCatException {
         Table tbl;
         try {
             Table oldtbl = hmsClient.getTable(checkDB(dbName), oldName);
@@ -287,7 +306,7 @@ public class HCatClientHMSImpl extends HCatClient {
 
     @Override
     public List<HCatPartition> getPartitions(String dbName, String tblName)
-        throws HCatException, ConnectionFailureException {
+        throws HCatException {
         List<HCatPartition> hcatPtns = new ArrayList<HCatPartition>();
         try {
             List<Partition> hivePtns = hmsClient.listPartitions(
@@ -310,8 +329,7 @@ public class HCatClientHMSImpl extends HCatClient {
 
     @Override
     public HCatPartition getPartition(String dbName, String tableName,
-                                      Map<String, String> partitionSpec) throws HCatException,
-        ConnectionFailureException {
+                                      Map<String, String> partitionSpec) throws HCatException {
         HCatPartition partition = null;
         try {
             ArrayList<String> ptnValues = new ArrayList<String>();
@@ -336,7 +354,7 @@ public class HCatClientHMSImpl extends HCatClient {
 
     @Override
     public void addPartition(HCatAddPartitionDesc partInfo)
-        throws HCatException, ConnectionFailureException {
+        throws HCatException {
         Table tbl = null;
         try {
             tbl = hmsClient.getTable(partInfo.getDatabaseName(),
@@ -368,7 +386,7 @@ public class HCatClientHMSImpl extends HCatClient {
     @Override
     public void dropPartition(String dbName, String tableName,
                               Map<String, String> partitionSpec, boolean ifExists)
-        throws HCatException, ConnectionFailureException {
+        throws HCatException {
         try {
             List<String> ptnValues = new ArrayList<String>();
             ptnValues.addAll(partitionSpec.values());
@@ -390,8 +408,7 @@ public class HCatClientHMSImpl extends HCatClient {
 
     @Override
     public List<HCatPartition> listPartitionsByFilter(String dbName,
-                                                      String tblName, String filter) throws HCatException,
-        ConnectionFailureException {
+                                                      String tblName, String filter) throws HCatException {
         List<HCatPartition> hcatPtns = new ArrayList<HCatPartition>();
         try {
             List<Partition> hivePtns = hmsClient.listPartitionsByFilter(
@@ -415,7 +432,7 @@ public class HCatClientHMSImpl extends HCatClient {
     @Override
     public void markPartitionForEvent(String dbName, String tblName,
                                       Map<String, String> partKVs, PartitionEventType eventType)
-        throws HCatException, ConnectionFailureException {
+        throws HCatException {
         try {
             hmsClient.markPartitionForEvent(checkDB(dbName), tblName, partKVs,
                 eventType);
@@ -450,7 +467,7 @@ public class HCatClientHMSImpl extends HCatClient {
     @Override
     public boolean isPartitionMarkedForEvent(String dbName, String tblName,
                                              Map<String, String> partKVs, PartitionEventType eventType)
-        throws HCatException, ConnectionFailureException {
+        throws HCatException {
         boolean isMarked = false;
         try {
             isMarked = hmsClient.isPartitionMarkedForEvent(checkDB(dbName),
@@ -486,8 +503,7 @@ public class HCatClientHMSImpl extends HCatClient {
 
     @Override
     public String getDelegationToken(String owner,
-                                     String renewerKerberosPrincipalName) throws HCatException,
-        ConnectionFailureException {
+                                     String renewerKerberosPrincipalName) throws HCatException {
         String token = null;
         try {
             token = hmsClient.getDelegationToken(owner,
@@ -504,8 +520,7 @@ public class HCatClientHMSImpl extends HCatClient {
     }
 
     @Override
-    public long renewDelegationToken(String tokenStrForm) throws HCatException,
-        ConnectionFailureException {
+    public long renewDelegationToken(String tokenStrForm) throws HCatException {
         long time = 0;
         try {
             time = hmsClient.renewDelegationToken(tokenStrForm);
@@ -522,7 +537,7 @@ public class HCatClientHMSImpl extends HCatClient {
 
     @Override
     public void cancelDelegationToken(String tokenStrForm)
-        throws HCatException, ConnectionFailureException {
+        throws HCatException {
         try {
             hmsClient.cancelDelegationToken(tokenStrForm);
         } catch (MetaException e) {
@@ -542,8 +557,7 @@ public class HCatClientHMSImpl extends HCatClient {
      * Configuration)
      */
     @Override
-    void initialize(Configuration conf) throws HCatException,
-        ConnectionFailureException {
+    void initialize(Configuration conf) throws HCatException {
         this.config = conf;
         try {
             hiveConfig = HCatUtil.getHiveConf(config);
@@ -560,7 +574,7 @@ public class HCatClientHMSImpl extends HCatClient {
 
     private Table getHiveTableLike(String dbName, String existingTblName,
                                    String newTableName, boolean isExternal, String location)
-        throws HCatException, ConnectionFailureException {
+        throws HCatException {
         Table oldtbl = null;
         Table newTable = null;
         try {
@@ -627,7 +641,7 @@ public class HCatClientHMSImpl extends HCatClient {
      */
     @Override
     public int addPartitions(List<HCatAddPartitionDesc> partInfoList)
-        throws HCatException, ConnectionFailureException {
+        throws HCatException {
         int numPartitions = -1;
         if ((partInfoList == null) || (partInfoList.size() == 0)) {
             throw new HCatException("The partition list is null or empty.");
