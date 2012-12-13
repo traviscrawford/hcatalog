@@ -27,6 +27,8 @@ import org.apache.hcatalog.cli.SemanticAnalysis.HCatSemanticAnalyzer;
 
 public class JavaAction {
 
+    private JavaAction() {}
+
     public static void main(String[] args) throws Exception {
 
         HiveConf conf = new HiveConf();

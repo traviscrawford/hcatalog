@@ -40,6 +40,9 @@ import org.apache.hadoop.util.StringUtils;
  * General utility methods.
  */
 public class TempletonUtils {
+
+    private TempletonUtils() {}
+
     /**
      * Is the object non-empty?
      */

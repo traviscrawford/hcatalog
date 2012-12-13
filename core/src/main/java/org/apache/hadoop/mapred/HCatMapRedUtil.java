@@ -24,6 +24,8 @@ import org.apache.hcatalog.shims.HCatHadoopShims;
 
 public class HCatMapRedUtil {
 
+    private HCatMapRedUtil() {}
+
     public static TaskAttemptContext createTaskAttemptContext(org.apache.hadoop.mapreduce.TaskAttemptContext context) {
         return  createTaskAttemptContext(new JobConf(context.getConfiguration()),
                                                             org.apache.hadoop.mapred.TaskAttemptID.forName(context.getTaskAttemptID().toString()),

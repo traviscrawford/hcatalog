@@ -38,6 +38,8 @@ public class HCatDataCheckUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(HCatDataCheckUtil.class);
 
+    private HCatDataCheckUtil() {}
+
     public static Driver instantiateDriver(MiniCluster cluster) {
         HiveConf hiveConf = new HiveConf(HCatDataCheckUtil.class);
         for (Entry e : cluster.getProperties().entrySet()) {

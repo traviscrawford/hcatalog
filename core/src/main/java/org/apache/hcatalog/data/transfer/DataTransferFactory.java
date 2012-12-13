@@ -34,6 +34,8 @@ import org.apache.hcatalog.data.transfer.state.StateProvider;
 
 public class DataTransferFactory {
 
+    private DataTransferFactory() {}
+
     /**
      * This should be called once from master node to obtain an instance of
      * {@link HCatReader}.

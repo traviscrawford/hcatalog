@@ -38,6 +38,8 @@ import org.apache.hcatalog.data.schema.HCatFieldSchema.Type;
 
 public class HCatSchemaUtils {
 
+    private HCatSchemaUtils() {}
+
     public static CollectionBuilder getStructSchemaBuilder() {
         return new CollectionBuilder();
     }

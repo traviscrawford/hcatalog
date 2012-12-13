@@ -79,6 +79,8 @@ public class HCatUtil {
     private static volatile HiveClientCache hiveClientCache;
     private final static int DEFAULT_HIVE_CACHE_EXPIRY_TIME_SECONDS = 2 * 60;
 
+    private HCatUtil() {}
+
     public static boolean checkJobContextIfRunningFromBackend(JobContext j) {
         if (j.getConfiguration().get("mapred.task.id", "").equals("")) {
             return false;

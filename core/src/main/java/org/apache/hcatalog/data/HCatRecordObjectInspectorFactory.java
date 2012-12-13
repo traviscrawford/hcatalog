@@ -45,6 +45,8 @@ public class HCatRecordObjectInspectorFactory {
     static HashMap<TypeInfo, ObjectInspector> cachedObjectInspectors =
         new HashMap<TypeInfo, ObjectInspector>();
 
+    private HCatRecordObjectInspectorFactory() {}
+
     /**
      * Returns HCatRecordObjectInspector given a StructTypeInfo type definition for the record to look into
      * @param typeInfo Type definition for the record to look into

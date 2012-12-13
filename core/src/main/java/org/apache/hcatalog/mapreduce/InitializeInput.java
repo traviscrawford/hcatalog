@@ -49,6 +49,8 @@ public class InitializeInput {
 
     private static final Logger LOG = LoggerFactory.getLogger(InitializeInput.class);
 
+    private InitializeInput() {}
+
     /**
      * @see org.apache.hcatalog.mapreduce.InitializeInput#setInput(org.apache.hadoop.conf.Configuration, InputJobInfo)
      */

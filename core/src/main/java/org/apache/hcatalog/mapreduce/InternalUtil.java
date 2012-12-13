@@ -58,6 +58,8 @@ import java.util.Properties;
 class InternalUtil {
     private static final Logger LOG = LoggerFactory.getLogger(InternalUtil.class);
 
+    private InternalUtil() {}
+
     static StorerInfo extractStorerInfo(StorageDescriptor sd, Map<String, String> properties) throws IOException {
         Properties hcatProperties = new Properties();
         for (String key : properties.keySet()) {

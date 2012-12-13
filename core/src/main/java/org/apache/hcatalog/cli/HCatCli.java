@@ -53,6 +53,8 @@ import org.apache.hcatalog.common.HCatUtil;
 
 public class HCatCli {
 
+    private HCatCli() {}
+
     @SuppressWarnings("static-access")
     public static void main(String[] args) {
 

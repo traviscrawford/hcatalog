@@ -48,6 +48,8 @@ public class HcatTestUtils {
     public static FsPermission perm500 = FsPermission.createImmutable((short) 0500); // -r-x------
     public static FsPermission perm555 = FsPermission.createImmutable((short) 0555); // -r-xr-xr-x
 
+    private HcatTestUtils() {}
+
     /**
      * Returns the database path.
      */
