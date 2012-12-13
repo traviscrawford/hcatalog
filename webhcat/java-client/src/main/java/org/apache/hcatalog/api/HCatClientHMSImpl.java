@@ -42,6 +42,7 @@ import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.UnknownDBException;
 import org.apache.hadoop.hive.metastore.api.UnknownPartitionException;
 import org.apache.hadoop.hive.metastore.api.UnknownTableException;
+import org.apache.hcatalog.common.HCatConstants;
 import org.apache.hcatalog.common.HCatException;
 import org.apache.hcatalog.common.HCatUtil;
 import org.apache.hcatalog.data.schema.HCatFieldSchema;
@@ -79,7 +80,7 @@ public class HCatClientHMSImpl extends HCatClient {
                 db = new HCatDatabase(hiveDB);
             }
         } catch (NoSuchObjectException exp) {
-            throw new HCatException(
+            throw new ObjectNotFoundException(
                 "NoSuchObjectException while fetching database", exp);
         } catch (MetaException exp) {
             throw new HCatException("MetaException while fetching database",
@@ -120,7 +121,7 @@ public class HCatClientHMSImpl extends HCatClient {
             hmsClient.dropDatabase(checkDB(dbName), true, ifExists, isCascade);
         } catch (NoSuchObjectException e) {
             if (!ifExists) {
-                throw new HCatException(
+                throw new ObjectNotFoundException(
                     "NoSuchObjectException while dropping db.", e);
             }
         } catch (InvalidOperationException e) {
@@ -162,7 +163,7 @@ public class HCatClientHMSImpl extends HCatClient {
             throw new ConnectionFailureException(
                 "TException while fetching table.", e);
         } catch (NoSuchObjectException e) {
-            throw new HCatException(
+            throw new ObjectNotFoundException(
                 "NoSuchObjectException while fetching table.", e);
         }
         return table;
@@ -184,7 +185,7 @@ public class HCatClientHMSImpl extends HCatClient {
         } catch (MetaException e) {
             throw new HCatException("MetaException while creating table.", e);
         } catch (NoSuchObjectException e) {
-            throw new HCatException(
+            throw new ObjectNotFoundException(
                 "NoSuchObjectException while creating table.", e);
         } catch (TException e) {
             throw new ConnectionFailureException(
@@ -210,7 +211,7 @@ public class HCatClientHMSImpl extends HCatClient {
             throw new HCatException("MetaException while updating table schema.", e);
         }
         catch (NoSuchObjectException e) {
-            throw new HCatException(
+            throw new ObjectNotFoundException(
                     "NoSuchObjectException while updating table schema.", e);
         }
         catch (TException e) {
@@ -243,7 +244,7 @@ public class HCatClientHMSImpl extends HCatClient {
                 throw new HCatException(
                     "MetaException in create table like command.", e);
             } catch (NoSuchObjectException e) {
-                throw new HCatException(
+                throw new ObjectNotFoundException(
                     "NoSuchObjectException in create table like command.",
                     e);
             } catch (TException e) {
@@ -260,7 +261,7 @@ public class HCatClientHMSImpl extends HCatClient {
             hmsClient.dropTable(checkDB(dbName), tableName, true, ifExists);
         } catch (NoSuchObjectException e) {
             if (!ifExists) {
-                throw new HCatException(
+                throw new ObjectNotFoundException(
                     "NoSuchObjectException while dropping table.", e);
             }
         } catch (MetaException e) {
@@ -295,7 +296,7 @@ public class HCatClientHMSImpl extends HCatClient {
             throw new ConnectionFailureException(
                 "TException while renaming table", e);
         } catch (NoSuchObjectException e) {
-            throw new HCatException(
+            throw new ObjectNotFoundException(
                 "NoSuchObjectException while renaming table", e);
         } catch (InvalidOperationException e) {
             throw new HCatException(
@@ -314,7 +315,7 @@ public class HCatClientHMSImpl extends HCatClient {
                 hcatPtns.add(new HCatPartition(ptn));
             }
         } catch (NoSuchObjectException e) {
-            throw new HCatException(
+            throw new ObjectNotFoundException(
                 "NoSuchObjectException while retrieving partition.", e);
         } catch (MetaException e) {
             throw new HCatException(
@@ -345,7 +346,7 @@ public class HCatClientHMSImpl extends HCatClient {
             throw new ConnectionFailureException(
                 "TException while retrieving partition.", e);
         } catch (NoSuchObjectException e) {
-            throw new HCatException(
+            throw new ObjectNotFoundException(
                 "NoSuchObjectException while retrieving partition.", e);
         }
         return partition;
@@ -377,7 +378,7 @@ public class HCatClientHMSImpl extends HCatClient {
             throw new ConnectionFailureException(
                 "TException while adding partition.", e);
         } catch (NoSuchObjectException e) {
-            throw new HCatException("The table " + partInfo.getTableName()
+            throw new ObjectNotFoundException("The table " + partInfo.getTableName()
                 + " is could not be found.", e);
         }
     }
@@ -393,7 +394,7 @@ public class HCatClientHMSImpl extends HCatClient {
                 ifExists);
         } catch (NoSuchObjectException e) {
             if (!ifExists) {
-                throw new HCatException(
+                throw new ObjectNotFoundException(
                     "NoSuchObjectException while dropping partition.", e);
             }
         } catch (MetaException e) {
@@ -419,7 +420,7 @@ public class HCatClientHMSImpl extends HCatClient {
             throw new HCatException("MetaException while fetching partitions.",
                 e);
         } catch (NoSuchObjectException e) {
-            throw new HCatException(
+            throw new ObjectNotFoundException(
                 "NoSuchObjectException while fetching partitions.", e);
         } catch (TException e) {
             throw new ConnectionFailureException(
@@ -439,7 +440,7 @@ public class HCatClientHMSImpl extends HCatClient {
             throw new HCatException(
                 "MetaException while marking partition for event.", e);
         } catch (NoSuchObjectException e) {
-            throw new HCatException(
+            throw new ObjectNotFoundException(
                 "NoSuchObjectException while marking partition for event.",
                 e);
         } catch (UnknownTableException e) {
@@ -475,7 +476,7 @@ public class HCatClientHMSImpl extends HCatClient {
             throw new HCatException(
                 "MetaException while checking partition for event.", e);
         } catch (NoSuchObjectException e) {
-            throw new HCatException(
+            throw new ObjectNotFoundException(
                 "NoSuchObjectException while checking partition for event.",
                 e);
         } catch (UnknownTableException e) {
@@ -585,7 +586,7 @@ public class HCatClientHMSImpl extends HCatClient {
             throw new ConnectionFailureException(
                 "TException while retrieving existing table.", e1);
         } catch (NoSuchObjectException e1) {
-            throw new HCatException(
+            throw new ObjectNotFoundException(
                 "NoSuchObjectException while retrieving existing table.",
                 e1);
         }
@@ -667,11 +668,26 @@ public class HCatClientHMSImpl extends HCatClient {
             throw new ConnectionFailureException(
                 "TException while adding partition.", e);
         } catch (NoSuchObjectException e) {
-            throw new HCatException("The table "
+            throw new ObjectNotFoundException("The table "
                 + partInfoList.get(0).getTableName()
                 + " is could not be found.", e);
         }
         return numPartitions;
+    }
+
+    @Override
+    public String getMessageBusTopicName(String dbName, String tableName) throws HCatException {
+        try {
+            return hmsClient.getTable(dbName, tableName).getParameters().get(HCatConstants.HCAT_MSGBUS_TOPIC_NAME);
+        }
+        catch (MetaException e) {
+            throw new HCatException("MetaException while retrieving JMS Topic name.", e);
+        } catch (TException e) {
+            throw new ConnectionFailureException(
+                    "TException while retrieving JMS Topic name.", e);
+        } catch (NoSuchObjectException e) {
+            throw new HCatException("Could not find DB:" + dbName + " or Table:" + tableName, e);
+        }
     }
 
 }
