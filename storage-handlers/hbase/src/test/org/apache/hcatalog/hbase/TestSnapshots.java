@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -38,7 +39,7 @@ import org.apache.hcatalog.cli.SemanticAnalysis.HCatSemanticAnalyzer;
 import org.apache.hcatalog.common.HCatConstants;
 import org.apache.hcatalog.common.HCatUtil;
 import org.apache.hcatalog.hbase.snapshot.TableSnapshot;
-import org.apache.hcatalog.mapreduce.InitializeInput;
+import org.apache.hcatalog.mapreduce.HCatInputFormat;
 import org.apache.hcatalog.mapreduce.InputJobInfo;
 import org.junit.Test;
 
@@ -88,15 +89,15 @@ public class TestSnapshots extends SkeletonHBaseTest {
         cmdResponse = hcatDriver.run(tableQuery);
         assertEquals(0, cmdResponse.getResponseCode());
 
-        InputJobInfo inputInfo = InputJobInfo.create(databaseName, tableName, null);
         Configuration conf = new Configuration(hcatConf);
         conf.set(HCatConstants.HCAT_KEY_HIVE_CONF,
             HCatUtil.serialize(getHiveConf().getAllProperties()));
         Job job = new Job(conf);
-        inputInfo.getProperties().setProperty(HBaseConstants.PROPERTY_TABLE_SNAPSHOT_KEY, "dummysnapshot");
-        InitializeInput.setInput(job, inputInfo);
+        Properties properties = new Properties();
+        properties.setProperty(HBaseConstants.PROPERTY_TABLE_SNAPSHOT_KEY, "dummysnapshot");
+        HCatInputFormat.setInput(job, databaseName, tableName).setProperties(properties);
         String modifiedInputInfo = job.getConfiguration().get(HCatConstants.HCAT_KEY_JOB_INFO);
-        inputInfo = (InputJobInfo) HCatUtil.deserialize(modifiedInputInfo);
+        InputJobInfo inputInfo = (InputJobInfo) HCatUtil.deserialize(modifiedInputInfo);
 
         Map<String, Long> revMap = new HashMap<String, Long>();
         revMap.put("cf1", 3L);
@@ -122,9 +123,7 @@ public class TestSnapshots extends SkeletonHBaseTest {
         revMap.clear();
         revMap.put("cf1", 3L);
         hbaseSnapshot = new TableSnapshot(fullyQualTableName, revMap, -1);
-        inputInfo = InputJobInfo.create(databaseName, tableName, null);
-        inputInfo.getProperties().setProperty(HBaseConstants.PROPERTY_TABLE_SNAPSHOT_KEY, "dummysnapshot");
-        InitializeInput.setInput(job, inputInfo);
+        HCatInputFormat.setInput(job, databaseName, tableName).setProperties(properties);
         modifiedInputInfo = job.getConfiguration().get(HCatConstants.HCAT_KEY_JOB_INFO);
         inputInfo = (InputJobInfo) HCatUtil.deserialize(modifiedInputInfo);
         hcatSnapshot = HBaseRevisionManagerUtil.convertSnapshot(hbaseSnapshot, inputInfo.getTableInfo());
@@ -139,5 +138,4 @@ public class TestSnapshots extends SkeletonHBaseTest {
         cmdResponse = hcatDriver.run(dropDatabase);
         assertEquals(0, cmdResponse.getResponseCode());
     }
-
 }

@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * serialized and written into the JobContext configuration. The inputInfo is also updated with
  * info required in the client process context.
  */
-public class InitializeInput {
+class InitializeInput {
 
     private static final Logger LOG = LoggerFactory.getLogger(InitializeInput.class);
 
@@ -80,8 +80,8 @@ public class InitializeInput {
         InputJobInfo inputJobInfo = InputJobInfo.create(
             theirInputJobInfo.getDatabaseName(),
             theirInputJobInfo.getTableName(),
-            theirInputJobInfo.getFilter());
-        inputJobInfo.getProperties().putAll(theirInputJobInfo.getProperties());
+            theirInputJobInfo.getFilter(),
+            theirInputJobInfo.getProperties());
         conf.set(
             HCatConstants.HCAT_KEY_JOB_INFO,
             HCatUtil.serialize(getInputJobInfo(conf, inputJobInfo, null)));

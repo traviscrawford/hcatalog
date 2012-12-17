@@ -59,7 +59,7 @@ public class HCatTable {
         }
         partCols = new ArrayList<HCatFieldSchema>();
         for (FieldSchema colFS : hiveTable.getPartitionKeys()) {
-            cols.add(HCatSchemaUtils.getHCatFieldSchema(colFS));
+            partCols.add(HCatSchemaUtils.getHCatFieldSchema(colFS));
         }
         bucketCols = hiveTable.getSd().getBucketCols();
         sortCols = hiveTable.getSd().getSortCols();

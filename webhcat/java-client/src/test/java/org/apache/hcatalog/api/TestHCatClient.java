@@ -37,6 +37,7 @@ import org.apache.hadoop.hive.serde2.columnar.ColumnarSerDe;
 import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hcatalog.cli.SemanticAnalysis.HCatSemanticAnalyzer;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hcatalog.common.HCatConstants;
 import org.apache.hcatalog.common.HCatException;
 import org.apache.hcatalog.data.schema.HCatFieldSchema;
 import org.apache.hcatalog.data.schema.HCatFieldSchema.Type;
@@ -47,8 +48,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertArrayEquals;
 
 public class TestHCatClient {
     private static final Logger LOG = LoggerFactory.getLogger(TestHCatClient.class);
@@ -201,7 +204,7 @@ public class TestHCatClient {
 
         Map<String, String> thirdPtn = new HashMap<String, String>();
         thirdPtn.put("dt", "04/13/2012");
-        thirdPtn.put("country", "argetina");
+        thirdPtn.put("country", "argentina");
         HCatAddPartitionDesc addPtn3 = HCatAddPartitionDesc.create(dbName,
             tableName, null, thirdPtn).build();
         client.addPartition(addPtn3);
@@ -219,7 +222,7 @@ public class TestHCatClient {
         assertTrue(ptnList.size() == 2);
 
         List<HCatPartition> ptnListTwo = client.listPartitionsByFilter(dbName,
-            tableName, "country = \"argetina\"");
+            tableName, "country = \"argentina\"");
         assertTrue(ptnListTwo.size() == 1);
 
         client.markPartitionForEvent(dbName, tableName, thirdPtn,
@@ -401,6 +404,133 @@ public class TestHCatClient {
         catch (Exception exception) {
             LOG.error("Unexpected exception.", exception);
             assertTrue("Unexpected exception: " + exception.getMessage(), false);
+        }
+    }
+
+    @Test
+    public void testObjectNotFoundException() throws Exception {
+        try {
+
+            HCatClient client = HCatClient.create(new  Configuration(hcatConf));
+            String dbName = "testObjectNotFoundException_DBName";
+            String tableName = "testObjectNotFoundException_TableName";
+            client.dropDatabase(dbName, true, HCatClient.DropDBMode.CASCADE);
+
+            try {    // Test that fetching a non-existent db-name yields ObjectNotFound.
+                client.getDatabase(dbName);
+                assertTrue("Expected ObjectNotFoundException.", false);
+            } catch(Exception exception) {
+                LOG.info("Got exception: ", exception);
+                assertTrue("Expected ObjectNotFoundException. Got:" + exception.getClass(),
+                        exception instanceof ObjectNotFoundException);
+            }
+
+            client.createDatabase(HCatCreateDBDesc.create(dbName).build());
+
+            try {   // Test that fetching a non-existent table-name yields ObjectNotFound.
+                client.getTable(dbName, tableName);
+                assertTrue("Expected ObjectNotFoundException.", false);
+            } catch(Exception exception) {
+                LOG.info("Got exception: ", exception);
+                assertTrue("Expected ObjectNotFoundException. Got:" + exception.getClass(),
+                        exception instanceof ObjectNotFoundException);
+            }
+
+            String partitionColumn = "part";
+
+            List<HCatFieldSchema> columns = Arrays.asList(new HCatFieldSchema("col", Type.STRING, ""));
+            ArrayList<HCatFieldSchema> partitionColumns = new ArrayList<HCatFieldSchema>(
+                    Arrays.asList(new HCatFieldSchema(partitionColumn, Type.STRING, "")));
+            client.createTable(HCatCreateTableDesc.create(dbName, tableName, columns)
+                    .partCols(partitionColumns)
+                    .build());
+
+            Map<String, String> partitionSpec = new HashMap<String, String>();
+            partitionSpec.put(partitionColumn, "foobar");
+            try {  // Test that fetching a non-existent partition yields ObjectNotFound.
+                client.getPartition(dbName, tableName, partitionSpec);
+                assertTrue("Expected ObjectNotFoundException.", false);
+            } catch(Exception exception) {
+                LOG.info("Got exception: ", exception);
+                assertTrue("Expected ObjectNotFoundException. Got:" + exception.getClass(),
+                        exception instanceof ObjectNotFoundException);
+            }
+
+            client.addPartition(HCatAddPartitionDesc.create(dbName, tableName, "", partitionSpec).build());
+
+            // Test that listPartitionsByFilter() returns an empty-set, if the filter selects no partitions.
+            assertEquals("Expected empty set of partitions.",
+                    0, client.listPartitionsByFilter(dbName, tableName, partitionColumn + " < 'foobar'").size());
+
+            try {  // Test that listPartitionsByFilter() throws HCatException if the partition-key is incorrect.
+                partitionSpec.put("NonExistentKey", "foobar");
+                client.getPartition(dbName, tableName, partitionSpec);
+                assertTrue("Expected HCatException.", false);
+            } catch(Exception exception) {
+                LOG.info("Got exception: ", exception);
+                assertTrue("Expected HCatException. Got:" + exception.getClass(),
+                        exception instanceof HCatException);
+                assertFalse("Did not expect ObjectNotFoundException.", exception instanceof ObjectNotFoundException);
+            }
+
+        }
+        catch (Throwable t) {
+            LOG.error("Unexpected exception!", t);
+            assertTrue("Unexpected exception! " + t.getMessage(), false);
+        }
+    }
+
+    @Test
+    public void testGetMessageBusTopicName() throws Exception {
+        try {
+            HCatClient client = HCatClient.create(new Configuration(hcatConf));
+            String dbName = "testGetMessageBusTopicName_DBName";
+            String tableName = "testGetMessageBusTopicName_TableName";
+            client.dropDatabase(dbName, true, HCatClient.DropDBMode.CASCADE);
+            client.createDatabase(HCatCreateDBDesc.create(dbName).build());
+            String messageBusTopicName = "MY.topic.name";
+            Map<String, String> tableProperties = new HashMap<String, String>(1);
+            tableProperties.put(HCatConstants.HCAT_MSGBUS_TOPIC_NAME, messageBusTopicName);
+            client.createTable(HCatCreateTableDesc.create(dbName, tableName, Arrays.asList(new HCatFieldSchema("foo", Type.STRING, ""))).tblProps(tableProperties).build());
+
+            assertEquals("MessageBus topic-name doesn't match!", messageBusTopicName, client.getMessageBusTopicName(dbName, tableName));
+            client.dropDatabase(dbName, true, HCatClient.DropDBMode.CASCADE);
+            client.close();
+        }
+        catch (Exception exception) {
+            LOG.error("Unexpected exception.", exception);
+            assertTrue("Unexpected exception:" + exception.getMessage(), false);
+        }
+    }
+
+    @Test
+    public void testPartitionSchema() throws Exception {
+        try {
+            HCatClient client = HCatClient.create(new Configuration(hcatConf));
+            final String dbName = "myDb";
+            final String tableName = "myTable";
+
+            client.dropDatabase(dbName, true, HCatClient.DropDBMode.CASCADE);
+
+            client.createDatabase(HCatCreateDBDesc.create(dbName).build());
+            List<HCatFieldSchema> columnSchema = Arrays.asList(new HCatFieldSchema("foo", Type.INT, ""),
+                    new HCatFieldSchema("bar", Type.STRING, ""));
+
+            List<HCatFieldSchema> partitionSchema = Arrays.asList(new HCatFieldSchema("dt", Type.STRING, ""),
+                    new HCatFieldSchema("grid", Type.STRING, ""));
+
+            client.createTable(HCatCreateTableDesc.create(dbName, tableName, columnSchema).partCols(partitionSchema).build());
+
+            HCatTable table = client.getTable(dbName, tableName);
+            List<HCatFieldSchema> partitionColumns = table.getPartCols();
+
+            assertArrayEquals("Didn't get expected partition-schema back from the HCatTable.",
+                    partitionSchema.toArray(), partitionColumns.toArray());
+            client.dropDatabase(dbName, false, HCatClient.DropDBMode.CASCADE);
+        }
+        catch (Exception unexpected) {
+            LOG.error("Unexpected exception!", unexpected);
+            assertTrue("Unexpected exception! " + unexpected.getMessage(), false);
         }
     }
 }
