@@ -32,8 +32,9 @@
                 config="${path.to.basedir}/build-support/checkstyle/coding_style.xml">
       <fileset dir="${basedir}">
           <exclude name="**/build/**"/>
-          <exclude name="**/license/*-LICENSE.txt"/>
+          <exclude name=".idea/**"/>
           <exclude name="build-support/checkstyle/apache_header.txt"/>
+          <exclude name="license/*-LICENSE.txt"/>
           <exclude name="src/docs/src/documentation/**"/>
           <exclude name="src/packages/**"/> <!-- TODO: delete packages configs -->
           <exclude name="src/test/e2e/hcatalog/data/**"/>
