@@ -29,6 +29,7 @@ import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
 import org.apache.hadoop.hive.metastore.api.SerDeInfo;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hcatalog.NoExitSecurityManager;
 import org.apache.hcatalog.cli.SemanticAnalysis.HCatSemanticAnalyzer;
 import org.apache.thrift.TException;
@@ -192,7 +193,7 @@ public class TestHiveClientCache {
         client.createDatabase(new Database(DB_NAME, "", null, null));
 
         List<FieldSchema> fields = new ArrayList<FieldSchema>();
-        fields.add(new FieldSchema("colname", org.apache.hadoop.hive.serde.Constants.STRING_TYPE_NAME, ""));
+        fields.add(new FieldSchema("colname", serdeConstants.STRING_TYPE_NAME, ""));
         Table tbl = new Table();
         tbl.setDbName(DB_NAME);
         tbl.setTableName(LONG_TABLE_NAME);
@@ -225,7 +226,8 @@ public class TestHiveClientCache {
             hiveConf.set("hive.metastore.local", "false");
             hiveConf.setVar(HiveConf.ConfVars.METASTOREURIS, "thrift://localhost:"
                     + MS_PORT);
-            hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTRETRIES, 3);
+            hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES, 3);
+            hiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTFAILURERETRIES, 3);
             hiveConf.set(HiveConf.ConfVars.SEMANTIC_ANALYZER_HOOK.varname,
                     HCatSemanticAnalyzer.class.getName());
             hiveConf.set(HiveConf.ConfVars.PREEXECHOOKS.varname, "");

@@ -89,7 +89,8 @@ public class TestHCatClient {
         hcatConf.set("hive.metastore.local", "false");
         hcatConf.setVar(HiveConf.ConfVars.METASTOREURIS, "thrift://localhost:"
             + msPort);
-        hcatConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTRETRIES, 3);
+        hcatConf.setIntVar(ConfVars.METASTORETHRIFTCONNECTIONRETRIES, 3);
+        hcatConf.setIntVar(ConfVars.METASTORETHRIFTFAILURERETRIES, 3);
         hcatConf.set(HiveConf.ConfVars.SEMANTIC_ANALYZER_HOOK.varname,
             HCatSemanticAnalyzer.class.getName());
         hcatConf.set(HiveConf.ConfVars.PREEXECHOOKS.varname, "");
