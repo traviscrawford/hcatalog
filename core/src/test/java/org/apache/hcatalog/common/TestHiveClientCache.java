@@ -43,6 +43,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,6 +166,7 @@ public class TestHiveClientCache {
      * Test that a long table name actually breaks the HMSC. Subsequently check that isOpen() reflects
      * and tells if the client is broken
      */
+    @Ignore("hangs indefinitely")
     @Test
     public void testHMSCBreakability() throws IOException, MetaException, LoginException, TException, AlreadyExistsException,
             InvalidObjectException, NoSuchObjectException, InterruptedException {
