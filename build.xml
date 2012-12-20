@@ -49,6 +49,9 @@
     <property name="package.buildroot" value="${build.dir}/rpm/hcatalog_package_build_${user.name}"/>
     <property name="package.build.dir" value="${build.dir}/rpm/hcatalog_package_build_${user.name}/BUILD"/>
 
+    <!-- rats properties -->
+    <property name="rat.reporting.classname" value="rat.Report"/>
+
     <target name="init">
         <mkdir dir="${dist.dir}"/>
     </target>
@@ -379,6 +382,13 @@
             <arg value="${final.name}"/>
         </exec>
         <checksum file="${build.dir}/${final.name}.tar.gz" forceOverwrite="yes"/>
+    </target>
+
+    <target name="releaseaudit" description="Release Audit activities">
+        <java classname="${rat.reporting.classname}" fork="true">
+            <classpath refid="releaseaudit.classpath"/>
+            <arg value="${basedir}/src"/>
+        </java>
     </target>
 
     <!-- ================================================================== -->
