@@ -9,11 +9,12 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.hcatalog.mapreduce;
 
@@ -69,6 +70,7 @@ public class InputJobInfo implements Serializable {
      * @param databaseName the db name
      * @param tableName the table name
      * @param filter the partition filter
+     * @param properties implementation specific job properties
      */
     public static InputJobInfo create(String databaseName,
                                       String tableName,
@@ -76,6 +78,21 @@ public class InputJobInfo implements Serializable {
                                       Properties properties) {
         return new InputJobInfo(databaseName, tableName, filter, properties);
     }
+
+    /**
+     * Initializes a new InputJobInfo
+     * for reading data from a table.
+     * @param databaseName the db name
+     * @param tableName the table name
+     * @param filter the partition filter
+     */
+    @Deprecated
+    public static InputJobInfo create(String databaseName,
+                                      String tableName,
+                                      String filter) {
+        return create(databaseName, tableName, filter, null);
+    }
+
 
     private InputJobInfo(String databaseName,
                          String tableName,

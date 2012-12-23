@@ -9,11 +9,12 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.apache.hcatalog.har;
@@ -23,7 +24,7 @@ import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hive.metastore.api.Constants;
+import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.tools.HadoopArchives;
@@ -47,7 +48,7 @@ public class HarOutputCommitterPostProcessor {
     public void exec(JobContext context, Partition partition, Path partPath) throws IOException {
 //    LOG.info("Archiving partition ["+partPath.toString()+"]");
         makeHar(context, partPath.toUri().toString(), harFile(partPath));
-        partition.getParameters().put(Constants.IS_ARCHIVED, "true");
+        partition.getParameters().put(hive_metastoreConstants.IS_ARCHIVED, "true");
     }
 
     public String harFile(Path ptnPath) throws IOException {

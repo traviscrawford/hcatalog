@@ -9,11 +9,12 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.apache.hcatalog.rcfile;
@@ -30,7 +31,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.ql.io.RCFile;
 import org.apache.hadoop.hive.ql.io.RCFileOutputFormat;
-import org.apache.hadoop.hive.serde.Constants;
+import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.columnar.BytesRefArrayWritable;
 import org.apache.hadoop.hive.serde2.columnar.BytesRefWritable;
 import org.apache.hadoop.hive.serde2.columnar.ColumnarSerDe;
@@ -160,12 +161,12 @@ public class TestRCFileMapReduceInputFormat extends TestCase {
         Properties tbl = new Properties();
 
         // Set the configuration parameters
-        tbl.setProperty(Constants.SERIALIZATION_FORMAT, "9");
+        tbl.setProperty(serdeConstants.SERIALIZATION_FORMAT, "9");
         tbl.setProperty("columns",
             "abyte,ashort,aint,along,adouble,astring,anullint,anullstring");
         tbl.setProperty("columns.types",
             "tinyint:smallint:int:bigint:double:string:int:string");
-        tbl.setProperty(Constants.SERIALIZATION_NULL_FORMAT, "NULL");
+        tbl.setProperty(serdeConstants.SERIALIZATION_NULL_FORMAT, "NULL");
         return tbl;
     }
 

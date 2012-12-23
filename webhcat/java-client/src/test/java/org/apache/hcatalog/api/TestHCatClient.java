@@ -9,11 +9,12 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.hcatalog.api;
 
@@ -89,7 +90,7 @@ public class TestHCatClient {
         hcatConf.set("hive.metastore.local", "false");
         hcatConf.setVar(HiveConf.ConfVars.METASTOREURIS, "thrift://localhost:"
             + msPort);
-        hcatConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTRETRIES, 3);
+        hcatConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES, 3);
         hcatConf.set(HiveConf.ConfVars.SEMANTIC_ANALYZER_HOOK.varname,
             HCatSemanticAnalyzer.class.getName());
         hcatConf.set(HiveConf.ConfVars.PREEXECHOOKS.varname, "");
@@ -215,7 +216,7 @@ public class TestHCatClient {
         HCatPartition ptn = client.getPartition(dbName, tableName, firstPtn);
         assertTrue(ptn != null);
 
-        client.dropPartition(dbName, tableName, firstPtn, true);
+        client.dropPartitions(dbName, tableName, firstPtn, true);
         ptnList = client.listPartitionsByFilter(dbName,
             tableName, null);
         assertTrue(ptnList.size() == 2);
@@ -284,7 +285,8 @@ public class TestHCatClient {
         try {
             client.getTable(null, tableName);
         } catch (HCatException exp) {
-            assertTrue(exp.getMessage().contains("NoSuchObjectException while fetching table"));
+            assertTrue("Unexpected exception message: " + exp.getMessage(),
+                    exp.getMessage().contains("NoSuchObjectException while fetching table"));
         }
         HCatTable newTable = client.getTable(null, newName);
         assertTrue(newTable != null);
@@ -308,7 +310,7 @@ public class TestHCatClient {
             client.createTable(tableDesc);
         } catch (Exception exp) {
             isExceptionCaught = true;
-            assertTrue(exp instanceof ConnectionFailureException);
+            assertEquals("Unexpected exception type.", HCatException.class, exp.getClass());
             // The connection was closed, so create a new one.
             client = HCatClient.create(new Configuration(hcatConf));
             String newName = "goodTable";
@@ -532,4 +534,103 @@ public class TestHCatClient {
             assertTrue("Unexpected exception! " + unexpected.getMessage(), false);
         }
     }
+
+    @Test
+    public void testGetPartitionsWithPartialSpec() throws Exception {
+        try {
+            HCatClient client = HCatClient.create(new Configuration(hcatConf));
+            final String dbName = "myDb";
+            final String tableName = "myTable";
+
+            client.dropDatabase(dbName, true, HCatClient.DropDBMode.CASCADE);
+
+            client.createDatabase(HCatCreateDBDesc.create(dbName).build());
+            List<HCatFieldSchema> columnSchema = Arrays.asList(new HCatFieldSchema("foo", Type.INT, ""),
+                    new HCatFieldSchema("bar", Type.STRING, ""));
+
+            List<HCatFieldSchema> partitionSchema = Arrays.asList(new HCatFieldSchema("dt", Type.STRING, ""),
+                    new HCatFieldSchema("grid", Type.STRING, ""));
+
+            client.createTable(HCatCreateTableDesc.create(dbName, tableName, columnSchema).partCols(new ArrayList<HCatFieldSchema>(partitionSchema)).build());
+
+            Map<String, String> partitionSpec = new HashMap<String, String>();
+            partitionSpec.put("grid", "AB");
+            partitionSpec.put("dt", "2011_12_31");
+            client.addPartition(HCatAddPartitionDesc.create(dbName, tableName, "", partitionSpec).build());
+            partitionSpec.put("grid", "AB");
+            partitionSpec.put("dt", "2012_01_01");
+            client.addPartition(HCatAddPartitionDesc.create(dbName, tableName, "", partitionSpec).build());
+            partitionSpec.put("dt", "2012_01_01");
+            partitionSpec.put("grid", "OB");
+            client.addPartition(HCatAddPartitionDesc.create(dbName, tableName, "", partitionSpec).build());
+            partitionSpec.put("dt", "2012_01_01");
+            partitionSpec.put("grid", "XB");
+            client.addPartition(HCatAddPartitionDesc.create(dbName, tableName, "", partitionSpec).build());
+
+            Map<String, String> partialPartitionSpec = new HashMap<String, String>();
+            partialPartitionSpec.put("dt", "2012_01_01");
+
+            List<HCatPartition> partitions = client.getPartitions(dbName, tableName, partialPartitionSpec);
+            assertEquals("Unexpected number of partitions.", 3, partitions.size());
+            assertArrayEquals("Mismatched partition.", new String[]{"2012_01_01", "AB"}, partitions.get(0).getValues().toArray());
+            assertArrayEquals("Mismatched partition.", new String[]{"2012_01_01", "OB"}, partitions.get(1).getValues().toArray());
+            assertArrayEquals("Mismatched partition.", new String[]{"2012_01_01", "XB"}, partitions.get(2).getValues().toArray());
+
+            client.dropDatabase(dbName, false, HCatClient.DropDBMode.CASCADE);
+        }
+        catch (Exception unexpected) {
+            LOG.error("Unexpected exception!", unexpected);
+            assertTrue("Unexpected exception! " + unexpected.getMessage(), false);
+        }
+    }
+
+    @Test
+    public void testDropPartitionsWithPartialSpec() throws Exception {
+        try {
+            HCatClient client = HCatClient.create(new Configuration(hcatConf));
+            final String dbName = "myDb";
+            final String tableName = "myTable";
+
+            client.dropDatabase(dbName, true, HCatClient.DropDBMode.CASCADE);
+
+            client.createDatabase(HCatCreateDBDesc.create(dbName).build());
+            List<HCatFieldSchema> columnSchema = Arrays.asList(new HCatFieldSchema("foo", Type.INT, ""),
+                    new HCatFieldSchema("bar", Type.STRING, ""));
+
+            List<HCatFieldSchema> partitionSchema = Arrays.asList(new HCatFieldSchema("dt", Type.STRING, ""),
+                    new HCatFieldSchema("grid", Type.STRING, ""));
+
+            client.createTable(HCatCreateTableDesc.create(dbName, tableName, columnSchema).partCols(new ArrayList<HCatFieldSchema>(partitionSchema)).build());
+
+            Map<String, String> partitionSpec = new HashMap<String, String>();
+            partitionSpec.put("grid", "AB");
+            partitionSpec.put("dt", "2011_12_31");
+            client.addPartition(HCatAddPartitionDesc.create(dbName, tableName, "", partitionSpec).build());
+            partitionSpec.put("grid", "AB");
+            partitionSpec.put("dt", "2012_01_01");
+            client.addPartition(HCatAddPartitionDesc.create(dbName, tableName, "", partitionSpec).build());
+            partitionSpec.put("dt", "2012_01_01");
+            partitionSpec.put("grid", "OB");
+            client.addPartition(HCatAddPartitionDesc.create(dbName, tableName, "", partitionSpec).build());
+            partitionSpec.put("dt", "2012_01_01");
+            partitionSpec.put("grid", "XB");
+            client.addPartition(HCatAddPartitionDesc.create(dbName, tableName, "", partitionSpec).build());
+
+            Map<String, String> partialPartitionSpec = new HashMap<String, String>();
+            partialPartitionSpec.put("dt", "2012_01_01");
+
+            client.dropPartitions(dbName, tableName, partialPartitionSpec, true);
+
+            List<HCatPartition> partitions = client.getPartitions(dbName, tableName);
+            assertEquals("Unexpected number of partitions.", 1, partitions.size());
+            assertArrayEquals("Mismatched partition.", new String[]{"2011_12_31", "AB"}, partitions.get(0).getValues().toArray());
+
+            client.dropDatabase(dbName, false, HCatClient.DropDBMode.CASCADE);
+        }
+        catch (Exception unexpected) {
+            LOG.error("Unexpected exception!", unexpected);
+            assertTrue("Unexpected exception! " + unexpected.getMessage(), false);
+        }
+    }
+
 }

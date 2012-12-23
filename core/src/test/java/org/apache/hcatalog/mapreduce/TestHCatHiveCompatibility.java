@@ -9,11 +9,12 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.apache.hcatalog.mapreduce;
@@ -27,7 +28,6 @@ import junit.framework.Assert;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hcatalog.common.HCatConstants;
-import org.apache.hcatalog.pig.HCatLoader;
 import org.apache.pig.ExecType;
 import org.apache.pig.PigServer;
 import org.apache.pig.data.Tuple;
@@ -63,7 +63,7 @@ public class TestHCatHiveCompatibility extends HCatBaseTest {
         PigServer server = new PigServer(ExecType.LOCAL);
         logAndRegister(server, "A = load '" + INPUT_FILE_NAME + "' as (a:int);");
         logAndRegister(server, "store A into 'default.junit_unparted_noisd' using org.apache.hcatalog.pig.HCatStorer();");
-        logAndRegister(server, "B = load 'default.junit_unparted_noisd' using " + HCatLoader.class.getName() + "();");
+        logAndRegister(server, "B = load 'default.junit_unparted_noisd' using org.apache.hcatalog.pig.HCatLoader();");
         Iterator<Tuple> itr = server.openIterator("B");
 
         int i = 0;
@@ -99,7 +99,7 @@ public class TestHCatHiveCompatibility extends HCatBaseTest {
         PigServer server = new PigServer(ExecType.LOCAL);
         logAndRegister(server, "A = load '" + INPUT_FILE_NAME + "' as (a:int);");
         logAndRegister(server, "store A into 'default.junit_parted_noisd' using org.apache.hcatalog.pig.HCatStorer('b=42');");
-        logAndRegister(server, "B = load 'default.junit_parted_noisd' using " + HCatLoader.class.getName() + "();");
+        logAndRegister(server, "B = load 'default.junit_parted_noisd' using org.apache.hcatalog.pig.HCatLoader();");
         Iterator<Tuple> itr = server.openIterator("B");
 
         int i = 0;
