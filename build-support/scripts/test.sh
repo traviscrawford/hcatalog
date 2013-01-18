@@ -45,17 +45,17 @@ cmd='ant clean src-release'
 run_cmd
 
 cd build
-tar -xzvf hcatalog-src-*.tar.gz
+tar -xzf hcatalog-src-*.tar.gz
 cd hcatalog-src-*
 echo "Running tests from $(pwd)"
 
 # Build with hadoop23, but do not run tests as they do not pass.
-cmd='ant -v clean package -Dmvn.hadoop.profile=hadoop23'
+cmd='ant clean package -Dmvn.hadoop.profile=hadoop23'
 run_cmd
 
 # Build and run tests with hadoop20. This must happen afterwards so test results
 # are available for CI to publish.
-cmd='ant -Dtest.junit.output.format=xml clean package test'
+cmd='ant -Dtest.junit.output.format=xml clean package releaseaudit test'
 if [ "${HUDSON_URL}" == "https://builds.apache.org/" ]; then
   cmd="${cmd} mvn-deploy"
 fi
