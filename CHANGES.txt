@@ -59,6 +59,8 @@ Release 0.5.0 - Unreleased
   HCAT-427 Document storage-based authorization (lefty via gates)
 
   IMPROVEMENTS
+  HCAT-604 add flexibility wrt. location of PID/LOG files (rvs via traviscrawford)
+
   HCAT-602 release notes for hcatalog 0.0.5 (traviscrawford)
 
   HCAT-595 Update hcatalog hive dependency to 0.10.0 (traviscrawford)
@@ -178,6 +180,12 @@ Release 0.5.0 - Unreleased
   OPTIMIZATIONS
 
   BUG FIXES
+  HCAT-608 exclude data files from hcatalog release audit report (traviscrawford)
+
+  HCAT-606 remove hcatalog test includes/excludes files (traviscrawford)
+
+  HCAT-599 NotificationListener doesn't use getTopic() for sending messages. (mithun via traviscrawford)
+
   HCAT-605 HCatalog release script does not update version in build.properties (traviscrawford)
 
   HCAT-603 releaseaudit should run before generating artifacts (traviscrawford)
